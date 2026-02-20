@@ -26,8 +26,8 @@ jobs:
 
       - name: Build Web
         run: |
-          # Note: If you have a custom domain, add: echo "yourdomain.com" > build/web/CNAME
           flutter build web --release
+          echo "grid.bramp.net" > build/web/CNAME
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
