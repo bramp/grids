@@ -10,7 +10,7 @@
 * **Tooling**: `pre-commit` hooks for automatic formatting (`dart format`) and linting (`flutter analyze`), conforming to typical code standards.
 
 ## Architecture Guidelines
-The app will use a feature-first architecture, leveraging a robust state management solution (e.g., `Provider` or `Riverpod`) to keep UI cleanly separated from puzzle logic. The separation ensures the puzzle core can completely work headless.
+The app will use a feature-first architecture, leveraging a robust state management solution (e.g., `Provider`) to keep UI cleanly separated from puzzle logic. The separation ensures the puzzle core can completely work headless.
 
 ### 1. Domain / Puzzle Engine (`lib/engine/`)
 This is the core logic. It must be highly testable without any UI dependencies.

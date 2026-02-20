@@ -18,9 +18,9 @@ Multiple mechanics can intersect in a single grid. The current planned mechanics
 * **Interaction**: The player must create boundaries through toggling, isolating the diamonds appropriately into different contiguous areas to ensure they are paired correctly.
 
 ### 2. Strict Number Areas
-* **Visual**: Specific cells contain a number and a color.
+* **Visual**: Specific cells contain a number.
 * **Rule**: The contiguous area (whether it is lit or unlit) containing this numbered cell must consist of exactly that number of cells.
-* **Combination**: Multiple numbered cells can share the exact same contiguous area *if and only if* they have the same color. If combined, the total area size must exactly equal the sum of those numbers. (For example, a red '2' and a red '3' in the same area means that area must be exactly 5 cells large).
+* **Combination**: Multiple numbered cells can share the exact same contiguous area. If combined, the total area size must exactly equal the sum of those numbers. (For example, a '2' and a '3' in the same area means that area must be exactly 5 cells large).
 
 ## Progression
 * **Main Campaign**: A sequence of static, hand-crafted puzzles with a carefully designed difficulty curve to introduce mechanics natively.

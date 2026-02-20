@@ -1,17 +1,31 @@
-# grids
+# Grids
 
-A new Flutter project.
+"Grids" is an interactive, grid-based puzzle game inspired by Taiji and The Witness. Built cross-platform with Flutter using modern, strict Dart testing environments and `provider` state management.
 
-## Getting Started
+## Documentation
 
-This project is a starting point for a Flutter application.
+* [Game Design Document](docs/game_design.md): Explains the overarching puzzle rules, how different grid mechanics work, and rule logic.
+* [Architecture Design Document](docs/architecture_design.md): High-level overview of the application components and tech stack.
+* [TODO Tracker](TODO.md): Track the immediate goals and task progress.
 
-A few resources to get you started if this is your first Flutter project:
+## Setup & Running
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+This project uses the standard Flutter framework.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Ensure you have Flutter SDK installed (3.11.0 or newer).
+2. Install packages:
+   ```bash
+   flutter pub get
+   ```
+3. Run or deploy to your target emulator/browser:
+   ```bash
+   flutter run -d chrome
+   ```
+   (Alternatively, use `-d macos` or an iPhone/Android emulator).
+
+## Testing
+
+The core engine is 100% decoupled from the UI, so it is extensively tested via unit tests. Run all tests locally with:
+```bash
+flutter test
+```
