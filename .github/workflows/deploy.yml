@@ -1,0 +1,36 @@
+name: Deploy to GitHub Pages
+
+# Disabling automatic triggers for now as requested.
+# Can be run manually via the Actions tab.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Build Web
+        run: |
+          # Note: If you have a custom domain, add: echo "yourdomain.com" > build/web/CNAME
+          flutter build web --release
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
