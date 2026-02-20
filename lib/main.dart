@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:grids/engine/rule_validator.dart';
 import 'package:grids/providers/puzzle_provider.dart';
+import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_widget.dart';
+import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => PuzzleProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => PuzzleProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
       child: const GridsApp(),
     ),
   );
@@ -50,8 +55,38 @@ class GameScreen extends StatelessWidget {
       (p) => p.hasPreviousLevel,
     );
 
+    final themeProvider = context.watch<ThemeProvider>();
+    final activeTheme = themeProvider.activeTheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text(puzzleName), centerTitle: true),
+      backgroundColor: activeTheme.backgroundColor,
+      appBar: AppBar(
+        title: Text(puzzleName),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: DropdownButton<PuzzleTheme>(
+              value: activeTheme,
+              underline: const SizedBox.shrink(),
+              icon: const Icon(Icons.palette),
+              onChanged: (theme) {
+                if (theme != null) {
+                  themeProvider.setTheme(theme);
+                }
+              },
+              items: themeProvider.availableThemes
+                  .map(
+                    (t) => DropdownMenuItem(
+                      value: t,
+                      child: Text(t.name),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(

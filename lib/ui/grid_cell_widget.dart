@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/providers/puzzle_provider.dart';
-import 'package:grids/ui/cell_symbol_renderer.dart';
+import 'package:grids/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class GridCellWidget extends StatelessWidget {
@@ -26,25 +26,27 @@ class GridCellWidget extends StatelessWidget {
       (p) => p.grid.isLocked(point),
     );
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      decoration: BoxDecoration(
-        // Subtle border for the grid lines
-        border: Border.all(
-          color: isLocked ? Colors.white54 : Colors.white12,
-          width: isLocked ? 2 : 1,
-        ),
-        // Change color based on lit state, highlighting failing cells as red
-        color: hasError
-            ? Colors.red.withValues(alpha: isLit ? 0.9 : 0.4)
-            : isLit
-            ? (isLocked ? Colors.indigoAccent : Colors.blueAccent)
-            : (isLocked ? Colors.black : Colors.grey[900]),
-        borderRadius: isLocked ? BorderRadius.circular(4) : null,
-      ),
-      child: Center(
-        child: CellSymbolRenderer(cell: mechanic),
+    final theme = context.watch<ThemeProvider>().activeTheme;
+
+    Widget mechanicWidget = const SizedBox.shrink();
+    if (mechanic is NumberCell) {
+      mechanicWidget = theme.buildNumberMechanic(context, mechanic);
+    } else if (mechanic is DiamondCell) {
+      mechanicWidget = theme.buildDiamondMechanic(context, mechanic);
+    }
+
+    final paddedCell = Padding(
+      padding: EdgeInsets.all(theme.cellPadding),
+      child: theme.buildCellBackground(
+        context,
+        mechanic: mechanic,
+        isLocked: isLocked,
+        isLit: isLit,
+        hasError: hasError,
+        child: Center(child: mechanicWidget),
       ),
     );
+
+    return paddedCell;
   }
 }

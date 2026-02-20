@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/providers/puzzle_provider.dart';
+import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_cell_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ class GridWidget extends StatelessWidget {
     // Read dimensions from the provider, listening for changes
     final width = context.select<PuzzleProvider, int>((p) => p.grid.width);
     final height = context.select<PuzzleProvider, int>((p) => p.grid.height);
+    final theme = context.watch<ThemeProvider>().activeTheme;
 
     // We use a LayoutBuilder to ensure the grid cells remain perfectly square
     return LayoutBuilder(
@@ -58,10 +60,13 @@ class GridWidget extends StatelessWidget {
               onPanEnd: (_) => context.read<PuzzleProvider>().endDrag(),
               behavior: HitTestBehavior.opaque,
               child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 4),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                padding: theme.gridPadding,
+                decoration:
+                    theme.gridBackgroundDecoration ??
+                    BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: Column(
