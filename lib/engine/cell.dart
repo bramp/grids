@@ -8,6 +8,9 @@ abstract class Cell {
 
   /// Returns a copy of this cell with isLocked set to true.
   Cell lock();
+
+  /// Returns a copy of this cell with the specified color.
+  Cell withColor(CellColor? color);
 }
 
 /// A cell representing a blank space that can be locked (immutable).
@@ -16,6 +19,9 @@ class BlankCell extends Cell {
 
   @override
   Cell lock() => const BlankCell(isLocked: true);
+
+  @override
+  Cell withColor(CellColor? color) => this; // Blank cells don't have color.
 
   @override
   bool operator ==(Object other) =>
@@ -43,6 +49,10 @@ class DiamondCell extends Cell {
   Cell lock() => DiamondCell(color, isLocked: true);
 
   @override
+  Cell withColor(CellColor? color) =>
+      DiamondCell(color ?? this.color, isLocked: isLocked);
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DiamondCell &&
@@ -59,11 +69,16 @@ class DiamondCell extends Cell {
 
 /// The Strict Number cell.
 class NumberCell extends Cell {
-  const NumberCell(this.number, {super.isLocked = false});
+  const NumberCell(this.number, {this.color, super.isLocked = false});
   final int number;
+  final CellColor? color;
 
   @override
-  Cell lock() => NumberCell(number, isLocked: true);
+  Cell lock() => NumberCell(number, color: color, isLocked: true);
+
+  @override
+  Cell withColor(CellColor? color) =>
+      NumberCell(number, color: color, isLocked: isLocked);
 
   @override
   bool operator ==(Object other) =>
@@ -71,11 +86,12 @@ class NumberCell extends Cell {
       other is NumberCell &&
           runtimeType == other.runtimeType &&
           number == other.number &&
+          color == other.color &&
           isLocked == other.isLocked;
 
   @override
-  int get hashCode => number.hashCode ^ isLocked.hashCode;
+  int get hashCode => number.hashCode ^ color.hashCode ^ isLocked.hashCode;
 
   @override
-  String toString() => 'Number($number)';
+  String toString() => 'Number($number, color: $color)';
 }

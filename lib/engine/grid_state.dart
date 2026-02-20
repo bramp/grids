@@ -112,8 +112,16 @@ class GridState {
         var token = parsedRows[y][x];
         var isLocked = false;
         var isLit = false;
+        CellColor? colorModifier;
 
-        // Recursive symbolic parsing (e.g., "(1*)" -> Locked + Lit + "1")
+        const colorPrefixes = {
+          'R': CellColor.red,
+          'B': CellColor.black,
+          'Y': CellColor.yellow,
+          'U': CellColor.blue,
+        };
+
+        // Recursive symbolic parsing (e.g., "(R1*)")
         while (true) {
           if (token.startsWith('(') && token.endsWith(')')) {
             isLocked = true;
@@ -130,6 +138,22 @@ class GridState {
             token = token.substring(0, token.length - 1).trim();
             continue;
           }
+
+          // Check for color prefixes (only if token is longer than 1,
+          // so 'R' remains a valid base symbol)
+          var foundColor = false;
+          if (token.length > 1) {
+            for (final prefix in colorPrefixes.keys) {
+              if (token.startsWith(prefix)) {
+                colorModifier = colorPrefixes[prefix];
+                token = token.substring(1).trim();
+                foundColor = true;
+                break;
+              }
+            }
+          }
+          if (foundColor) continue;
+
           break;
         }
 
@@ -142,6 +166,9 @@ class GridState {
         }
 
         var result = base;
+        if (colorModifier != null) {
+          result = result.copyWith(cell: result.cell.withColor(colorModifier));
+        }
         if (isLocked) {
           result = result.copyWith(cell: result.cell.lock());
         }

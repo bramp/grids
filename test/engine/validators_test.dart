@@ -234,4 +234,61 @@ void main() {
       expect(result.isValid, isTrue);
     });
   });
+
+  group('NumberColorValidator', () {
+    test('Numbers of same color in area is valid', () {
+      final grid = GridState.fromAscii(
+        '''
+        R1 R2 .
+        .  .  .
+      ''',
+        legend: const {
+          '1': CellState(cell: NumberCell(1)),
+          '2': CellState(cell: NumberCell(2)),
+          '.': CellState(),
+        },
+      );
+
+      final area = {const GridPoint(0, 0), const GridPoint(1, 0)};
+      final result = numberColorValidator(grid, area);
+      expect(result.isValid, isTrue);
+    });
+
+    test('Numbers of different colors in area is invalid', () {
+      final grid = GridState.fromAscii(
+        '''
+        R1 B2 .
+        .  .  .
+      ''',
+        legend: const {
+          '1': CellState(cell: NumberCell(1)),
+          '2': CellState(cell: NumberCell(2)),
+          '.': CellState(),
+        },
+      );
+
+      final area = {const GridPoint(0, 0), const GridPoint(1, 0)};
+      final result = numberColorValidator(grid, area);
+      expect(result.isValid, isFalse);
+      expect(result.errors.length, 2);
+    });
+
+    test('Color and null color mixed in area is invalid', () {
+      final grid = GridState.fromAscii(
+        '''
+        R1 2 .
+        .  . .
+      ''',
+        legend: const {
+          '1': CellState(cell: NumberCell(1)),
+          '2': CellState(cell: NumberCell(2)),
+          '.': CellState(),
+        },
+      );
+
+      final area = {const GridPoint(0, 0), const GridPoint(1, 0)};
+      final result = numberColorValidator(grid, area);
+      expect(result.isValid, isFalse);
+    });
+  });
 }

@@ -68,3 +68,26 @@ ValidationResult strictNumberValidator(GridState grid, Set<GridPoint> area) {
 
   return ValidationResult.success();
 }
+
+/// Validates that within any contiguous area containing numbers, all numbers
+/// must share the identical color (including null).
+ValidationResult numberColorValidator(GridState grid, Set<GridPoint> area) {
+  final numberPoints = <GridPoint>[];
+  final colors = <CellColor?>{};
+
+  for (final pt in area) {
+    final cell = grid.getMechanic(pt);
+    if (cell is NumberCell) {
+      numberPoints.add(pt);
+      colors.add(cell.color);
+    }
+  }
+
+  // If there are different colors (or color + null) in the same area, it's an
+  // error.
+  if (colors.length > 1) {
+    return ValidationResult.failure(numberPoints);
+  }
+
+  return ValidationResult.success();
+}

@@ -7,7 +7,11 @@ import 'package:grids/engine/validators.dart';
 /// of the full puzzle.
 class PuzzleValidator {
   PuzzleValidator({
-    this.validators = const [diamondValidator, strictNumberValidator],
+    this.validators = const [
+      diamondValidator,
+      strictNumberValidator,
+      numberColorValidator,
+    ],
   });
   final List<RuleValidator> validators;
 

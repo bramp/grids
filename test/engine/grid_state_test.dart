@@ -71,4 +71,31 @@ void main() {
       expect(state.getMechanic(const GridPoint(0, 1)), isA<BlankCell>());
     });
   });
+
+  group('GridState.fromAscii (Colored Symbols)', () {
+    test('supports R, B, Y, U prefixes for numbers', () {
+      final grid = GridState.fromAscii(
+        '''
+        R1 B2
+        Y3 U4
+      ''',
+        legend: const {
+          '1': CellState(cell: NumberCell(1)),
+          '2': CellState(cell: NumberCell(2)),
+          '3': CellState(cell: NumberCell(3)),
+          '4': CellState(cell: NumberCell(4)),
+        },
+      );
+
+      final n1 = grid.getMechanic(const GridPoint(0, 0)) as NumberCell;
+      final n2 = grid.getMechanic(const GridPoint(1, 0)) as NumberCell;
+      final n3 = grid.getMechanic(const GridPoint(0, 1)) as NumberCell;
+      final n4 = grid.getMechanic(const GridPoint(1, 1)) as NumberCell;
+
+      expect(n1.color, CellColor.red);
+      expect(n2.color, CellColor.black);
+      expect(n3.color, CellColor.yellow);
+      expect(n4.color, CellColor.blue);
+    });
+  });
 }

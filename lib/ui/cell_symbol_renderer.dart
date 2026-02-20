@@ -21,10 +21,12 @@ class CellSymbolRenderer extends StatelessWidget {
   Widget _buildNumber(NumberCell numberCell) {
     return Text(
       numberCell.number.toString(),
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: numberCell.color != null
+            ? _getColor(numberCell.color!)
+            : Colors.white,
       ),
     );
   }
