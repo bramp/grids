@@ -137,7 +137,7 @@ class GridState {
         if (base == null) {
           throw ArgumentError(
             "Symbol '$token' (parsed from '${parsedRows[y][x]}') "
-            "not found in legend.",
+            'not found in legend.',
           );
         }
 

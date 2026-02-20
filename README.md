@@ -29,3 +29,18 @@ The core engine is 100% decoupled from the UI, so it is extensively tested via u
 ```bash
 flutter test
 ```
+
+## Development
+
+To ensure code quality and consistency, we use [pre-commit](https://pre-commit.com/) hooks. To set them up locally:
+
+1. Install `pre-commit` (e.g., `brew install pre-commit`).
+2. Install the hooks in the repository:
+   ```bash
+   pre-commit install
+   ```
+
+The hooks will now run automatically on every `git commit`. You can also run them manually on all files:
+```bash
+pre-commit run --all-files
+```

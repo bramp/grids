@@ -92,7 +92,7 @@ class LevelRepository {
          .   1   1
       ''', legend: _legend),
     ),
-    // TODO 8
+    // TODO(bramp): level 8
     Puzzle(
       id: 'shrine_9',
       initialGrid: GridState.fromAscii('''
@@ -100,6 +100,6 @@ class LevelRepository {
          2   .
       ''', legend: _legend),
     ),
-    // TODO 10
+    // TODO(bramp): level 10
   ];
 }
