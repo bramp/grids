@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 # Disabling automatic triggers for now as requested.
 # Can be run manually via the Actions tab.
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
