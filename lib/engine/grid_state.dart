@@ -355,27 +355,28 @@ class GridState {
       }
     }
 
-    final columnWidths = List<int>.generate(width, (x) {
-      var max = 0;
+    var maxWidth = 0;
+    for (var x = 0; x < width; x++) {
       for (var y = 0; y < height; y++) {
-        if (tokens[x][y].length > max) max = tokens[x][y].length;
+        if (tokens[x][y].length > maxWidth) maxWidth = tokens[x][y].length;
       }
-      return max;
-    });
+    }
 
     final buffer = StringBuffer();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         final token = tokens[x][y];
-        final paddedToken = token.padRight(columnWidths[x]);
+        final leftPadding = (maxWidth - token.length) ~/ 2;
+        final rightPadding = maxWidth - token.length - leftPadding;
+        final alignedToken = ' ' * leftPadding + token + ' ' * rightPadding;
 
         if (useColor) {
           final cellState = cells[x][y];
           final fg = _getAnsiForeground(cellState);
           final bg = cellState.isLit ? '\x1B[48;5;18m' : '\x1B[40m';
-          buffer.write('$bg$fg$paddedToken\x1B[0m ');
+          buffer.write('$bg$fg$alignedToken\x1B[0m ');
         } else {
-          buffer.write('$paddedToken ');
+          buffer.write('$alignedToken ');
         }
       }
       buffer.writeln();

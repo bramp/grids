@@ -8,8 +8,8 @@ class LevelRepository {
   static final Map<String, CellState> legend = {
     // Empty playable cell
     '.': const CellState(),
-    '█': const CellState(isLit: true),
     '·': const CellState(),
+    '█': const CellState(isLit: true),
 
     // Diamonds
     'R': const CellState(cell: DiamondCell(CellColor.red)),
@@ -163,6 +163,47 @@ class LevelRepository {
         ''',
       ],
     ),
-    // TODO(bramp): level 10
+    // TODO(bramp): level 10-16
+    Puzzle(
+      id: 'shrine_17',
+      initialGrid: GridState.fromAscii('''
+         U1
+         Y1
+      ''', legend: legend),
+    ),
+    Puzzle(
+      id: 'shrine_18',
+      initialGrid: GridState.fromAscii('''
+         (U1) Y1
+          Y1 (*Y1)
+      ''', legend: legend),
+    ),
+    Puzzle(
+      id: 'shrine_19',
+      initialGrid: GridState.fromAscii('''
+         Y1 Y1 U1 U1
+         U1 Y1 U1 Y1
+         U1 Y1 U1 Y1
+         Y1 Y1 U1 U1
+      ''', legend: legend),
+    ),
+    Puzzle(
+      id: 'shrine_20',
+      initialGrid: GridState.fromAscii('''
+         .  .  .  .
+         .  .  U1 Y1
+         Y1 U1 .  .
+         .  .  .  .
+      ''', legend: legend),
+    ),
+    Puzzle(
+      id: 'shrine_21',
+      initialGrid: GridState.fromAscii('''
+         .  .  U1  .
+         .  .  U1 U1
+         Y1 Y1 .  .
+         .  Y1  .  .
+      ''', legend: legend),
+    ),
   ];
 }

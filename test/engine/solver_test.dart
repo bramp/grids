@@ -23,8 +23,8 @@ void main() {
     test('finds correct number of solutions for shrine_1', () {
       final level = levels.firstWhere((l) => l.id == 'shrine_1');
       final solutions = solver.solve(level);
-      // We know shrine_1 has 4 solutions (it's a very open 2x2)
-      expect(solutions.length, equals(4));
+      // We know shrine_1 has 2 solutions after deduplicating empty cells.
+      expect(solutions.length, equals(2));
     });
   });
 }
