@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 /// Represents a distinct coordinate on the puzzle grid.
 @immutable

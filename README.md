@@ -44,3 +44,19 @@ The hooks will now run automatically on every `git commit`. You can also run the
 ```bash
 pre-commit run --all-files
 ```
+
+### Puzzle Solver CLI
+
+The project includes a brute-force solver that can find all possible solutions for the levels defined in the game.
+
+To run a summary of all levels:
+```bash
+dart run bin/solve.dart
+```
+
+To see all solutions for a specific level (and copy-pastable ASCII):
+```bash
+dart run bin/solve.dart shrine_5
+```
+
+This tool is useful for verifying puzzle uniqueness and ensuring that every level in the repository is actually solvable.

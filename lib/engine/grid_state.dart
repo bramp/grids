@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
+import 'package:meta/meta.dart';
 
 /// Represents the exhaustive state of a single cell on the grid.
 @immutable
@@ -78,6 +78,7 @@ class GridState {
   ///   '.': const CellState(isLit: false),
   /// });
   /// ```
+
   factory GridState.fromAscii(
     String ascii, {
     required Map<String, CellState> legend,
@@ -110,6 +111,10 @@ class GridState {
       width,
       (x) => List.generate(height, (y) {
         var token = parsedRows[y][x];
+
+        // Strip ANSI escape codes if present
+        token = token.replaceAll(RegExp(r'\x1B\[[0-9;]*[mK]'), '');
+
         var isLocked = false;
         var isLit = false;
         CellColor? colorModifier;
@@ -311,28 +316,101 @@ class GridState {
       const DeepCollectionEquality().hash(cells);
 
   /// Returns a beautiful debug ASCII representation of the grid.
-  String toAsciiString() {
-    final buffer = StringBuffer();
+  ///
+  /// The output is designed to be copy-pastable back into
+  /// [GridState.fromAscii].
+  String toAsciiString({bool useColor = false}) {
+    final tokens = List.generate(
+      width,
+      (_) => List<String>.filled(height, ''),
+      growable: false,
+    );
+
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         final cellState = cells[x][y];
         final cell = cellState.cell;
 
-        var symbol = cellState.isLit ? '█' : '·';
-
-        // Output cell overrides
+        // Base token
+        var token = '.';
         if (cell is NumberCell) {
-          symbol = '${cell.number}';
+          token = '${cell.number}';
+          final colorSymbol = _getSymbolColor(cell.color);
+          if (colorSymbol != null) {
+            token = '$colorSymbol$token';
+          }
         } else if (cell is DiamondCell) {
-          symbol = cell.color == CellColor.red ? 'R' : 'B';
+          token = _getSymbolColor(cell.color) ?? 'R';
         }
 
-        buffer
-          ..write(symbol)
-          ..write(' ');
+        // Modifiers
+        if (cellState.isLit) {
+          token = '$token*';
+        }
+        if (cell.isLocked) {
+          token = '($token)';
+        }
+
+        tokens[x][y] = token;
+      }
+    }
+
+    final columnWidths = List<int>.generate(width, (x) {
+      var max = 0;
+      for (var y = 0; y < height; y++) {
+        if (tokens[x][y].length > max) max = tokens[x][y].length;
+      }
+      return max;
+    });
+
+    final buffer = StringBuffer();
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        final token = tokens[x][y];
+        final paddedToken = token.padRight(columnWidths[x]);
+
+        if (useColor) {
+          final cellState = cells[x][y];
+          final fg = _getAnsiForeground(cellState);
+          final bg = cellState.isLit ? '\x1B[48;5;18m' : '\x1B[40m';
+          buffer.write('$bg$fg$paddedToken\x1B[0m ');
+        } else {
+          buffer.write('$paddedToken ');
+        }
       }
       buffer.writeln();
     }
     return buffer.toString();
+  }
+
+  String? _getSymbolColor(CellColor? color) {
+    if (color == null) return null;
+    return switch (color) {
+      CellColor.red => 'R',
+      CellColor.black => 'B',
+      CellColor.blue => 'U',
+      CellColor.yellow => 'Y',
+    };
+  }
+
+  String _getAnsiForeground(CellState state) {
+    final cell = state.cell;
+    CellColor? color;
+    if (cell is DiamondCell) {
+      color = cell.color;
+    } else if (cell is NumberCell) {
+      color = cell.color;
+    }
+
+    if (color != null) {
+      return switch (color) {
+        CellColor.red => '\x1B[38;5;196m', // bright red
+        CellColor.black => '\x1B[38;5;232m', // deep black
+        CellColor.blue => '\x1B[38;5;33m', // bright blue
+        CellColor.yellow => '\x1B[38;5;220m', // amber
+      };
+    }
+
+    return '\x1B[37m'; // white
   }
 }

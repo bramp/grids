@@ -5,9 +5,11 @@ import 'package:grids/engine/puzzle.dart';
 /// A hardcoded repository of levels to build the initial game progression.
 class LevelRepository {
   /// The global legend used to parse puzzle ASCII strings.
-  static final Map<String, CellState> _legend = {
+  static final Map<String, CellState> legend = {
     // Empty playable cell
     '.': const CellState(),
+    '█': const CellState(isLit: true),
+    '·': const CellState(),
 
     // Diamonds
     'R': const CellState(cell: DiamondCell(CellColor.red)),
@@ -35,14 +37,26 @@ class LevelRepository {
       initialGrid: GridState.fromAscii('''
         . .
         1 .
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        . .
+        1* .
+        ''',
+      ],
     ),
     Puzzle(
       id: 'shrine_2',
       initialGrid: GridState.fromAscii('''
         . 1
         1 .
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        . 1*
+        1* .
+        ''',
+      ],
     ),
     Puzzle(
       id: 'shrine_3',
@@ -51,7 +65,15 @@ class LevelRepository {
         . 1
         1 .
         1 .
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        . 1*
+        . 1*
+        1* .
+        1 .*
+        ''',
+      ],
     ),
     Puzzle(
       id: 'shrine_4',
@@ -60,7 +82,15 @@ class LevelRepository {
         1 .
         1 .
         . 1
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        . 1*
+        1* .
+        1 .*
+        .* 1
+        ''',
+      ],
     ),
     Puzzle(
       id: 'shrine_5',
@@ -69,7 +99,15 @@ class LevelRepository {
          1  .
          1  .
         (.) 1
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        (.) 1*
+        1* .
+        1* .
+        (.) 1*
+        ''',
+      ],
     ),
     Puzzle(
       id: 'shrine_6',
@@ -78,7 +116,15 @@ class LevelRepository {
          .   1  .  .
          .   .  1  .
         (1)  .  .  1
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        (1*) . .* (1)
+        . 1* . .*
+        .* . 1* .
+        (1) .* . 1*
+        ''',
+      ],
     ),
     Puzzle(
       id: 'shrine_7',
@@ -90,7 +136,18 @@ class LevelRepository {
          .   .   1
          1   .   .
          .   1   1
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        . . 1*
+        . . .
+        (1*) . .
+        1 .* .
+        .* . 1*
+        1 .* .
+        .* 1 1*
+        ''',
+      ],
     ),
     // TODO(bramp): level 8
     Puzzle(
@@ -98,7 +155,13 @@ class LevelRepository {
       initialGrid: GridState.fromAscii('''
          .   .
          2   .
-      ''', legend: _legend),
+      ''', legend: legend),
+      knownSolutions: const [
+        '''
+        . .
+        2* .*
+        ''',
+      ],
     ),
     // TODO(bramp): level 10
   ];

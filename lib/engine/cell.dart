@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 /// The base class for any cell or symbol placed on a cell.
 @immutable
