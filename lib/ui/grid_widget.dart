@@ -14,6 +14,9 @@ class GridWidget extends StatelessWidget {
     final width = context.select<PuzzleProvider, int>((p) => p.grid.width);
     final height = context.select<PuzzleProvider, int>((p) => p.grid.height);
     final theme = context.watch<ThemeProvider>().activeTheme;
+    final puzzleId = context.select<PuzzleProvider, String>(
+      (p) => p.currentPuzzle.id,
+    );
 
     // We use a LayoutBuilder to ensure the grid cells remain perfectly square
     return LayoutBuilder(
@@ -40,8 +43,8 @@ class GridWidget extends StatelessWidget {
             width: finalWidth,
             height: finalHeight,
             // Container adds the outer stroke of the entire game grid
-            child: GestureDetector(
-              onPanStart: (details) => _handleDrag(
+            child: Listener(
+              onPointerDown: (details) => _handleDrag(
                 context,
                 details.localPosition,
                 finalWidth,
@@ -49,7 +52,7 @@ class GridWidget extends StatelessWidget {
                 width,
                 height,
               ),
-              onPanUpdate: (details) => _handleDrag(
+              onPointerMove: (details) => _handleDrag(
                 context,
                 details.localPosition,
                 finalWidth,
@@ -57,9 +60,11 @@ class GridWidget extends StatelessWidget {
                 width,
                 height,
               ),
-              onPanEnd: (_) => context.read<PuzzleProvider>().endDrag(),
+              onPointerUp: (_) => context.read<PuzzleProvider>().endDrag(),
+              onPointerCancel: (_) => context.read<PuzzleProvider>().endDrag(),
               behavior: HitTestBehavior.opaque,
               child: Container(
+                key: ValueKey(puzzleId),
                 padding: theme.gridPadding,
                 decoration:
                     theme.gridBackgroundDecoration ??
