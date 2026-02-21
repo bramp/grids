@@ -6,14 +6,6 @@ class ThemeProvider extends ChangeNotifier {
   ThemeProvider() {
     _themes = [
       const CyberTheme(),
-      // --- Unfinished / Draft Themes ---
-      // const ClassicTheme(),
-      // const NeoTheme(),
-      // const CasinoTheme(),
-      // const PixelTheme(),
-      // const NeonTheme(),
-      // const NeobrutalTheme(),
-      // const PastelTheme(),
     ];
     _activeTheme = _themes.first;
   }
