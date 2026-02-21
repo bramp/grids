@@ -7,7 +7,9 @@ import 'package:grids/ui/grid_widget.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  testWidgets('Generate Golden theme screenshots', (tester) async {
+  testWidgets('Generate Golden theme screenshots', tags: ['golden', 'mac'], (
+    tester,
+  ) async {
     // Set a consistent large window size for taking screenshots
     tester.view.physicalSize = const Size(1200, 1600);
     tester.view.devicePixelRatio = 2.0;
