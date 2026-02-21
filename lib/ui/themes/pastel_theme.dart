@@ -75,6 +75,11 @@ class PastelTheme extends PuzzleTheme {
                   offset: const Offset(2, 2),
                   blurRadius: 4,
                 ),
+                const BoxShadow(
+                  color: Colors.transparent,
+                  offset: Offset(-4, -4),
+                  blurRadius: 10,
+                ),
               ]
             : [
                 // Popped out look

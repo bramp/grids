@@ -63,7 +63,18 @@ class CyberTheme extends PuzzleTheme {
                   spreadRadius: 8,
                 ),
               ]
-            : [],
+            : [
+                BoxShadow(
+                  color: glowColor.withValues(alpha: 0),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: glowColor.withValues(alpha: 0),
+                  blurRadius: 40,
+                  spreadRadius: 8,
+                ),
+              ],
       ),
       child: Stack(
         fit: StackFit.expand,
