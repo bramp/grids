@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:grids/ui/themes/casino_theme.dart';
-import 'package:grids/ui/themes/classic_theme.dart';
-import 'package:grids/ui/themes/neo_theme.dart';
-import 'package:grids/ui/themes/neon_theme.dart';
-import 'package:grids/ui/themes/pixel_theme.dart';
+import 'package:grids/ui/themes/cyber_theme.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeProvider() {
     _themes = [
-      const ClassicTheme(),
-      const NeoTheme(),
-      const CasinoTheme(),
-      const PixelTheme(),
-      const NeonTheme(),
+      const CyberTheme(),
+      // --- Unfinished / Draft Themes ---
+      // const ClassicTheme(),
+      // const NeoTheme(),
+      // const CasinoTheme(),
+      // const PixelTheme(),
+      // const NeonTheme(),
+      // const NeobrutalTheme(),
+      // const PastelTheme(),
     ];
     _activeTheme = _themes.first;
   }
