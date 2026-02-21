@@ -98,6 +98,12 @@ class CasinoTheme extends PuzzleTheme {
         return const Color(0xff2266ee);
       case CellColor.yellow:
         return const Color(0xffeedd22);
+      case CellColor.purple:
+        return const Color(0xff8822ee);
+      case CellColor.white:
+        return Colors.white;
+      case CellColor.cyan:
+        return const Color(0xff22eeee);
     }
   }
 }

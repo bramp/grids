@@ -129,6 +129,12 @@ class NeonTheme extends PuzzleTheme {
         return Colors.cyanAccent.shade400;
       case CellColor.yellow:
         return Colors.limeAccent.shade400;
+      case CellColor.purple:
+        return Colors.deepPurpleAccent.shade400;
+      case CellColor.white:
+        return Colors.white;
+      case CellColor.cyan:
+        return Colors.cyanAccent.shade400;
     }
   }
 }

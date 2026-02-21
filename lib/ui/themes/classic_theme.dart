@@ -89,6 +89,12 @@ class ClassicTheme extends PuzzleTheme {
         return Colors.blueAccent;
       case CellColor.yellow:
         return Colors.amber;
+      case CellColor.purple:
+        return Colors.purple;
+      case CellColor.white:
+        return Colors.white;
+      case CellColor.cyan:
+        return Colors.cyan;
     }
   }
 }

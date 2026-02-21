@@ -38,7 +38,7 @@ class BlankCell extends Cell {
 }
 
 /// Represents a specific color for cells like diamonds or numbers.
-enum CellColor { red, black, blue, yellow }
+enum CellColor { red, black, blue, yellow, purple, white, cyan }
 
 /// The Diamond cell.
 class DiamondCell extends Cell {

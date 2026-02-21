@@ -391,6 +391,9 @@ class GridState {
       CellColor.black => 'B',
       CellColor.blue => 'U',
       CellColor.yellow => 'Y',
+      CellColor.purple => 'P',
+      CellColor.white => 'W',
+      CellColor.cyan => 'C',
     };
   }
 
@@ -409,6 +412,9 @@ class GridState {
         CellColor.black => '\x1B[38;5;232m', // deep black
         CellColor.blue => '\x1B[38;5;33m', // bright blue
         CellColor.yellow => '\x1B[38;5;220m', // amber
+        CellColor.purple => '\x1B[38;5;129m', // purple
+        CellColor.white => '\x1B[38;5;255m', // white
+        CellColor.cyan => '\x1B[38;5;51m', // cyan
       };
     }
 

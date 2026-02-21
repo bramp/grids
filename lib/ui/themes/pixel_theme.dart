@@ -129,6 +129,12 @@ class PixelTheme extends PuzzleTheme {
         return const Color(0xff5bc9e5);
       case CellColor.yellow:
         return const Color(0xfffbf236);
+      case CellColor.purple:
+        return const Color(0xff76428a);
+      case CellColor.white:
+        return const Color(0xffffffff);
+      case CellColor.cyan:
+        return const Color(0xff5fcde4);
     }
   }
 }

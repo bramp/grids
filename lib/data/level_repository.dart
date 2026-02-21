@@ -16,6 +16,8 @@ class LevelRepository {
     'B': const CellState(cell: DiamondCell(CellColor.black)),
     'Y': const CellState(cell: DiamondCell(CellColor.yellow)),
     'U': const CellState(cell: DiamondCell(CellColor.blue)),
+    'P': const CellState(cell: DiamondCell(CellColor.purple)),
+    'W': const CellState(cell: DiamondCell(CellColor.white)),
 
     // Numbers
     '1': const CellState(cell: NumberCell(1)),
@@ -203,6 +205,53 @@ class LevelRepository {
          .  .  U1 U1
          Y1 Y1 .  .
          .  Y1  .  .
+      ''', legend: legend),
+    ),
+    Puzzle(
+      id: 'shrine_22',
+      initialGrid: GridState.fromAscii('''
+         B1 Y1 P1 W1
+         Y1 U1 B1 P1
+         P1 W1 U1 W1
+         U1 B1 Y1 P1
+      ''', legend: legend),
+    ),
+    Puzzle(
+      id: 'shrine_23',
+      initialGrid: GridState.fromAscii('''
+         U1 U1 Y1 U1
+         Y1 Y1 Y1 U1
+         U1 U1 U1 Y1
+         Y1 Y1 U1 Y1
+      ''', legend: legend),
+    ),
+    // shrine 24 is a repeat of 23.
+    Puzzle(
+      id: 'shrine_25',
+      initialGrid: GridState.fromAscii('''
+         . . .
+         U4 . Y4
+         . . .
+      ''', legend: legend),
+    ),
+
+    Puzzle(
+      id: 'shrine_26',
+      initialGrid: GridState.fromAscii('''
+         U1 U1 Y1 U1
+         Y1 Y1 Y1 U1
+         U1 U1 U1 Y1
+         Y1 Y1 U1 Y1
+      ''', legend: legend),
+    ),
+
+    Puzzle(
+      id: 'shrine_27',
+      initialGrid: GridState.fromAscii('''
+         U1 U1 Y1 U1
+         Y1 Y1 Y1 U1
+         U1 U1 U1 Y1
+         Y1 Y1 U1 Y1
       ''', legend: legend),
     ),
   ];

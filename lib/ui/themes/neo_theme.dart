@@ -120,6 +120,12 @@ class NeoTheme extends PuzzleTheme {
         return Colors.blueAccent.shade400;
       case CellColor.yellow:
         return Colors.amber.shade500;
+      case CellColor.purple:
+        return Colors.purpleAccent.shade400;
+      case CellColor.white:
+        return Colors.white;
+      case CellColor.cyan:
+        return Colors.cyanAccent.shade400;
     }
   }
 }
