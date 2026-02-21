@@ -124,6 +124,9 @@ class GridState {
           'B': CellColor.black,
           'Y': CellColor.yellow,
           'U': CellColor.blue,
+          'P': CellColor.purple,
+          'W': CellColor.white,
+          'C': CellColor.cyan,
         };
 
         // Recursive symbolic parsing (e.g., "(R1*)")
