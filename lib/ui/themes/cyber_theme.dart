@@ -109,14 +109,28 @@ class CyberTheme extends PuzzleTheme {
 
   @override
   Widget buildNumberMechanic(BuildContext context, NumberCell cell) {
+    final color = cell.color != null
+        ? _getColor(cell.color!)
+        : const Color(0xFF00FFCC);
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       child: DiceDotsWidget(
         key: ValueKey('${cell.number}_${cell.color}'),
         number: cell.number,
-        dotColor: cell.color != null
-            ? _getColor(cell.color!)
-            : const Color(0xFF00FFCC),
+        dotColor: color,
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.8),
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: color.withValues(alpha: 0.4),
+            blurRadius: 16,
+            spreadRadius: 2,
+          ),
+        ],
       ),
     );
   }

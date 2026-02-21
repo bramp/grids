@@ -6,11 +6,13 @@ class DiceDotsWidget extends StatelessWidget {
   const DiceDotsWidget({
     required this.number,
     required this.dotColor,
+    this.boxShadow,
     super.key,
   });
 
   final int number;
   final Color dotColor;
+  final List<BoxShadow>? boxShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +93,7 @@ class DiceDotsWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: dotColor,
           shape: BoxShape.circle,
+          boxShadow: boxShadow,
         ),
       ),
     );
