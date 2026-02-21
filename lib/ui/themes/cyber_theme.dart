@@ -1,7 +1,7 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
+import 'package:grids/ui/widgets/dice_dots_widget.dart';
 
 class CyberTheme extends PuzzleTheme {
   const CyberTheme();
@@ -109,19 +109,14 @@ class CyberTheme extends PuzzleTheme {
 
   @override
   Widget buildNumberMechanic(BuildContext context, NumberCell cell) {
-    // In Cyber theme, we replace simple numbers with neon geometric shapes
-    // To maintain gameplay identity, we'll map numbers to specific shapes
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
-      child: CustomPaint(
+      child: DiceDotsWidget(
         key: ValueKey('${cell.number}_${cell.color}'),
-        painter: _CyberShapePainter(
-          number: cell.number,
-          color: cell.color != null
-              ? _getColor(cell.color!)
-              : const Color(0xFF00FFCC),
-        ),
-        child: const SizedBox.expand(),
+        number: cell.number,
+        dotColor: cell.color != null
+            ? _getColor(cell.color!)
+            : const Color(0xFF00FFCC),
       ),
     );
   }
@@ -158,103 +153,6 @@ class CyberTheme extends PuzzleTheme {
       case CellColor.cyan:
         return const Color(0xFF00FFCC); // Neon Cyan
     }
-  }
-}
-
-class _CyberShapePainter extends CustomPainter {
-  const _CyberShapePainter({required this.number, required this.color});
-  final int number;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width, size.height) * 0.25;
-
-    // Draw a glow behind the line
-    final shadowPaint = Paint()
-      ..color = color.withValues(alpha: 0.5)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.0
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-
-    void drawShape() {
-      switch (number % 5) {
-        case 0:
-        case 1:
-          // Triangle
-          final path = Path();
-          for (var i = 0; i < 3; i++) {
-            final angle = (i * 2 * pi / 3) - (pi / 2);
-            final point = Offset(
-              center.dx + radius * cos(angle),
-              center.dy + radius * sin(angle),
-            );
-            if (i == 0) {
-              path.moveTo(point.dx, point.dy);
-            } else {
-              path.lineTo(point.dx, point.dy);
-            }
-          }
-          path.close();
-          canvas
-            ..drawPath(path, shadowPaint)
-            ..drawPath(path, paint);
-        case 2:
-          // 'X' Cross
-          canvas
-            ..drawLine(
-              Offset(center.dx - radius, center.dy - radius),
-              Offset(center.dx + radius, center.dy + radius),
-              shadowPaint,
-            )
-            ..drawLine(
-              Offset(center.dx + radius, center.dy - radius),
-              Offset(center.dx - radius, center.dy + radius),
-              shadowPaint,
-            )
-            ..drawLine(
-              Offset(center.dx - radius, center.dy - radius),
-              Offset(center.dx + radius, center.dy + radius),
-              paint,
-            )
-            ..drawLine(
-              Offset(center.dx + radius, center.dy - radius),
-              Offset(center.dx - radius, center.dy + radius),
-              paint,
-            );
-        case 3:
-          // Circle
-          canvas
-            ..drawCircle(center, radius, shadowPaint)
-            ..drawCircle(center, radius, paint);
-        case 4:
-          // Rune 'M' / Sigma like shape
-          final path = Path()
-            ..moveTo(center.dx - radius, center.dy + radius)
-            ..lineTo(center.dx - radius, center.dy - radius)
-            ..lineTo(center.dx, center.dy)
-            ..lineTo(center.dx + radius, center.dy - radius)
-            ..lineTo(center.dx + radius, center.dy + radius);
-          canvas
-            ..drawPath(path, shadowPaint)
-            ..drawPath(path, paint);
-      }
-    }
-
-    drawShape();
-  }
-
-  @override
-  bool shouldRepaint(covariant _CyberShapePainter oldDelegate) {
-    return oldDelegate.number != number || oldDelegate.color != color;
   }
 }
 
