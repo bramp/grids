@@ -420,18 +420,16 @@ class LevelRepository {
     ),
 
     // TODO(bramp): shrine_35 / shrine_36 is a start-end problem
-    // TODO(bramp): shrine_37
-
-    /*
+    // TODO(bramp): shrine_37 is a start-end problem
     Puzzle(
       id: 'shrine_38',
+      note: 'Beginning of the negative numbers',
       initialGrid: GridFormat.parse('''
-         . . . . . . Y1
-         . . . Y5 W4 B3 W2
-         . . . K6 . . .
+        K-2 . .
+        . . .
+        (*K6) . (K4)
 
       '''),
     ),
-  */
   ];
 }

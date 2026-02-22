@@ -73,7 +73,7 @@ class NumberCell extends Cell {
     this.number, {
     this.color = CellColor.black,
     super.isLocked = false,
-  });
+  }) : assert(number != 0, 'NumberCell does not support 0');
   final int number;
   final CellColor color;
 

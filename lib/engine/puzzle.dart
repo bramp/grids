@@ -8,6 +8,7 @@ class Puzzle {
     required this.id,
     required this.initialGrid,
     this.knownSolutions = const [],
+    this.note,
     this.metadata = const {},
   });
 
@@ -19,6 +20,11 @@ class Puzzle {
 
   /// A list of known valid solutions represented as bitsets of the lit state.
   final List<BigInt> knownSolutions;
+
+  /// Optional developer note for context about the puzzle
+  /// (e.g. unsupported mechanics, design intent, source).
+  /// Not shown to the player.
+  final String? note;
 
   /// Additional optional metadata (e.g. difficulty, author).
   final Map<String, dynamic> metadata;

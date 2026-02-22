@@ -112,6 +112,7 @@ class CyberTheme extends PuzzleTheme {
         key: ValueKey('${cell.number}_${cell.color}'),
         number: cell.number,
         dotColor: color,
+        backgroundColor: backgroundColor,
         boxShadow: [
           BoxShadow(
             color: color.withValues(alpha: 0.8),

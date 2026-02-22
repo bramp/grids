@@ -112,7 +112,13 @@ class GridFormat {
         if (token == 'o') {
           cell = DiamondCell(color ?? CellColor.black);
         } else if (int.tryParse(token) != null) {
-          cell = NumberCell(int.parse(token), color: color ?? CellColor.black);
+          final n = int.parse(token);
+          if (n == 0) {
+            throw ArgumentError(
+              "Number cell value '0' is not allowed in ASCII grid.",
+            );
+          }
+          cell = NumberCell(n, color: color ?? CellColor.black);
         } else if (token == '.' || token == '·' || token.isEmpty) {
           cell = const BlankCell();
         } else {

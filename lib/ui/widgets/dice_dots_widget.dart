@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 
 /// A widget that renders a number as an arrangement of dots (like a die).
-/// Supports numbers 1 through 9.
+///
+/// Supports numbers 1–9 (positive) and -1 to -9 (negative).
+/// - Positive numbers render as **filled** dots.
+/// - Negative numbers render as **outlined** dots (hollow circles), using the
+///   absolute value to determine the dot pattern.
 class DiceDotsWidget extends StatelessWidget {
   const DiceDotsWidget({
     required this.number,
     required this.dotColor,
-    this.boxShadow,
+    required this.backgroundColor,
+    this.boxShadow = const [],
     super.key,
-  });
+  }) : assert(number != 0, 'DiceDotsWidget does not support 0');
 
   final int number;
   final Color dotColor;
-  final List<BoxShadow>? boxShadow;
+  final Color backgroundColor;
+  final List<BoxShadow> boxShadow;
 
   @override
   Widget build(BuildContext context) {
-    if (number < 1 || number > 9) {
+    final abs = number.abs();
+    if (abs < 1 || abs > 9) {
       // Fallback if number is out of visual bounds
       return Text(
         number.toString(),
@@ -45,15 +52,15 @@ class DiceDotsWidget extends StatelessWidget {
     // ML, MC, MR
     // BL, BC, BR
 
+    final abs = number.abs();
     final positions = <Alignment>[];
 
-    // Standard dice logic expanded up to 9
-    final hasCenterCenter = number % 2 != 0; // 1, 3, 5, 7, 9
-    final hasCorners = number > 1; // 2, 3, 4, 5, 6, 7, 8, 9
-    final hasMidLeftRight =
-        number == 6 || number == 7 || number == 8 || number == 9;
-    final hasTopBottomCenter = number == 8 || number == 9;
-    final hasAllCorners = number >= 4; // 4, 5, 6, 7, 8, 9
+    // Standard dice logic expanded up to 9, using absolute value
+    final hasCenterCenter = abs % 2 != 0; // 1, 3, 5, 7, 9
+    final hasCorners = abs > 1; // 2, 3, 4, 5, 6, 7, 8, 9
+    final hasMidLeftRight = abs == 6 || abs == 7 || abs == 8 || abs == 9;
+    final hasTopBottomCenter = abs == 8 || abs == 9;
+    final hasAllCorners = abs >= 4; // 4, 5, 6, 7, 8, 9
 
     if (hasCenterCenter) positions.add(Alignment.center);
 
@@ -81,19 +88,31 @@ class DiceDotsWidget extends StatelessWidget {
         ..add(Alignment.bottomCenter);
     }
 
-    return positions.map((align) => _buildDot(align, size)).toList();
+    final filled = number > 0;
+    return positions.map((align) => _buildDot(align, size, filled)).toList();
   }
 
-  Widget _buildDot(Alignment alignment, double size) {
+  Widget _buildDot(Alignment alignment, double size, bool filled) {
     return Align(
       alignment: alignment,
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: dotColor,
+          color: filled ? dotColor : Colors.transparent,
           shape: BoxShape.circle,
-          boxShadow: boxShadow,
+          border: Border.all(color: dotColor, width: size * 0.15),
+          boxShadow: [
+            ...boxShadow,
+
+            // This shadow fills in the middle with the background colour.
+            // Otherwise the entire inside of the dot is glow effect.
+            BoxShadow(
+              color: backgroundColor,
+              spreadRadius: -2,
+              blurRadius: 16,
+            ),
+          ],
         ),
       ),
     );
