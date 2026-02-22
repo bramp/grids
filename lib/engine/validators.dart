@@ -3,30 +3,40 @@ import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
 import 'package:grids/engine/rule_validator.dart';
 
-/// Validates that within any contiguous area, there must be exactly two
-/// diamonds of the same color (or zero diamonds for a given color).
+/// Validates that diamonds are always part of a pair of the same color.
+///
+/// If an area contains at least one diamond, the entire area follows the
+/// "Pairing" rule: every color present in the area must have exactly two
+/// mechanics (diamonds or numbers).
 class DiamondValidator extends RuleValidator {
   const DiamondValidator();
 
   @override
   ValidationResult validate(GridState grid, List<GridPoint> area) {
-    // Collect all diamond cells within this specific area, mapped by color.
     final colorMap = <CellColor, List<GridPoint>>{};
+    var hasDiamond = false;
 
     for (final pt in area) {
       final cell = grid.getMechanic(pt);
       if (cell is DiamondCell) {
+        hasDiamond = true;
+        colorMap.putIfAbsent(cell.color, () => []).add(pt);
+      } else if (cell is NumberCell) {
         colorMap.putIfAbsent(cell.color, () => []).add(pt);
       }
     }
 
+    // This rule only triggers for areas that contain at least one diamond.
+    if (!hasDiamond) {
+      return ValidationResult.success();
+    }
+
     final errors = <GridPoint>[];
 
-    // For every color present in this area, there MUST be exactly TWO diamonds
+    // Every color present in a diamond area must have exactly two members.
     for (final entry in colorMap.entries) {
-      final colorPts = entry.value;
-      if (colorPts.length != 2) {
-        errors.addAll(colorPts);
+      if (entry.value.length != 2) {
+        errors.addAll(entry.value);
       }
     }
 
@@ -62,12 +72,21 @@ class StrictNumberValidator extends RuleValidator {
   ValidationResult validate(GridState grid, List<GridPoint> area) {
     // Collect all number cells within this specific area, grouped by color.
     final byColor = <CellColor, List<GridPoint>>{};
+    var hasDiamond = false;
 
     for (final pt in area) {
       final cell = grid.getMechanic(pt);
       if (cell is NumberCell) {
         byColor.putIfAbsent(cell.color, () => []).add(pt);
+      } else if (cell is DiamondCell) {
+        hasDiamond = true;
       }
+    }
+
+    // If there is a diamond in the area, the DiamondValidator handles
+    // the pairing rules instead of this validator.
+    if (hasDiamond) {
+      return ValidationResult.success();
     }
 
     // If no number cells at all, the area is automatically valid.
@@ -120,13 +139,22 @@ class NumberColorValidator extends RuleValidator {
   ValidationResult validate(GridState grid, List<GridPoint> area) {
     final numberPoints = <GridPoint>[];
     final colors = <CellColor?>{};
+    var hasDiamond = false;
 
     for (final pt in area) {
       final cell = grid.getMechanic(pt);
       if (cell is NumberCell) {
         numberPoints.add(pt);
         colors.add(cell.color);
+      } else if (cell is DiamondCell) {
+        hasDiamond = true;
       }
+    }
+
+    // If an area has a diamond, it's allowed to have multiple colors
+    // (the DiamondValidator ensures they are all pairs).
+    if (hasDiamond) {
+      return ValidationResult.success();
     }
 
     // If there are different colors (or color + null) in the same area, it's an

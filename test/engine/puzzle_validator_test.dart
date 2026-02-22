@@ -48,12 +48,16 @@ void main() {
         // Create a totally blank 3x3 grid (1 unlit area of size 9)
         final state = GridState.empty(width: 3, height: 3);
         final grid = state
-            // Fails: One single black diamond
+            // Fails: One single red diamond.
+            // Under new pairing rules, since a diamond exists in the area,
+            // ALL colors in the area (Red and Black) must be pairs.
             .withMechanic(
               state.pointAt(0, 0),
-              const DiamondCell(CellColor.black),
+              const DiamondCell(CellColor.red),
             )
-            // Fails: Tries to be a '3' block but is in an area of 9
+            // Fails:
+            // 1. Diamond rule: Black color (from NumberCell) is not a pair.
+            // 2. Number rule: Tries to be a '3' block but is in an area of 9.
             .withMechanic(state.pointAt(2, 2), const NumberCell(3));
 
         final puzzle = PuzzleValidator();
