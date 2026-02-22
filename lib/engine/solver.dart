@@ -22,6 +22,10 @@ class PuzzleSolver {
   /// will take significant time to solve.
   List<GridState> solve(Puzzle puzzle, {bool deduplicate = true}) {
     final grid = puzzle.initialGrid;
+
+    // Optimize validation by only using rules relevant to this specific puzzle.
+    final optimizedValidator = _validator.filter(grid);
+
     final playableIndices = <GridPoint>[];
 
     for (var i = 0; i < grid.mechanics.length; i++) {
@@ -44,6 +48,7 @@ class PuzzleSolver {
       solutions,
       seenSignatures,
       deduplicate,
+      optimizedValidator,
     );
 
     return solutions;
@@ -57,10 +62,11 @@ class PuzzleSolver {
     List<GridState> solutions,
     Set<String> seenSignatures,
     bool deduplicate,
+    PuzzleValidator validator,
   ) {
     if (index == bitMasks.length) {
       final current = initialGrid.withBits(currentBits);
-      if (_validator.validate(current).isValid) {
+      if (validator.validate(current).isValid) {
         if (!deduplicate) {
           solutions.add(current);
           return;
@@ -68,7 +74,7 @@ class PuzzleSolver {
 
         final signature = _getSignature(current);
         if (seenSignatures.add(signature)) {
-          solutions.add(_normalize(current));
+          solutions.add(_normalize(current, validator));
         }
       }
       return;
@@ -85,6 +91,7 @@ class PuzzleSolver {
       solutions,
       seenSignatures,
       deduplicate,
+      validator,
     );
 
     // Try bit on
@@ -96,6 +103,7 @@ class PuzzleSolver {
       solutions,
       seenSignatures,
       deduplicate,
+      validator,
     );
   }
 
@@ -120,7 +128,7 @@ class PuzzleSolver {
   /// Returns a clean copy of the grid where unnecessary lit cells are turned
   /// off. It verifies that any change does not break validity or the core
   /// mechanic signature.
-  GridState _normalize(GridState grid) {
+  GridState _normalize(GridState grid, PuzzleValidator validator) {
     var normalized = grid;
     final originalSignature = _getSignature(grid);
 
@@ -137,7 +145,7 @@ class PuzzleSolver {
 
       if (normalized.isLit(pt)) {
         final testGrid = normalized.setLit(pt, isLit: false);
-        if (_validator.validate(testGrid).isValid &&
+        if (validator.validate(testGrid).isValid &&
             _getSignature(testGrid) == originalSignature) {
           normalized = testGrid;
         }
@@ -145,7 +153,7 @@ class PuzzleSolver {
     }
 
     assert(
-      _validator.validate(normalized).isValid,
+      validator.validate(normalized).isValid,
       'Normalization broke grid validity!',
     );
     return normalized;

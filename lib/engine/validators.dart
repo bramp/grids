@@ -5,33 +5,44 @@ import 'package:grids/engine/rule_validator.dart';
 
 /// Validates that within any contiguous area, there must be exactly two
 /// diamonds of the same color (or zero diamonds for a given color).
-ValidationResult diamondValidator(GridState grid, List<GridPoint> area) {
-  // Collect all diamond cells within this specific area, mapped by color.
-  final colorMap = <CellColor, List<GridPoint>>{};
+class DiamondValidator extends RuleValidator {
+  const DiamondValidator();
 
-  for (final pt in area) {
-    final cell = grid.getMechanic(pt);
-    if (cell is DiamondCell) {
-      colorMap.putIfAbsent(cell.color, () => []).add(pt);
+  @override
+  ValidationResult validate(GridState grid, List<GridPoint> area) {
+    // Collect all diamond cells within this specific area, mapped by color.
+    final colorMap = <CellColor, List<GridPoint>>{};
+
+    for (final pt in area) {
+      final cell = grid.getMechanic(pt);
+      if (cell is DiamondCell) {
+        colorMap.putIfAbsent(cell.color, () => []).add(pt);
+      }
     }
-  }
 
-  final errors = <GridPoint>[];
+    final errors = <GridPoint>[];
 
-  // For every color present in this area, there MUST be exactly TWO diamonds
-  for (final entry in colorMap.entries) {
-    final colorPts = entry.value;
-    if (colorPts.length != 2) {
-      errors.addAll(colorPts);
+    // For every color present in this area, there MUST be exactly TWO diamonds
+    for (final entry in colorMap.entries) {
+      final colorPts = entry.value;
+      if (colorPts.length != 2) {
+        errors.addAll(colorPts);
+      }
     }
+
+    if (errors.isNotEmpty) {
+      return ValidationResult.failure(errors);
+    }
+
+    return ValidationResult.success();
   }
 
-  if (errors.isNotEmpty) {
-    return ValidationResult.failure(errors);
-  }
-
-  return ValidationResult.success();
+  @override
+  bool isApplicable(GridState grid) =>
+      grid.mechanics.any((cell) => cell is DiamondCell);
 }
+
+const diamondValidator = DiamondValidator();
 
 /// Validates that within any contiguous area containing numbers, the size of
 /// the area precisely matches the sum of all number cells of the same color.
@@ -44,92 +55,124 @@ ValidationResult diamondValidator(GridState grid, List<GridPoint> area) {
 ///
 /// If the sum is zero (e.g., K-2 and K2 in the same area), the area can
 /// be any size. Negative sums (net negative) are never allowed.
-ValidationResult strictNumberValidator(GridState grid, List<GridPoint> area) {
-  // Collect all number cells within this specific area, grouped by color.
-  final byColor = <CellColor, List<GridPoint>>{};
+class StrictNumberValidator extends RuleValidator {
+  const StrictNumberValidator();
 
-  for (final pt in area) {
-    final cell = grid.getMechanic(pt);
-    if (cell is NumberCell) {
-      byColor.putIfAbsent(cell.color, () => []).add(pt);
+  @override
+  ValidationResult validate(GridState grid, List<GridPoint> area) {
+    // Collect all number cells within this specific area, grouped by color.
+    final byColor = <CellColor, List<GridPoint>>{};
+
+    for (final pt in area) {
+      final cell = grid.getMechanic(pt);
+      if (cell is NumberCell) {
+        byColor.putIfAbsent(cell.color, () => []).add(pt);
+      }
     }
-  }
 
-  // If no number cells at all, the area is automatically valid.
-  if (byColor.isEmpty) {
+    // If no number cells at all, the area is automatically valid.
+    if (byColor.isEmpty) {
+      return ValidationResult.success();
+    }
+
+    // Sum all numbers across all color groups to get the required area size.
+    var requiredAreaSize = 0;
+    final errors = <GridPoint>[];
+
+    for (final entry in byColor.entries) {
+      var colorSum = 0;
+      for (final pt in entry.value) {
+        colorSum += (grid.getMechanic(pt) as NumberCell).number;
+      }
+      requiredAreaSize += colorSum;
+    }
+
+    if (requiredAreaSize < 0) {
+      // Negative regions are never allowed.
+      byColor.values.forEach(errors.addAll);
+      return ValidationResult.failure(errors);
+    }
+
+    if (requiredAreaSize > 0 && area.length != requiredAreaSize) {
+      // Area isn't the required size; mark all number cells as errors.
+      byColor.values.forEach(errors.addAll);
+      return ValidationResult.failure(errors);
+    }
+
+    // If requiredAreaSize == 0, the sum of negative and positive is zero.
+    // In this case, the area can be any size.
     return ValidationResult.success();
   }
 
-  // Sum all numbers across all color groups to get the required area size.
-  // Negative numbers within a color group reduce the total.
-  var requiredAreaSize = 0;
-  final errors = <GridPoint>[];
-
-  for (final entry in byColor.entries) {
-    var colorSum = 0;
-    for (final pt in entry.value) {
-      colorSum += (grid.getMechanic(pt) as NumberCell).number;
-    }
-    requiredAreaSize += colorSum;
-  }
-
-  if (requiredAreaSize < 0) {
-    // Negative regions are never allowed.
-    byColor.values.forEach(errors.addAll);
-    return ValidationResult.failure(errors);
-  }
-
-  if (requiredAreaSize > 0 && area.length != requiredAreaSize) {
-    // The total area isn't the required size; mark all number cells as errors.
-    byColor.values.forEach(errors.addAll);
-    return ValidationResult.failure(errors);
-  }
-
-  // If requiredAreaSize == 0, the sum of negative and positive numbers is zero.
-  // In this case, the area can be any size.
-  return ValidationResult.success();
+  @override
+  bool isApplicable(GridState grid) =>
+      grid.mechanics.any((cell) => cell is NumberCell);
 }
+
+const strictNumberValidator = StrictNumberValidator();
 
 /// Validates that within any contiguous area containing numbers, all numbers
 /// must share the identical color (including null).
-ValidationResult numberColorValidator(GridState grid, List<GridPoint> area) {
-  final numberPoints = <GridPoint>[];
-  final colors = <CellColor?>{};
+class NumberColorValidator extends RuleValidator {
+  const NumberColorValidator();
 
-  for (final pt in area) {
-    final cell = grid.getMechanic(pt);
-    if (cell is NumberCell) {
-      numberPoints.add(pt);
-      colors.add(cell.color);
-    }
-  }
+  @override
+  ValidationResult validate(GridState grid, List<GridPoint> area) {
+    final numberPoints = <GridPoint>[];
+    final colors = <CellColor?>{};
 
-  // If there are different colors (or color + null) in the same area, it's an
-  // error.
-  if (colors.length > 1) {
-    return ValidationResult.failure(numberPoints);
-  }
-
-  return ValidationResult.success();
-}
-
-/// Validates that no locked cell has been toggled from its original state.
-ValidationResult lockedCellValidator(GridState grid, List<GridPoint> area) {
-  final errors = <GridPoint>[];
-
-  for (final pt in area) {
-    final cell = grid.getMechanic(pt);
-    if (cell.isLocked) {
-      // If the cell is locked, it must match its intended lit state.
-      if (grid.isLit(pt) != cell.lockedLit) {
-        errors.add(pt);
+    for (final pt in area) {
+      final cell = grid.getMechanic(pt);
+      if (cell is NumberCell) {
+        numberPoints.add(pt);
+        colors.add(cell.color);
       }
     }
+
+    // If there are different colors (or color + null) in the same area, it's an
+    // error.
+    if (colors.length > 1) {
+      return ValidationResult.failure(numberPoints);
+    }
+
+    return ValidationResult.success();
   }
 
-  if (errors.isNotEmpty) {
-    return ValidationResult.failure(errors);
-  }
-
-  return ValidationResult.success();
+  @override
+  bool isApplicable(GridState grid) =>
+      grid.mechanics.any((cell) => cell is NumberCell);
 }
+
+const numberColorValidator = NumberColorValidator();
+
+/// Validates that no locked cell has been toggled from its original state.
+class LockedCellValidator extends RuleValidator {
+  const LockedCellValidator();
+
+  @override
+  ValidationResult validate(GridState grid, List<GridPoint> area) {
+    final errors = <GridPoint>[];
+
+    for (final pt in area) {
+      final cell = grid.getMechanic(pt);
+      if (cell.isLocked) {
+        // If the cell is locked, it must match its intended lit state.
+        if (grid.isLit(pt) != cell.lockedLit) {
+          errors.add(pt);
+        }
+      }
+    }
+
+    if (errors.isNotEmpty) {
+      return ValidationResult.failure(errors);
+    }
+
+    return ValidationResult.success();
+  }
+
+  @override
+  bool isApplicable(GridState grid) =>
+      grid.mechanics.any((cell) => cell.isLocked);
+}
+
+const lockedCellValidator = LockedCellValidator();

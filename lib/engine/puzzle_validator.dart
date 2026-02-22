@@ -14,7 +14,19 @@ class PuzzleValidator {
       lockedCellValidator,
     ],
   });
+
+  /// The list of rules to be applied to each contiguous area.
   final List<RuleValidator> validators;
+
+  /// Returns a new [PuzzleValidator] containing only the rules relevant to
+  /// the given [grid].
+  ///
+  /// This optimizes validation by skipping rules for mechanics that are not
+  /// present in the puzzle.
+  PuzzleValidator filter(GridState grid) {
+    final relevant = validators.where((v) => v.isApplicable(grid)).toList();
+    return PuzzleValidator(validators: relevant);
+  }
 
   /// Evaluates an entire grid state.
   ///
@@ -28,7 +40,7 @@ class PuzzleValidator {
     // Evaluate every contiguous area against every rule cell
     for (final area in areas) {
       for (final validator in validators) {
-        final result = validator(grid, area);
+        final result = validator.validate(grid, area);
         if (!result.isValid) {
           allValid = false;
           allErrors.addAll(result.errors);

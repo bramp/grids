@@ -18,9 +18,18 @@ class ValidationResult {
   final List<GridPoint> errors;
 }
 
-/// A function that validates a single contiguous area from a grid.
-typedef RuleValidator =
-    ValidationResult Function(
-      GridState grid,
-      List<GridPoint> area,
-    );
+/// A rule that can be applied to a contiguous area of the grid.
+abstract class RuleValidator {
+  const RuleValidator();
+
+  /// Validates a single contiguous area from a grid.
+  ///
+  /// Returns a [ValidationResult] indicating if the area satisfies the rule.
+  ValidationResult validate(GridState grid, List<GridPoint> area);
+
+  /// Returns true if this rule is relevant to the given [grid].
+  ///
+  /// For example, a diamond rule is only applicable if the grid contains
+  /// at least one diamond cell.
+  bool isApplicable(GridState grid);
+}

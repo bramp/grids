@@ -18,7 +18,7 @@ void main() {
         const GridPoint(2),
       ]; // (0,0) and (0,1) for width 2
 
-      final result = diamondValidator(grid, area);
+      final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isTrue);
       expect(result.errors, isEmpty);
     });
@@ -38,7 +38,7 @@ void main() {
         const GridPoint(1),
       ]; // (0,0), (1,1), (1,0) - width 3
 
-      final result = diamondValidator(grid, area);
+      final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isTrue);
     });
 
@@ -53,7 +53,7 @@ void main() {
 
       final area = [const GridPoint(0), const GridPoint(3)]; // (0,0), (0,1)
 
-      final result = diamondValidator(grid, area);
+      final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(result.errors, contains(const GridPoint(0)));
     });
@@ -73,7 +73,7 @@ void main() {
         const GridPoint(3),
       ]; // (0,0), (1,0), (0,1)
 
-      final result = diamondValidator(grid, area);
+      final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(result.errors.length, 3);
     });
@@ -88,7 +88,7 @@ void main() {
 
       final area = [const GridPoint(0), const GridPoint(1)];
 
-      final result = diamondValidator(grid, area);
+      final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isFalse);
     });
 
@@ -103,7 +103,7 @@ void main() {
 
       final area = [const GridPoint(0), const GridPoint(1), const GridPoint(3)];
 
-      final result = diamondValidator(grid, area);
+      final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       // Validates ONLY the blue diamond as the error (index 3)
       expect(result.errors, [const GridPoint(3)]);
@@ -119,7 +119,7 @@ void main() {
       ''',
       );
 
-      final result = strictNumberValidator(grid, [const GridPoint(0)]);
+      final result = strictNumberValidator.validate(grid, [const GridPoint(0)]);
       expect(result.isValid, isTrue);
     });
 
@@ -135,7 +135,7 @@ void main() {
       // Area of exactly 3 cells
       final area = [const GridPoint(0), const GridPoint(3), const GridPoint(1)];
 
-      final result = strictNumberValidator(grid, area);
+      final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isTrue);
     });
 
@@ -151,7 +151,7 @@ void main() {
       // Area of 3 cells, but number asks for 2
       final area = [const GridPoint(0), const GridPoint(3), const GridPoint(1)];
 
-      final result = strictNumberValidator(grid, area);
+      final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(result.errors, [const GridPoint(0)]);
     });
@@ -174,7 +174,7 @@ void main() {
         const GridPoint(2),
       ];
 
-      final result = strictNumberValidator(grid, area);
+      final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isTrue);
     });
 
@@ -194,7 +194,7 @@ void main() {
         const GridPoint(4),
       ];
 
-      final result = strictNumberValidator(grid, area);
+      final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isTrue);
     });
 
@@ -208,7 +208,7 @@ void main() {
 
       // Area of 3 cells
       final area = [const GridPoint(0), const GridPoint(1), const GridPoint(2)];
-      final result1 = strictNumberValidator(grid, area);
+      final result1 = strictNumberValidator.validate(grid, area);
       expect(
         result1.isValid,
         isTrue,
@@ -217,7 +217,7 @@ void main() {
 
       // Area of 1 cell
       final area2 = [const GridPoint(0)];
-      final result2 = strictNumberValidator(grid, area2);
+      final result2 = strictNumberValidator.validate(grid, area2);
       expect(
         result2.isValid,
         isTrue,
@@ -234,7 +234,7 @@ void main() {
       );
 
       final area = [const GridPoint(0)];
-      final result = strictNumberValidator(grid, area);
+      final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(result.errors, [const GridPoint(0)]);
     });
@@ -248,7 +248,7 @@ void main() {
       );
 
       final area = [const GridPoint(0), const GridPoint(1)];
-      final result = strictNumberValidator(grid, area);
+      final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(
         result.errors,
@@ -267,7 +267,7 @@ void main() {
       );
 
       final area = [const GridPoint(0), const GridPoint(1)];
-      final result = numberColorValidator(grid, area);
+      final result = numberColorValidator.validate(grid, area);
       expect(result.isValid, isTrue);
     });
 
@@ -280,7 +280,7 @@ void main() {
       );
 
       final area = [const GridPoint(0), const GridPoint(1)];
-      final result = numberColorValidator(grid, area);
+      final result = numberColorValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(result.errors.length, 2);
     });
@@ -294,7 +294,7 @@ void main() {
       );
 
       final area = [const GridPoint(0), const GridPoint(1)];
-      final result = numberColorValidator(grid, area);
+      final result = numberColorValidator.validate(grid, area);
       expect(result.isValid, isFalse);
     });
   });
