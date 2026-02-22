@@ -28,7 +28,10 @@ class GridFormat {
   ///
   /// Legacy support:
   /// - A lone color prefix (e.g., `R`) is treated as a Diamond of that color.
-  static GridState parse(String ascii) {
+  static GridState parse(
+    String ascii, {
+    CellColor defaultColor = CellColor.black,
+  }) {
     final rows = ascii
         .trim()
         .split('\n')
@@ -110,7 +113,7 @@ class GridFormat {
 
         Cell cell;
         if (token == 'o') {
-          cell = DiamondCell(color ?? CellColor.black);
+          cell = DiamondCell(color ?? defaultColor);
         } else if (int.tryParse(token) != null) {
           final n = int.parse(token);
           if (n == 0) {
@@ -118,7 +121,7 @@ class GridFormat {
               "Number cell value '0' is not allowed in ASCII grid.",
             );
           }
-          cell = NumberCell(n, color: color ?? CellColor.black);
+          cell = NumberCell(n, color: color ?? defaultColor);
         } else if (token == '.' || token == '·' || token.isEmpty) {
           cell = const BlankCell();
         } else {
