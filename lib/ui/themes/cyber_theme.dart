@@ -161,6 +161,20 @@ class CyberTheme extends PuzzleTheme {
     );
   }
 
+  @override
+  Widget buildDashMechanic(BuildContext context, DashCell cell) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: CustomPaint(
+        key: ValueKey('dash_${cell.color}'),
+        painter: _CyberDashPainter(
+          color: _getColor(cell.color),
+        ),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+
   Color _getColor(CellColor color) {
     switch (color) {
       case CellColor.red:
@@ -301,5 +315,44 @@ class _CyberFlowerPainter extends CustomPainter {
         oldDelegate.purplePetals != purplePetals ||
         oldDelegate.orangeColor != orangeColor ||
         oldDelegate.purpleColor != purpleColor;
+  }
+}
+
+class _CyberDashPainter extends CustomPainter {
+  const _CyberDashPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final shadowPaint = Paint()
+      ..color = color.withValues(alpha: 0.6)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+
+    // A horizontal dash
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(cx, cy),
+        width: size.width * 0.5,
+        height: size.height * 0.15,
+      ),
+      Radius.circular(size.height * 0.05),
+    );
+
+    canvas
+      ..drawRRect(rect, shadowPaint)
+      ..drawRRect(rect, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CyberDashPainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }

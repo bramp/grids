@@ -114,6 +114,8 @@ class GridFormat {
         Cell cell;
         if (token == 'o') {
           cell = DiamondCell(color ?? defaultColor);
+        } else if (token == '-') {
+          cell = DashCell(color ?? defaultColor);
         } else if (token.startsWith('F') &&
             token.length == 2 &&
             int.tryParse(token[1]) != null) {
@@ -188,6 +190,9 @@ class GridFormat {
           token = '${colorSymbol ?? ''}o';
         } else if (cell is FlowerCell) {
           token = 'F${cell.orangePetals}';
+        } else if (cell is DashCell) {
+          final colorSymbol = _getSymbolColor(cell.color);
+          token = '${colorSymbol ?? ''}-';
         } else {
           token = '.';
         }
@@ -247,6 +252,8 @@ class GridFormat {
   static String _getAnsiForeground(Cell cell) {
     CellColor? color;
     if (cell is DiamondCell) {
+      color = cell.color;
+    } else if (cell is DashCell) {
       color = cell.color;
     } else if (cell is NumberCell) {
       color = cell.color;

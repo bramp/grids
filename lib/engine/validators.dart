@@ -23,6 +23,8 @@ class DiamondValidator extends RuleValidator {
         colorMap.putIfAbsent(cell.color, () => []).add(pt);
       } else if (cell is NumberCell) {
         colorMap.putIfAbsent(cell.color, () => []).add(pt);
+      } else if (cell is DashCell) {
+        colorMap.putIfAbsent(cell.color, () => []).add(pt);
       } else if (cell is FlowerCell) {
         // A flower can be considered orange and purple for matching purposes
         // in diamond pairing areas.
@@ -251,3 +253,92 @@ class FlowerValidator extends RuleValidator {
 }
 
 const flowerValidator = FlowerValidator();
+
+/// Validates that all dash cells of the same color are located in identically
+/// shaped contiguous areas, with the dash situated in the exact same relative
+/// position within the area.
+class DashValidator extends RuleValidator {
+  const DashValidator();
+
+  @override
+  ValidationResult validate(GridState grid, List<GridPoint> area) {
+    final areaHasDash = area.any((pt) => grid.getMechanic(pt) is DashCell);
+    if (!areaHasDash) {
+      return ValidationResult.success();
+    }
+
+    final errors = <GridPoint>[];
+    final allAreas = grid.extractContiguousAreas();
+
+    // Find all unique dash colors in THIS area to test
+    final colorsToCheck = <CellColor>{};
+    for (final pt in area) {
+      final mechanic = grid.getMechanic(pt);
+      if (mechanic is DashCell) {
+        colorsToCheck.add(mechanic.color);
+      }
+    }
+
+    for (final color in colorsToCheck) {
+      // Find all dashes of this color on the ENTIRE board
+      final globalDashes = <GridPoint>[];
+      for (var i = 0; i < grid.mechanics.length; i++) {
+        final mechanic = grid.mechanics[i];
+        if (mechanic is DashCell && mechanic.color == color) {
+          globalDashes.add(GridPoint(i));
+        }
+      }
+
+      // If this is the only dash of its color, it trivially satisfies the rule
+      if (globalDashes.length <= 1) {
+        continue;
+      }
+
+      // Compute the shape of the area relative to each dash
+      Set<String> getShapeStrings(GridPoint dashPt) {
+        final dashArea = allAreas.firstWhere((a) => a.contains(dashPt));
+        final dashX = grid.x(dashPt);
+        final dashY = grid.y(dashPt);
+        return dashArea.map((pt) {
+          return '${grid.x(pt) - dashX},${grid.y(pt) - dashY}';
+        }).toSet();
+      }
+
+      final referenceShape = getShapeStrings(globalDashes.first);
+      var allMatch = true;
+
+      for (var i = 1; i < globalDashes.length; i++) {
+        final shape = getShapeStrings(globalDashes[i]);
+        if (shape.length != referenceShape.length ||
+            !shape.containsAll(referenceShape)) {
+          allMatch = false;
+          break;
+        }
+      }
+
+      // If any dashes of this color don't match exactly, all dashes of this
+      // color in the CURRENT area are marked as errors. (Other areas will
+      // catch theirs)
+      if (!allMatch) {
+        errors.addAll(
+          area.where((pt) {
+            final mechanic = grid.getMechanic(pt);
+            return mechanic is DashCell && mechanic.color == color;
+          }),
+        );
+      }
+    }
+
+    if (errors.isNotEmpty) {
+      return ValidationResult.failure(errors);
+    }
+
+    return ValidationResult.success();
+  }
+
+  @override
+  bool isApplicable(GridState grid) =>
+      grid.mechanics.any((cell) => cell is DashCell);
+}
+
+const dashValidator = DashValidator();

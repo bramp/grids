@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grids/engine/grid_point.dart';
+import 'package:grids/engine/grid_format.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/providers/puzzle_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_widget.dart';
@@ -18,12 +19,17 @@ void main() {
 
     for (final theme in themeProvider.availableThemes) {
       themeProvider.setTheme(theme);
+
+      final demoGrid = GridFormat.parse('''
+        1   R2  B3  Y4  P5   W1   C2
+        o   Ro  Bo  Yo  Po   Wo   Co
+        F0  F1  F2  F3  F4   F1*  F4*
+        -   R-  B-  Y-  P-   W-   C-
+       (.) (1)  1* (R-) R-* (F2)  F2*
+      ''');
+
       final puzzleProvider = PuzzleProvider()
-        // Let's toggle some cells so we can see lit vs unlit
-        // For shrine_1 (2x2), indices are 0 and 3
-        ..dragToggleCell(const GridPoint(0))
-        ..dragToggleCell(const GridPoint(3))
-        ..endDrag()
+        ..loadCustomPuzzle(Puzzle(id: 'golden_demo', initialGrid: demoGrid))
         // Force validation to show error highlights or solved states
         ..checkAnswer();
 

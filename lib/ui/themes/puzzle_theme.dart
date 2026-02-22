@@ -39,4 +39,7 @@ abstract class PuzzleTheme {
 
   /// Builds the visual representation of a Flower mechanic.
   Widget buildFlowerMechanic(BuildContext context, FlowerCell cell);
+
+  /// Builds the visual representation of a Dash mechanic.
+  Widget buildDashMechanic(BuildContext context, DashCell cell);
 }

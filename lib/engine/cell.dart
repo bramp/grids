@@ -13,6 +13,10 @@ enum LockType {
 }
 
 /// The base class for any cell or symbol placed on a cell.
+// TODO(bramp): Let's create a new ColourCell class to handle the color of
+// the cell. It should have a method matchColor(CellColor color) that
+// returns true if the cell matches that color. This handles the flower cell
+// matching logic.
 @immutable
 abstract class Cell {
   const Cell({this.lockType = LockType.unlocked});
@@ -172,4 +176,34 @@ class FlowerCell extends Cell {
 
   @override
   String toString() => 'Flower($orangePetals orange, lock: $lockType)';
+}
+
+/// The Dash cell.
+class DashCell extends Cell {
+  const DashCell(this.color, {super.lockType = LockType.unlocked});
+  final CellColor color;
+
+  @override
+  Cell lock({required bool isLit}) => DashCell(
+    color,
+    lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
+  );
+
+  @override
+  Cell withColor(CellColor? color) =>
+      DashCell(color ?? this.color, lockType: lockType);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DashCell &&
+          runtimeType == other.runtimeType &&
+          color == other.color &&
+          lockType == other.lockType;
+
+  @override
+  int get hashCode => Object.hash(color, lockType);
+
+  @override
+  String toString() => 'Dash($color, lock: $lockType)';
 }

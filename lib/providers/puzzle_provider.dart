@@ -131,4 +131,12 @@ class PuzzleProvider extends ChangeNotifier {
 
   /// The index of the currently active level.
   int get currentLevelIndex => _currentLevelIndex;
+
+  /// Loads a custom puzzle directly. Primarily for testing or debug.
+  void loadCustomPuzzle(Puzzle puzzle) {
+    _currentPuzzle = puzzle;
+    _grid = puzzle.initialGrid;
+    _lastValidation = null;
+    notifyListeners();
+  }
 }

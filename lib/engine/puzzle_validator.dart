@@ -13,6 +13,7 @@ class PuzzleValidator {
       numberColorValidator,
       lockedCellValidator,
       flowerValidator,
+      dashValidator,
     ],
   });
 
