@@ -101,7 +101,7 @@ class LevelRepository {
       ],
     ),
     /*
-    shrine_7 requires a start and end - which is not supported yet.    
+    shrine_7 requires a start and end - which is not supported yet.
     Puzzle(
       id: 'shrine_7',
       initialGrid: GridFormat.parse('''
@@ -191,6 +191,8 @@ class LevelRepository {
          B1 K1 Y1 P1
       '''),
     ),
+    /*
+     shrine_23 / shrine_24 requires a start and end - which is not supported yet.
     Puzzle(
       id: 'shrine_23',
       initialGrid: GridFormat.parse('''
@@ -201,6 +203,7 @@ class LevelRepository {
       '''),
     ),
     // shrine 24 is a repeat of 23.
+    */
     Puzzle(
       id: 'shrine_25',
       initialGrid: GridFormat.parse('''
@@ -241,6 +244,7 @@ class LevelRepository {
          Y2 . B2
       '''),
     ),
+    // TODO(bramp): shrine_30 is an end-start problem
     Puzzle(
       id: 'shrine_30',
       initialGrid: GridFormat.parse('''
@@ -269,6 +273,34 @@ class LevelRepository {
          . Y4  B4  .
          . . W4 .
          . . K4 .
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_33',
+      initialGrid: GridFormat.parse('''
+         . .  .  . .  .
+         . K3 W3 . B3 Y3
+         . B3 Y3 . K3 W3
+         . .  .  . .  .
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_33',
+      initialGrid: GridFormat.parse('''
+         . .  .  . .  .
+         . K3 W3 . B3 Y3
+         . B3 Y3 . K3 W3
+         . .  .  . .  .
+      '''),
+    ),
+
+    Puzzle(
+      id: 'shrine_34',
+      initialGrid: GridFormat.parse('''
+         . . . . . . Y1
+         . . . Y5 W4 B3 W2
+         . . . K6 . . .
+
       '''),
     ),
   ];
