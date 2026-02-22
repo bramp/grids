@@ -69,16 +69,20 @@ class DiamondCell extends Cell {
 
 /// The Strict Number cell.
 class NumberCell extends Cell {
-  const NumberCell(this.number, {this.color, super.isLocked = false});
+  const NumberCell(
+    this.number, {
+    this.color = CellColor.black,
+    super.isLocked = false,
+  });
   final int number;
-  final CellColor? color;
+  final CellColor color;
 
   @override
   Cell lock() => NumberCell(number, color: color, isLocked: true);
 
   @override
   Cell withColor(CellColor? color) =>
-      NumberCell(number, color: color, isLocked: isLocked);
+      NumberCell(number, color: color ?? this.color, isLocked: isLocked);
 
   @override
   bool operator ==(Object other) =>

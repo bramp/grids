@@ -82,7 +82,9 @@ class GridWidget extends StatelessWidget {
                           children: List.generate(
                             width,
                             (x) => Expanded(
-                              child: GridCellWidget(point: GridPoint(x, y)),
+                              child: GridCellWidget(
+                                point: GridPoint(y * width + x),
+                              ),
                             ),
                           ),
                         ),
@@ -113,7 +115,7 @@ class GridWidget extends StatelessWidget {
     final x = (localPosition.dx / cellWidth).floor();
     final y = (localPosition.dy / cellHeight).floor();
 
-    final point = GridPoint(x, y);
+    final point = GridPoint(y * gridWidth + x);
     final provider = context.read<PuzzleProvider>();
 
     if (provider.grid.isValid(point)) {

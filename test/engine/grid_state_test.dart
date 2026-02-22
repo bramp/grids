@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grids/engine/cell.dart';
+import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
 
@@ -7,23 +8,20 @@ void main() {
   group('GridState Base Functionality', () {
     test('Initialization is purely unlit', () {
       final state = GridState.empty(width: 3, height: 3);
-      expect(state.isLit(const GridPoint(0, 0)), isFalse);
-      expect(state.isLit(const GridPoint(2, 2)), isFalse);
-      expect(
-        state.isLit(const GridPoint(3, 3)),
-        isFalse,
-      ); // OOB safely returns false
+      expect(state.isLit(state.pointAt(0, 0)), isFalse);
+      expect(state.isLit(state.pointAt(2, 2)), isFalse);
     });
 
     test('toggle flips the state immutably', () {
       final state1 = GridState.empty(width: 3, height: 3);
-      final state2 = state1.toggle(const GridPoint(1, 1));
+      final pt = state1.pointAt(1, 1);
+      final state2 = state1.toggle(pt);
 
-      expect(state1.isLit(const GridPoint(1, 1)), isFalse);
-      expect(state2.isLit(const GridPoint(1, 1)), isTrue);
+      expect(state1.isLit(pt), isFalse);
+      expect(state2.isLit(pt), isTrue);
 
-      final state3 = state2.toggle(const GridPoint(1, 1));
-      expect(state3.isLit(const GridPoint(1, 1)), isFalse);
+      final state3 = state2.toggle(pt);
+      expect(state3.isLit(pt), isFalse);
     });
 
     test('extractContiguousAreas returns single area for blank grid', () {
@@ -32,6 +30,7 @@ void main() {
 
       expect(areas.length, 1);
       expect(areas.first.length, 9);
+      expect(areas.first.every((pt) => pt >= 0 && pt < 9), isTrue);
     });
 
     test('extractContiguousAreas works with a checkerboard split', () {
@@ -39,11 +38,11 @@ void main() {
       // 1 1 1
       // 0 1 0
       final state = GridState.empty(width: 3, height: 3)
-          .toggle(const GridPoint(1, 0))
-          .toggle(const GridPoint(0, 1))
-          .toggle(const GridPoint(1, 1))
-          .toggle(const GridPoint(2, 1))
-          .toggle(const GridPoint(1, 2));
+          .toggle(const GridPoint(1)) // (1, 0)
+          .toggle(const GridPoint(3)) // (0, 1)
+          .toggle(const GridPoint(4)) // (1, 1)
+          .toggle(const GridPoint(5)) // (2, 1)
+          .toggle(const GridPoint(7)); // (1, 2)
 
       final areas = state.extractContiguousAreas();
 
@@ -62,35 +61,34 @@ void main() {
     });
 
     test('withMechanic accurately configures and retains cells', () {
-      final state = GridState.empty(width: 2, height: 2)
-          .withMechanic(const GridPoint(0, 0), const DiamondCell(CellColor.red))
-          .withMechanic(const GridPoint(1, 1), const NumberCell(3));
+      final state = GridState.empty(width: 2, height: 2);
+      final p00 = state.pointAt(0, 0);
+      final p11 = state.pointAt(1, 1);
+      final p01 = state.pointAt(0, 1);
 
-      expect(state.getMechanic(const GridPoint(0, 0)), isA<DiamondCell>());
-      expect(state.getMechanic(const GridPoint(1, 1)), isA<NumberCell>());
-      expect(state.getMechanic(const GridPoint(0, 1)), isA<BlankCell>());
+      final state2 = state
+          .withMechanic(p00, const DiamondCell(CellColor.red))
+          .withMechanic(p11, const NumberCell(3));
+
+      expect(state2.getMechanic(p00), isA<DiamondCell>());
+      expect(state2.getMechanic(p11), isA<NumberCell>());
+      expect(state2.getMechanic(p01), isA<BlankCell>());
     });
   });
 
-  group('GridState.fromAscii (Colored Symbols)', () {
-    test('supports R, B, Y, U prefixes for numbers', () {
-      final grid = GridState.fromAscii(
+  group('GridFormat.parse (Colored Symbols)', () {
+    test('supports R, K, Y, B prefixes for numbers', () {
+      final grid = GridFormat.parse(
         '''
-        R1 B2
-        Y3 U4
+        R1 K2
+        Y3 B4
       ''',
-        legend: const {
-          '1': CellState(cell: NumberCell(1)),
-          '2': CellState(cell: NumberCell(2)),
-          '3': CellState(cell: NumberCell(3)),
-          '4': CellState(cell: NumberCell(4)),
-        },
       );
 
-      final n1 = grid.getMechanic(const GridPoint(0, 0)) as NumberCell;
-      final n2 = grid.getMechanic(const GridPoint(1, 0)) as NumberCell;
-      final n3 = grid.getMechanic(const GridPoint(0, 1)) as NumberCell;
-      final n4 = grid.getMechanic(const GridPoint(1, 1)) as NumberCell;
+      final n1 = grid.getMechanic(grid.pointAt(0, 0)) as NumberCell;
+      final n2 = grid.getMechanic(grid.pointAt(1, 0)) as NumberCell;
+      final n3 = grid.getMechanic(grid.pointAt(0, 1)) as NumberCell;
+      final n4 = grid.getMechanic(grid.pointAt(1, 1)) as NumberCell;
 
       expect(n1.color, CellColor.red);
       expect(n2.color, CellColor.black);

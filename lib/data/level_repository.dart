@@ -1,136 +1,110 @@
-import 'package:grids/engine/cell.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/puzzle.dart';
 
 /// A hardcoded repository of levels to build the initial game progression.
 class LevelRepository {
-  /// The global legend used to parse puzzle ASCII strings.
-  static final Map<String, CellState> legend = {
-    // Empty playable cell
-    '.': const CellState(),
-    '·': const CellState(),
-    '█': const CellState(isLit: true),
-
-    // Diamonds
-    'R': const CellState(cell: DiamondCell(CellColor.red)),
-    'B': const CellState(cell: DiamondCell(CellColor.black)),
-    'Y': const CellState(cell: DiamondCell(CellColor.yellow)),
-    'U': const CellState(cell: DiamondCell(CellColor.blue)),
-    'P': const CellState(cell: DiamondCell(CellColor.purple)),
-    'W': const CellState(cell: DiamondCell(CellColor.white)),
-
-    // Numbers
-    '1': const CellState(cell: NumberCell(1)),
-    '2': const CellState(cell: NumberCell(2)),
-    '3': const CellState(cell: NumberCell(3)),
-    '4': const CellState(cell: NumberCell(4)),
-    '5': const CellState(cell: NumberCell(5)),
-    '6': const CellState(cell: NumberCell(6)),
-    '7': const CellState(cell: NumberCell(7)),
-    '8': const CellState(cell: NumberCell(8)),
-    '9': const CellState(cell: NumberCell(9)),
-  };
-
   /// Ordered list of levels for the main progression.
   /// https://steamcommunity.com/sharedfiles/filedetails/?id=2861109284
   static final List<Puzzle> levels = [
     Puzzle(
       id: 'shrine_1',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
         . .
         1 .
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        . .
-        1* .
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . .
+          * .
+        '''),
       ],
     ),
     Puzzle(
       id: 'shrine_2',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
         . 1
         1 .
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        . 1*
-        1* .
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . *
+          * .
+        '''),
       ],
     ),
     Puzzle(
       id: 'shrine_3',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
         . 1
         . 1
         1 .
         1 .
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        . 1*
-        . 1*
-        1* .
-        1 .*
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . *
+          . *
+          * .
+          . *
+        '''),
       ],
     ),
     Puzzle(
       id: 'shrine_4',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
         . 1
         1 .
         1 .
         . 1
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        . 1*
-        1* .
-        1 .*
-        .* 1
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . *
+          * .
+          * .
+          . *
+        '''),
       ],
     ),
     Puzzle(
       id: 'shrine_5',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
         (.) 1
          1  .
          1  .
         (.) 1
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        (.) 1*
-        1* .
-        1* .
-        (.) 1*
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . *
+          * .
+          * .
+          . *
+        '''),
       ],
     ),
     Puzzle(
       id: 'shrine_6',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
         (*1) .  . (1)
          .   1  .  .
          .   .  1  .
         (1)  .  .  1
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        (1*) . .* (1)
-        . 1* . .*
-        .* . 1* .
-        (1) .* . 1*
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          * . * .
+          . * . *
+          * . * .
+          . * . *
+        '''),
       ],
     ),
+    /*
+    shrine_7 requires a start and end - which is not supported yet.    
     Puzzle(
       id: 'shrine_7',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
          .   .   1
          .   .   .
         (*1) .   .
@@ -138,121 +112,164 @@ class LevelRepository {
          .   .   1
          1   .   .
          .   1   1
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        . . 1*
-        . . .
-        (1*) . .
-        1 .* .
-        .* . 1*
-        1 .* .
-        .* 1 1*
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . *
+          . . .
+          * . .
+          . * .
+          * . *
+          . * .
+          * . *
+        '''),
       ],
     ),
-    // TODO(bramp): level 8
+    */
+    // TODO(bramp): level 8 is a walking path problem
     Puzzle(
       id: 'shrine_9',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
          .   .
          2   .
-      ''', legend: legend),
-      knownSolutions: const [
-        '''
-        . .
-        2* .*
-        ''',
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . .
+          * *
+        '''),
       ],
     ),
-    // TODO(bramp): level 10-16
+    // TODO(bramp): level 10-16 are walking path problems
     Puzzle(
       id: 'shrine_17',
-      initialGrid: GridState.fromAscii('''
-         U1
+      initialGrid: GridFormat.parse('''
+         B1
          Y1
-      ''', legend: legend),
+      '''),
     ),
     Puzzle(
       id: 'shrine_18',
-      initialGrid: GridState.fromAscii('''
-         (U1) Y1
+      initialGrid: GridFormat.parse('''
+         (B1) Y1
           Y1 (*Y1)
-      ''', legend: legend),
+      '''),
     ),
     Puzzle(
       id: 'shrine_19',
-      initialGrid: GridState.fromAscii('''
-         Y1 Y1 U1 U1
-         U1 Y1 U1 Y1
-         U1 Y1 U1 Y1
-         Y1 Y1 U1 U1
-      ''', legend: legend),
+      initialGrid: GridFormat.parse('''
+         Y1 Y1 B1 B1
+         B1 Y1 B1 Y1
+         B1 Y1 B1 Y1
+         Y1 Y1 B1 B1
+      '''),
     ),
     Puzzle(
       id: 'shrine_20',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
          .  .  .  .
-         .  .  U1 Y1
-         Y1 U1 .  .
+         .  .  B1 Y1
+         Y1 B1 .  .
          .  .  .  .
-      ''', legend: legend),
+      '''),
     ),
     Puzzle(
       id: 'shrine_21',
-      initialGrid: GridState.fromAscii('''
-         .  .  U1  .
-         .  .  U1 U1
+      initialGrid: GridFormat.parse('''
+         .  .  B1  .
+         .  .  B1 B1
          Y1 Y1 .  .
          .  Y1  .  .
-      ''', legend: legend),
+      '''),
     ),
     Puzzle(
       id: 'shrine_22',
-      initialGrid: GridState.fromAscii('''
-         B1 Y1 P1 W1
-         Y1 U1 B1 P1
-         P1 W1 U1 W1
-         U1 B1 Y1 P1
-      ''', legend: legend),
+      initialGrid: GridFormat.parse('''
+         K1 Y1 P1 W1
+         Y1 B1 K1 P1
+         P1 W1 B1 W1
+         B1 K1 Y1 P1
+      '''),
     ),
     Puzzle(
       id: 'shrine_23',
-      initialGrid: GridState.fromAscii('''
-         U1 U1 Y1 U1
-         Y1 Y1 Y1 U1
-         U1 U1 U1 Y1
-         Y1 Y1 U1 Y1
-      ''', legend: legend),
+      initialGrid: GridFormat.parse('''
+         B1 B1 Y1 B1
+         Y1 Y1 Y1 B1
+         B1 B1 B1 Y1
+         Y1 Y1 B1 Y1
+      '''),
     ),
     // shrine 24 is a repeat of 23.
     Puzzle(
       id: 'shrine_25',
-      initialGrid: GridState.fromAscii('''
+      initialGrid: GridFormat.parse('''
          . . .
-         U4 . Y4
+         B4 . Y4
          . . .
-      ''', legend: legend),
+      '''),
     ),
-
     Puzzle(
       id: 'shrine_26',
-      initialGrid: GridState.fromAscii('''
-         U1 U1 Y1 U1
-         Y1 Y1 Y1 U1
-         U1 U1 U1 Y1
-         Y1 Y1 U1 Y1
-      ''', legend: legend),
+      initialGrid: GridFormat.parse('''
+         . . .
+         B4 . Y3
+         . . .
+      '''),
     ),
-
     Puzzle(
       id: 'shrine_27',
-      initialGrid: GridState.fromAscii('''
-         U1 U1 Y1 U1
-         Y1 Y1 Y1 U1
-         U1 U1 U1 Y1
-         Y1 Y1 U1 Y1
-      ''', legend: legend),
+      initialGrid: GridFormat.parse('''
+         . . .
+         . B4 Y2
+         . . .
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_28',
+      initialGrid: GridFormat.parse('''
+         . . .
+         . B4 Y1
+         . . .
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_29',
+      initialGrid: GridFormat.parse('''
+         B3 . Y2
+         . . .
+         Y2 . B2
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_30',
+      initialGrid: GridFormat.parse('''
+         . . B3
+         . . Y2
+         . . B4
+         Y2 . .
+         B4 . .
+         . . Y2
+         . . B4
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_31',
+      initialGrid: GridFormat.parse('''
+         . .  .  .
+         . .  .  .
+         . B4 Y4 .
+         . Y4 B4 .
+      '''),
+    ),
+    Puzzle(
+      id: 'shrine_32',
+      initialGrid: GridFormat.parse('''
+         . .  .  .
+         . Y4  B4  .
+         . . W4 .
+         . . K4 .
+      '''),
     ),
   ];
 }

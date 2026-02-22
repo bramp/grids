@@ -17,12 +17,7 @@ class PuzzleValidator {
 
   /// Evaluates an entire grid state.
   ///
-  /// Returns a [ValidationResult] representing the entire board. If
-  /// [ValidationResult.isValid] is true, the user has completely solved the
-  /// puzzle.
-  /// If [ValidationResult.isValid] is false, [ValidationResult.errors] will
-  /// contain EVERY specific cell across all contiguous areas that currently
-  /// violates a rule, allowing UI to highlight them.
+  /// Returns a [ValidationResult] representing the entire board.
   ValidationResult validate(GridState grid) {
     var allValid = true;
     final allErrors = <GridPoint>{};
@@ -43,6 +38,7 @@ class PuzzleValidator {
     if (allValid) {
       return ValidationResult.success();
     }
+
     return ValidationResult.failure(allErrors.toList());
   }
 }

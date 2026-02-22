@@ -30,8 +30,8 @@ class CyberTheme extends PuzzleTheme {
       glowColor = Colors.redAccent;
     } else if (mechanic is DiamondCell) {
       glowColor = _getColor(mechanic.color);
-    } else if (mechanic is NumberCell && mechanic.color != null) {
-      glowColor = _getColor(mechanic.color!);
+    } else if (mechanic is NumberCell) {
+      glowColor = _getColor(mechanic.color);
     } else {
       glowColor = const Color(0xFF00FFCC); // Default Neon Cyan
     }
@@ -45,10 +45,12 @@ class CyberTheme extends PuzzleTheme {
             : Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isLit
-              ? glowColor.withValues(alpha: 0.8)
-              : Colors.white.withValues(alpha: 0.1),
-          width: isLit ? 2 : 1,
+          color: isLocked
+              ? glowColor.withValues(alpha: 1)
+              : (isLit
+                    ? glowColor.withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.1)),
+          width: isLocked ? 4 : (isLit ? 2 : 1),
         ),
         boxShadow: isLit
             ? [
@@ -93,14 +95,7 @@ class CyberTheme extends PuzzleTheme {
               ),
             ),
           ),
-          if (isLocked)
-            Center(
-              child: Icon(
-                Icons.lock_outline,
-                color: Colors.white.withValues(alpha: 0.3),
-                size: 32,
-              ),
-            ),
+
           child,
         ],
       ),
@@ -109,9 +104,7 @@ class CyberTheme extends PuzzleTheme {
 
   @override
   Widget buildNumberMechanic(BuildContext context, NumberCell cell) {
-    final color = cell.color != null
-        ? _getColor(cell.color!)
-        : const Color(0xFF00FFCC);
+    final color = _getColor(cell.color);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
@@ -155,7 +148,7 @@ class CyberTheme extends PuzzleTheme {
       case CellColor.red:
         return const Color(0xFFFF0055); // Neon Pink/Red
       case CellColor.black:
-        return const Color(0xFF555555); // Cannot have glowing black easily
+        return const Color(0xFF00FFCC); // Default Neon Cyan (mapped from black)
       case CellColor.blue:
         return const Color(0xFF0055FF); // Neon Blue
       case CellColor.yellow:

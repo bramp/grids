@@ -20,8 +20,9 @@ void main() {
       themeProvider.setTheme(theme);
       final puzzleProvider = PuzzleProvider()
         // Let's toggle some cells so we can see lit vs unlit
-        ..dragToggleCell(const GridPoint(0, 0))
-        ..dragToggleCell(const GridPoint(1, 1))
+        // For shrine_1 (2x2), indices are 0 and 3
+        ..dragToggleCell(const GridPoint(0))
+        ..dragToggleCell(const GridPoint(3))
         ..endDrag()
         // Force validation to show error highlights or solved states
         ..checkAnswer();

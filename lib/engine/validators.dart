@@ -5,7 +5,7 @@ import 'package:grids/engine/rule_validator.dart';
 
 /// Validates that within any contiguous area, there must be exactly two
 /// diamonds of the same color (or zero diamonds for a given color).
-ValidationResult diamondValidator(GridState grid, Set<GridPoint> area) {
+ValidationResult diamondValidator(GridState grid, List<GridPoint> area) {
   // Collect all diamond cells within this specific area, mapped by color.
   final colorMap = <CellColor, List<GridPoint>>{};
 
@@ -19,8 +19,6 @@ ValidationResult diamondValidator(GridState grid, Set<GridPoint> area) {
   final errors = <GridPoint>[];
 
   // For every color present in this area, there MUST be exactly TWO diamonds
-  // (or exactly ZERO, which is trivially true if the color key isn't in
-  // the map).
   for (final entry in colorMap.entries) {
     final colorPts = entry.value;
     if (colorPts.length != 2) {
@@ -37,14 +35,14 @@ ValidationResult diamondValidator(GridState grid, Set<GridPoint> area) {
 
 /// Validates that within any contiguous area containing numbers, the size of
 /// the area precisely matches the sum of all number cells inside it.
-ValidationResult strictNumberValidator(GridState grid, Set<GridPoint> area) {
+ValidationResult strictNumberValidator(GridState grid, List<GridPoint> area) {
   // Collect all number cells within this specific area.
-  final numbers = <MapEntry<GridPoint, NumberCell>>[];
+  final numbers = <GridPoint>[];
 
   for (final pt in area) {
     final cell = grid.getMechanic(pt);
     if (cell is NumberCell) {
-      numbers.add(MapEntry(pt, cell));
+      numbers.add(pt);
     }
   }
 
@@ -56,14 +54,14 @@ ValidationResult strictNumberValidator(GridState grid, Set<GridPoint> area) {
 
   // Sum up the numbers requested.
   var requiredAreaSize = 0;
-  for (final entry in numbers) {
-    requiredAreaSize += entry.value.number;
+  for (final pt in numbers) {
+    final cell = grid.getMechanic(pt) as NumberCell;
+    requiredAreaSize += cell.number;
   }
 
   if (area.length != requiredAreaSize) {
     // The total area isn't the required size; all number blocks are wrong.
-    final errors = numbers.map((e) => e.key).toList();
-    return ValidationResult.failure(errors);
+    return ValidationResult.failure(numbers);
   }
 
   return ValidationResult.success();
@@ -71,7 +69,7 @@ ValidationResult strictNumberValidator(GridState grid, Set<GridPoint> area) {
 
 /// Validates that within any contiguous area containing numbers, all numbers
 /// must share the identical color (including null).
-ValidationResult numberColorValidator(GridState grid, Set<GridPoint> area) {
+ValidationResult numberColorValidator(GridState grid, List<GridPoint> area) {
   final numberPoints = <GridPoint>[];
   final colors = <CellColor?>{};
 

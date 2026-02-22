@@ -21,32 +21,44 @@ class PuzzleSolver {
   /// will take significant time to solve.
   List<GridState> solve(Puzzle puzzle, {bool deduplicate = true}) {
     final grid = puzzle.initialGrid;
-    final playablePoints = <GridPoint>[];
+    final playableIndices = <GridPoint>[];
 
-    for (var y = 0; y < grid.height; y++) {
-      for (var x = 0; x < grid.width; x++) {
-        final pt = GridPoint(x, y);
-        if (!grid.isLocked(pt)) {
-          playablePoints.add(pt);
-        }
+    for (var i = 0; i < grid.mechanics.length; i++) {
+      final pt = GridPoint(i);
+      if (!grid.isLocked(pt)) {
+        playableIndices.add(pt);
       }
     }
 
     final solutions = <GridState>[];
     final seenSignatures = <String>{};
-    _backtrack(grid, playablePoints, 0, solutions, seenSignatures, deduplicate);
+
+    final bitMasks = playableIndices.map((pt) => BigInt.one << pt).toList();
+
+    _backtrack(
+      grid,
+      bitMasks,
+      0,
+      grid.bits,
+      solutions,
+      seenSignatures,
+      deduplicate,
+    );
+
     return solutions;
   }
 
   void _backtrack(
-    GridState current,
-    List<GridPoint> points,
+    GridState initialGrid,
+    List<BigInt> bitMasks,
     int index,
+    BigInt currentBits,
     List<GridState> solutions,
     Set<String> seenSignatures,
     bool deduplicate,
   ) {
-    if (index == points.length) {
+    if (index == bitMasks.length) {
+      final current = initialGrid.withBits(currentBits);
       if (_validator.validate(current).isValid) {
         if (!deduplicate) {
           solutions.add(current);
@@ -61,21 +73,25 @@ class PuzzleSolver {
       return;
     }
 
-    final pt = points[index];
+    final bit = bitMasks[index];
 
-    // Try both states for the current point
+    // Try bit off
     _backtrack(
-      current.setLit(pt, isLit: false),
-      points,
+      initialGrid,
+      bitMasks,
       index + 1,
+      currentBits & ~bit,
       solutions,
       seenSignatures,
       deduplicate,
     );
+
+    // Try bit on
     _backtrack(
-      current.setLit(pt, isLit: true),
-      points,
+      initialGrid,
+      bitMasks,
       index + 1,
+      currentBits | bit,
       solutions,
       seenSignatures,
       deduplicate,
@@ -89,12 +105,9 @@ class PuzzleSolver {
     for (final area in areas) {
       final hasMechanic = area.any((pt) => grid.getMechanic(pt) is! BlankCell);
       if (hasMechanic) {
-        final sortedPts = area.toList()
-          ..sort(
-            (a, b) => a.x != b.x ? a.x.compareTo(b.x) : a.y.compareTo(b.y),
-          );
+        final sortedPts = area.toList()..sort();
         final litState = grid.isLit(sortedPts.first) ? '1' : '0';
-        final pointsStr = sortedPts.map((p) => '${p.x},${p.y}').join('|');
+        final pointsStr = sortedPts.join('|');
         mechanicAreas.add('$litState:$pointsStr');
       }
     }
@@ -110,16 +123,14 @@ class PuzzleSolver {
     var normalized = grid;
     final originalSignature = _getSignature(grid);
 
-    // Greedily try to unlight cells that aren't strictly necessary.
-    for (var y = 0; y < grid.height; y++) {
-      for (var x = 0; x < grid.width; x++) {
-        final pt = GridPoint(x, y);
-        if (normalized.isLit(pt)) {
-          final testGrid = normalized.setLit(pt, isLit: false);
-          if (_validator.validate(testGrid).isValid &&
-              _getSignature(testGrid) == originalSignature) {
-            normalized = testGrid;
-          }
+    final size = grid.mechanics.length;
+    for (var i = 0; i < size; i++) {
+      final pt = GridPoint(i);
+      if (normalized.isLit(pt)) {
+        final testGrid = normalized.setLit(pt, isLit: false);
+        if (_validator.validate(testGrid).isValid &&
+            _getSignature(testGrid) == originalSignature) {
+          normalized = testGrid;
         }
       }
     }
@@ -129,18 +140,5 @@ class PuzzleSolver {
       'Normalization broke grid validity!',
     );
     return normalized;
-  }
-}
-
-extension on GridState {
-  GridState setLit(GridPoint pt, {required bool isLit}) {
-    if (this.isLit(pt) == isLit) return this;
-
-    final newCells = List<List<CellState>>.generate(
-      width,
-      (x) => List<CellState>.from(cells[x]),
-    );
-    newCells[pt.x][pt.y] = cells[pt.x][pt.y].copyWith(isLit: isLit);
-    return GridState.fromCells(newCells);
   }
 }

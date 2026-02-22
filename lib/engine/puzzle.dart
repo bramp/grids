@@ -17,8 +17,8 @@ class Puzzle {
   /// The starting layout of the grid, including all mechanics.
   final GridState initialGrid;
 
-  /// A list of known valid solutions in ASCII symbolic notation.
-  final List<String> knownSolutions;
+  /// A list of known valid solutions represented as bitsets of the lit state.
+  final List<BigInt> knownSolutions;
 
   /// Additional optional metadata (e.g. difficulty, author).
   final Map<String, dynamic> metadata;
