@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/rule_validator.dart';
 import 'package:grids/providers/puzzle_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
@@ -64,6 +66,8 @@ class GameScreen extends StatelessWidget {
         title: Text(puzzleName),
         centerTitle: true,
         actions: [
+          // Debug-only: level selector for quickly jumping to any puzzle.
+          if (kDebugMode) const _DebugLevelPicker(),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: DropdownButton<PuzzleTheme>(
@@ -172,5 +176,42 @@ class GameScreen extends StatelessWidget {
         ),
       );
     }
+  }
+}
+
+/// Debug-only widget: a dropdown in the AppBar for jumping directly to any
+/// puzzle by ID. Only compiled in when [kDebugMode] is true.
+class _DebugLevelPicker extends StatelessWidget {
+  const _DebugLevelPicker();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<PuzzleProvider>();
+    final levels = LevelRepository.levels;
+    final currentIndex = provider.currentLevelIndex;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: DropdownButton<int>(
+        value: currentIndex,
+        underline: const SizedBox.shrink(),
+        icon: const Icon(Icons.bug_report, size: 20),
+        onChanged: (index) {
+          if (index != null) {
+            context.read<PuzzleProvider>().jumpToLevel(index);
+          }
+        },
+        items: List.generate(
+          levels.length,
+          (i) => DropdownMenuItem(
+            value: i,
+            child: Text(
+              levels[i].id,
+              style: const TextStyle(fontSize: 13),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

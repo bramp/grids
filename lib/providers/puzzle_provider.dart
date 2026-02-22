@@ -117,4 +117,18 @@ class PuzzleProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Jumps directly to a level by index, bypassing the unlock gate.
+  /// Intended for debug/development use only.
+  void jumpToLevel(int index) {
+    assert(
+      index >= 0 && index < LevelRepository.levels.length,
+      'Level index $index out of range',
+    );
+    _loadLevel(index);
+    notifyListeners();
+  }
+
+  /// The index of the currently active level.
+  int get currentLevelIndex => _currentLevelIndex;
 }
