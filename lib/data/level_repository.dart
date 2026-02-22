@@ -594,16 +594,192 @@ class LevelRepository {
         Y-1 .  .  Y-1
         (Y1)  .  .   (Y1)
         (Y1)   .  .   (Y1)
-        Y-1 .  .  Y-1
+        Y1 .  .  Y1
       '''),
       knownSolutions: [
         GridFormat.parseMask('''
+          * * * *
           . * * .
           . * * .
+          * * * *
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_49',
+      initialGrid: GridFormat.parse('''
+        Y-1  Y-1 Y-1 Y-1
+        (Y1) Y-1 Y-1 (Y1)
+        (Y1) Y-1 Y-1 (Y1)
+        (Y1)   Y1  Y1  (Y1)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . .
+          . . . .
+          . . . .
+          . . . .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_50',
+      initialGrid: GridFormat.parse('''
+        (Y1)  Y-1 (*Y1) Y-1
+        (*Y1) Y-1 (Y1) Y-1
+        (Y1)  Y-1 (*Y1) Y-1
+        (*Y1) Y-1  (Y1) Y-1
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * *
+          * * . .
+          . . * *
+          * * . .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_51',
+      initialGrid: GridFormat.parse('''
+        Y9 . . Y-1
+        Y-1 . . Y-1
+        Y-1 . . Y-1
+        Y-1 . . Y9
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . .
+          . . . .
           . * * .
           . * * .
         '''),
       ],
     ),
+
+    Puzzle(
+      id: 'shrine_52',
+      initialGrid: GridFormat.parse('''
+        Y-7 .  .  Y3
+        .   Y9 .  .
+        .   .  Y9 .
+        Y3  .  .  Y-7
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . .
+          * . * *
+          * * . *
+          . . . .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_53',
+      initialGrid: GridFormat.parse('''
+        Y1   .  Y1  Y-1
+        Y-1  .   .  Y-1
+        Y-1 Y-1 Y1  Y-1
+        Y-1  .   .  Y-1
+        Y-1  .   .  Y-1
+        Y-1  Y1  .   Y9
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . .
+          . . . .
+          . . * .
+          . . . .
+          . . . .
+          . * . .
+        '''),
+      ],
+    ),
+    // TODO(bramp): shrine_54 is a start-end problem
+    // TODO(bramp): shrine_55 is a start-end problem
+    // TODO(bramp): shrine_56 is a previous start-end problem
+    Puzzle(
+      id: 'shrine_57',
+      initialGrid: GridFormat.parse('''
+        (2)  .  (*3)  .  (2)
+        .    .   .   .  .
+        (*3) .  (5)  .  (*3)
+        .    .   .   .  .
+        (2)  .  (*3) .  (2)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * . .
+          . . * * *
+          * . . . *
+          * * * * *
+          . . * . .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_58',
+      initialGrid: GridFormat.parse('''
+        (3)  .  (*3) .  (3)
+        .    .   .   .   .
+        (*3) .   .   .  (*3)
+        .    .   .   .   .
+        (3)  .  (*3) .  (3)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * . .
+          . * * . *
+          * * . * *
+          . * * . .
+          . . * * .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_59',
+      initialGrid: GridFormat.parse('''
+        (2)  .   .    .   (2)
+         .   .   .    .    .
+         .   .  (*6)  .    .
+         .   .   .    .    .
+        (2)  .   .    .   (2)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * . .
+          * * . * *
+          . . * * .
+          * * . * *
+          . . * . .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_60',
+      initialGrid: GridFormat.parse('''
+        (5)    .    .    .     .   (5)
+         .   (*6)   .    .     .    .
+         .     .    .   (B4)   .    .
+         .     .    .    .     .    .
+         .     .    .    .    (*6)  .
+        (5)  (*)   .    .     .    (5)
+      '''),
+    ),
+
+    // TODO Shortcut #2 start to finish puzzle
+
+    // TODO Bonus_5 diamond puzzle
+
+    // TODO Gardens
+
+    // Next puzzle here
   ];
 }
