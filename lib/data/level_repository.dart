@@ -428,8 +428,182 @@ class LevelRepository {
         K-2 . .
         . . .
         (*K6) . (K4)
-
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          * . *
+          * . .
+          * * .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_39',
+      initialGrid: GridFormat.parse('''
+        . . .
+        K-3 . .
+        (*K6) . (K4)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * .
+          * . .
+          * * .
+        '''),
+      ],
+    ),
+    Puzzle(
+      id: 'shrine_40',
+      initialGrid: GridFormat.parse('''
+        . . .
+        K-4 . .
+        (*K6) . (K4)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * *
+          * . .
+          * . .
+        '''),
+      ],
+    ),
+    Puzzle(
+      id: 'shrine_41',
+      initialGrid: GridFormat.parse('''
+        .     .  K-2
+        .     .  K-1
+        (*K5) .  (K6)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * .
+          * * .
+          * * .
+        '''),
+      ],
+    ),
+    Puzzle(
+      id: 'shrine_42',
+      initialGrid: GridFormat.parse('''
+        K-3 . .
+        . K-3 .
+        (*K6) (K6) .
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          * . *
+          * . *
+          * . *
+        '''),
+      ],
+    ),
+    Puzzle(
+      id: 'shrine_43',
+      initialGrid: GridFormat.parse('''
+        Y6 . . .
+        . 3 -1 .
+        . -1 3 .
+        . . . Y6
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . .
+          . * * .
+          . * * .
+          . . . .
+        '''),
+      ],
+    ),
+    Puzzle(
+      id: 'shrine_44',
+      initialGrid: GridFormat.parse('''
+        K6 . . .
+        . Y3 K-1 .
+        . K-1 Y3 .
+        . . . K6
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . .
+          * * . *
+          * . * *
+          . . . .
+        '''),
+      ],
+    ),
+    Puzzle(
+      id: 'shrine_45',
+      initialGrid: GridFormat.parse('''
+        (*Y4) .    .     .
+        .    (Y3)  Y-1   .
+        .     Y-1  (Y3)  .
+        .      .    .   (*Y4)
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          * . * .
+          * . . *
+          * * . .
+          . * * *
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_46',
+      note: 'Learn if a area sums to zero, the area can be any size',
+      initialGrid: GridFormat.parse('''
+        Y1 . Y1 K-2
+        .  . .  .
+        Y1 . Y1 .
+        K2 . .  Y1
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * . *
+          * * * *
+          . * . *
+          * * * .
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_47',
+      note: 'Learn that areas can never have a net negative sum',
+      initialGrid: GridFormat.parse('''
+        Y-1 .  B1  K-1
+        Y1  .  .   .
+        .   .  .   Y1
+        B-1 K1 .   Y-1
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * * .
+          . * . .
+          * * . *
+          * . . *
+        '''),
+      ],
+    ),
+
+    Puzzle(
+      id: 'shrine_48',
+      initialGrid: GridFormat.parse('''
+        Y-1 .  .  Y-1
+        (Y1)  .  .   (Y1)
+        (Y1)   .  .   (Y1)
+        Y-1 .  .  Y-1
+      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * * .
+          . * * .
+          . * * .
+          . * * .
+        '''),
+      ],
     ),
   ];
 }

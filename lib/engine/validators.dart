@@ -41,9 +41,9 @@ ValidationResult diamondValidator(GridState grid, List<GridPoint> area) {
 ///
 /// Each distinct color group is validated independently. All number cells
 /// in the area (across all colors) must sum to the area's actual size.
-// TODO(bramp): Decide if a lone negative number (e.g. K-2 alone in an area)
-// is valid. It would imply a required size of -2, which is impossible.
-// Current behaviour: treated as invalid (required size <= 0 fails).
+///
+/// If the sum is zero (e.g., K-2 and K2 in the same area), the area can
+/// be any size. Negative sums (net negative) are never allowed.
 ValidationResult strictNumberValidator(GridState grid, List<GridPoint> area) {
   // Collect all number cells within this specific area, grouped by color.
   final byColor = <CellColor, List<GridPoint>>{};
@@ -70,17 +70,23 @@ ValidationResult strictNumberValidator(GridState grid, List<GridPoint> area) {
     for (final pt in entry.value) {
       colorSum += (grid.getMechanic(pt) as NumberCell).number;
     }
-    // TODO(bramp): Decide if a net-negative color group (e.g. only K-2)
-    // should be an immediate error or contribute a negative to the total.
     requiredAreaSize += colorSum;
   }
 
-  if (area.length != requiredAreaSize) {
+  if (requiredAreaSize < 0) {
+    // Negative regions are never allowed.
+    byColor.values.forEach(errors.addAll);
+    return ValidationResult.failure(errors);
+  }
+
+  if (requiredAreaSize > 0 && area.length != requiredAreaSize) {
     // The total area isn't the required size; mark all number cells as errors.
     byColor.values.forEach(errors.addAll);
     return ValidationResult.failure(errors);
   }
 
+  // If requiredAreaSize == 0, the sum of negative and positive numbers is zero.
+  // In this case, the area can be any size.
   return ValidationResult.success();
 }
 

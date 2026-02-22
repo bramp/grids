@@ -177,6 +177,84 @@ void main() {
       final result = strictNumberValidator(grid, area);
       expect(result.isValid, isTrue);
     });
+
+    test('Negative numbers reduce required area size', () {
+      final grid = GridFormat.parse(
+        '''
+        5 -1 .
+        . . .
+      ''',
+      );
+
+      // Area of 4 cells, which is 5 + (-1)
+      final area = [
+        const GridPoint(0),
+        const GridPoint(1),
+        const GridPoint(3),
+        const GridPoint(4),
+      ];
+
+      final result = strictNumberValidator(grid, area);
+      expect(result.isValid, isTrue);
+    });
+
+    test('Net zero sum allows any area size', () {
+      final grid = GridFormat.parse(
+        '''
+        1 -1 .
+        .  . .
+      ''',
+      );
+
+      // Area of 3 cells
+      final area = [const GridPoint(0), const GridPoint(1), const GridPoint(2)];
+      final result1 = strictNumberValidator(grid, area);
+      expect(
+        result1.isValid,
+        isTrue,
+        reason: 'Area of 3 should be valid for sum 0',
+      );
+
+      // Area of 1 cell
+      final area2 = [const GridPoint(0)];
+      final result2 = strictNumberValidator(grid, area2);
+      expect(
+        result2.isValid,
+        isTrue,
+        reason: 'Area of 1 should be valid for sum 0',
+      );
+    });
+
+    test('Net negative sum is always invalid', () {
+      final grid = GridFormat.parse(
+        '''
+        -1 . .
+        .  . .
+      ''',
+      );
+
+      final area = [const GridPoint(0)];
+      final result = strictNumberValidator(grid, area);
+      expect(result.isValid, isFalse);
+      expect(result.errors, [const GridPoint(0)]);
+    });
+
+    test('Net negative sum (multiple cells) is always invalid', () {
+      final grid = GridFormat.parse(
+        '''
+        1 -2 .
+        .  . .
+      ''',
+      );
+
+      final area = [const GridPoint(0), const GridPoint(1)];
+      final result = strictNumberValidator(grid, area);
+      expect(result.isValid, isFalse);
+      expect(
+        result.errors,
+        containsAll([const GridPoint(0), const GridPoint(1)]),
+      );
+    });
   });
 
   group('NumberColorValidator', () {
