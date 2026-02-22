@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:grids/data/level_repository.dart';
+import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
 import 'package:grids/engine/solver.dart';
@@ -20,27 +21,16 @@ int _countPlayable(GridState grid) {
 
 /// Returns a difficulty rating based on solution density and grid complexity.
 ///
-/// Heuristic:
-///   - search space = 2^playableCells
-///   - density = solutions / searchSpace
-///   - Lower density + more playable cells = harder
+/// Heuristic: score = playableCells - log2(solutionCount)
+/// This represents "how many bits of information you need to find a solution."
+/// Higher = harder.
 String _difficulty(int solutionCount, int playableCells) {
   if (playableCells == 0) return '⬜ trivial';
-
-  // The ratio of solutions to total search space
-  final searchSpace = pow(2, playableCells);
-  final density = solutionCount / searchSpace;
-
-  // Combine density with raw playable count for a composite score.
-  // A 3x3 with 1 solution is easier than a 5x5 with 1 solution,
-  // even though both have the same density-like feel.
-  //
-  // Score: lower = harder. We use -log2(density) * playableCells
-  // as a rough "information bits needed to find a solution".
   if (solutionCount == 0) return '🚫 impossible';
 
-  final bitsPerSolution = -log(density) / ln2; // = playable - log2(solutions)
-  final score = bitsPerSolution;
+  final searchSpace = pow(2, playableCells);
+  final density = solutionCount / searchSpace;
+  final score = -log(density) / ln2;
 
   if (score <= 4) return '🟢 easy';
   if (score <= 8) return '🟡 medium';
@@ -49,11 +39,14 @@ String _difficulty(int solutionCount, int playableCells) {
 }
 
 void main(List<String> args) {
+  final maskMode = args.contains('--mask');
+  final filteredArgs = args.where((a) => a != '--mask').toList();
+
   final levels = LevelRepository.levels;
   final solver = PuzzleSolver();
 
-  if (args.isNotEmpty) {
-    final targetId = args[0];
+  if (filteredArgs.isNotEmpty) {
+    final targetId = filteredArgs[0];
     final puzzle = levels.firstWhereOrNull((l) => l.id == targetId);
 
     if (puzzle == null) {
@@ -86,22 +79,28 @@ void main(List<String> args) {
       'Found ${solutions.length} solution(s) in '
       '${stopwatch.elapsedMilliseconds}ms',
     );
-    print(
-      'Solution density: ${solutions.length}/$searchSpace '
-      '($density%)',
-    );
+    print('Solution density: ${solutions.length}/$searchSpace ($density%)');
     print('Difficulty: $difficulty');
 
     for (var i = 0; i < solutions.length; i++) {
       print('\n--- Solution #${i + 1} ---');
-      print(solutions[i].toAsciiString(useColor: true));
+      if (maskMode) {
+        print("        GridFormat.parseMask('''");
+        print(GridFormat.toMaskString(solutions[i], useColor: true));
+        print("        '''),");
+      } else {
+        print(solutions[i].toAsciiString(useColor: true));
+      }
     }
     return;
   }
 
   // Summary mode (when no args provided)
   print('Grids Solver Summary');
-  print('Usage: dart run bin/solve.dart [puzzle_id]');
+  print('Usage: dart run bin/solve.dart [--mask] [puzzle_id]');
+  print(
+    '       --mask   Print solutions as parseMask strings for copy-pasting',
+  );
   print('');
 
   final header =

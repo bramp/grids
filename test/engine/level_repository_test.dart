@@ -4,25 +4,38 @@ import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 
 void main() {
-  group('Known Solutions Verification', () {
-    final validator = PuzzleValidator();
-    final levels = LevelRepository.levels;
+  final validator = PuzzleValidator();
+  final levels = LevelRepository.levels;
 
+  test('all puzzle IDs are unique', () {
+    final ids = levels.map((p) => p.id).toList();
+    final seen = <String>{};
+    final duplicates = <String>[];
+    for (final id in ids) {
+      if (!seen.add(id)) {
+        duplicates.add(id);
+      }
+    }
+    expect(
+      duplicates,
+      isEmpty,
+      reason: 'Duplicate puzzle IDs found: $duplicates',
+    );
+  });
+
+  group('Known Solutions', () {
     for (final level in levels) {
-      if (level.knownSolutions.isEmpty) continue;
-
-      group('Level ${level.id}', () {
+      group(level.id, () {
         for (var i = 0; i < level.knownSolutions.length; i++) {
           final solutionBits = level.knownSolutions[i];
-          test('Solution #$i is valid', () {
+          test('solution #$i is valid', () {
             final solutionGrid = level.initialGrid.withBits(solutionBits);
             final result = validator.validate(solutionGrid);
-
             expect(
               result.isValid,
               isTrue,
               reason:
-                  'Level ${level.id} logic should accept this solution:\n'
+                  '${level.id} solution #$i should be valid:\n'
                   '${GridFormat.toAsciiString(solutionGrid)}',
             );
           });

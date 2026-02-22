@@ -245,4 +245,27 @@ class GridFormat {
     }
     return '\x1B[37m';
   }
+
+  /// Returns a plain mask string suitable for pasting into [parseMask].
+  ///
+  /// Each lit cell is represented as `*` and each unlit cell as `.`.
+  static String toMaskString(GridState grid, {bool useColor = false}) {
+    const reset = '\x1B[0m';
+    const litColor = '\x1B[32m'; // green
+    const unlitColor = '\x1B[90m'; // dark gray
+    final buffer = StringBuffer();
+    for (var y = 0; y < grid.height; y++) {
+      buffer.write('          ');
+      for (var x = 0; x < grid.width; x++) {
+        final pt = grid.pointAt(x, y);
+        final lit = grid.isLit(pt);
+        if (useColor) buffer.write(lit ? litColor : unlitColor);
+        buffer.write(lit ? '*' : '.');
+        if (useColor) buffer.write(reset);
+        if (x < grid.width - 1) buffer.write(' ');
+      }
+      if (y < grid.height - 1) buffer.writeln();
+    }
+    return buffer.toString();
+  }
 }

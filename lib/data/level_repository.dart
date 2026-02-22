@@ -2,6 +2,10 @@ import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/puzzle.dart';
 
 /// A hardcoded repository of levels to build the initial game progression.
+///
+/// To add a known solution to a puzzle, run:
+///   `dart run bin/solve.dart --mask PUZZLE_ID`
+/// and copy the output directly.
 class LevelRepository {
   /// Ordered list of levels for the main progression.
   /// https://steamcommunity.com/sharedfiles/filedetails/?id=2861109284
@@ -147,6 +151,12 @@ class LevelRepository {
          B1
          Y1
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          .
+          *
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_18',
@@ -154,6 +164,12 @@ class LevelRepository {
          (B1) Y1
           Y1 (*Y1)
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . *
+          * *
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_19',
@@ -163,6 +179,14 @@ class LevelRepository {
          B1 Y1 B1 Y1
          Y1 Y1 B1 B1
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * *
+          * . * .
+          . * . *
+          * . * .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_20',
@@ -172,6 +196,14 @@ class LevelRepository {
          Y1 B1 .  .
          .  .  .  .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . *
+          * . * .
+          . * . *
+          * . . .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_21',
@@ -181,6 +213,14 @@ class LevelRepository {
          Y1 Y1 .  .
          .  Y1  .  .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * .
+          . . * *
+          * * . .
+          . * . .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_22',
@@ -190,6 +230,14 @@ class LevelRepository {
          P1 W1 B1 W1
          B1 K1 Y1 P1
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * . *
+          * . * .
+          . * . *
+          * . * .
+        '''),
+      ],
     ),
     /*
      shrine_23 / shrine_24 requires a start and end - which is not supported yet.
@@ -211,6 +259,13 @@ class LevelRepository {
          B4 . Y4
          . . .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . .
+          . * *
+          * * .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_26',
@@ -219,6 +274,13 @@ class LevelRepository {
          B4 . Y3
          . . .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . .
+          . * *
+          * . *
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_27',
@@ -227,6 +289,13 @@ class LevelRepository {
          . B4 Y2
          . . .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . *
+          . . *
+          * * .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_28',
@@ -235,6 +304,13 @@ class LevelRepository {
          . B4 Y1
          . . .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . .
+          * . *
+          . * .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_29',
@@ -243,6 +319,13 @@ class LevelRepository {
          . . .
          Y2 . B2
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . *
+          * . *
+          * . .
+        '''),
+      ],
     ),
     // TODO(bramp): shrine_30 is an end-start problem
     Puzzle(
@@ -256,6 +339,17 @@ class LevelRepository {
          . . Y2
          . . B4
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . .
+          . * *
+          . . .
+          * * .
+          . . .
+          . * *
+          . . .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_31',
@@ -265,6 +359,14 @@ class LevelRepository {
          . B4 Y4 .
          . Y4 B4 .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . * *
+          * . * .
+          * . * .
+          * * . .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_32',
@@ -274,6 +376,14 @@ class LevelRepository {
          . . W4 .
          . . K4 .
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . *
+          * * . *
+          * . * *
+          * . . .
+        '''),
+      ],
     ),
     Puzzle(
       id: 'shrine_33',
@@ -283,15 +393,14 @@ class LevelRepository {
          . B3 Y3 . K3 W3
          . .  .  . .  .
       '''),
-    ),
-    Puzzle(
-      id: 'shrine_33',
-      initialGrid: GridFormat.parse('''
-         . .  .  . .  .
-         . K3 W3 . B3 Y3
-         . B3 Y3 . K3 W3
-         . .  .  . .  .
-      '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . * * . * *
+          . . * . . *
+          * * . * * .
+          * . . * . .
+        '''),
+      ],
     ),
 
     Puzzle(
@@ -300,8 +409,14 @@ class LevelRepository {
          . . . . . . Y1
          . . . Y5 W4 B3 W2
          . . . K6 . . .
-
       '''),
+      knownSolutions: [
+        GridFormat.parseMask('''
+          . . . * * * .
+          * * . . * . *
+          * * * * . . *
+        '''),
+      ],
     ),
 
     // TODO(bramp): shrine_35 / shrine_36 is a start-end problem
