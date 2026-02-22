@@ -144,6 +144,23 @@ class CyberTheme extends PuzzleTheme {
     );
   }
 
+  @override
+  Widget buildFlowerMechanic(BuildContext context, FlowerCell cell) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: CustomPaint(
+        key: ValueKey('flower_${cell.orangePetals}'),
+        painter: _CyberFlowerPainter(
+          orangePetals: cell.orangePetals,
+          purplePetals: cell.purplePetals,
+          orangeColor: _getColor(CellColor.orange),
+          purpleColor: _getColor(CellColor.purple),
+        ),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+
   Color _getColor(CellColor color) {
     switch (color) {
       case CellColor.red:
@@ -160,6 +177,8 @@ class CyberTheme extends PuzzleTheme {
         return const Color(0xFFFFFFFF); // Pure White
       case CellColor.cyan:
         return const Color(0xFF00FFCC); // Neon Cyan
+      case CellColor.orange:
+        return const Color(0xFFFF8800); // Neon Orange
     }
   }
 }
@@ -200,5 +219,87 @@ class _CyberLightningPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _CyberLightningPainter oldDelegate) {
     return oldDelegate.color != color;
+  }
+}
+
+class _CyberFlowerPainter extends CustomPainter {
+  const _CyberFlowerPainter({
+    required this.orangePetals,
+    required this.purplePetals,
+    required this.orangeColor,
+    required this.purpleColor,
+  });
+
+  final int orangePetals;
+  final int purplePetals;
+  final Color orangeColor;
+  final Color purpleColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final center = Offset(cx, cy);
+    final radius = size.width * 0.25;
+
+    // Draw the center core
+    final corePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    final coreShadowPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.6)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+
+    canvas
+      ..drawCircle(center, radius * 0.5, coreShadowPaint)
+      ..drawCircle(center, radius * 0.5, corePaint);
+
+    final totalPetals = orangePetals + purplePetals;
+    if (totalPetals == 0) return;
+
+    for (var i = 0; i < totalPetals; i++) {
+      // Rotate by -90 degrees (pi/2) to start pointing UP
+      final angle = (i * 2 * 3.14159 / totalPetals) - 1.5708;
+
+      final isOrange = i < orangePetals;
+      final color = isOrange ? orangeColor : purpleColor;
+
+      final paint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill;
+
+      final shadowPaint = Paint()
+        ..color = color.withValues(alpha: 0.6)
+        ..style = PaintingStyle.fill
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+
+      canvas
+        ..save()
+        ..translate(cx, cy)
+        ..rotate(angle);
+
+      // Draw a teardrop / leaf petal shape pointing 'right' in transformed space
+      // which corresponds to 'outward' from the center.
+      final path = Path()
+        ..moveTo(radius * 0.6, 0)
+        ..quadraticBezierTo(radius * 1.5, -radius * 0.8, radius * 2.0, 0)
+        ..quadraticBezierTo(radius * 1.5, radius * 0.8, radius * 0.6, 0)
+        ..close();
+
+      canvas
+        ..drawPath(path, shadowPaint)
+        ..drawPath(path, paint)
+        ..restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CyberFlowerPainter oldDelegate) {
+    return oldDelegate.orangePetals != orangePetals ||
+        oldDelegate.purplePetals != purplePetals ||
+        oldDelegate.orangeColor != orangeColor ||
+        oldDelegate.purpleColor != purpleColor;
   }
 }

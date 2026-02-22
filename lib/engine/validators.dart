@@ -23,6 +23,15 @@ class DiamondValidator extends RuleValidator {
         colorMap.putIfAbsent(cell.color, () => []).add(pt);
       } else if (cell is NumberCell) {
         colorMap.putIfAbsent(cell.color, () => []).add(pt);
+      } else if (cell is FlowerCell) {
+        // A flower can be considered orange and purple for matching purposes
+        // in diamond pairing areas.
+        if (cell.orangePetals > 0) {
+          colorMap.putIfAbsent(CellColor.orange, () => []).add(pt);
+        }
+        if (cell.purplePetals > 0) {
+          colorMap.putIfAbsent(CellColor.purple, () => []).add(pt);
+        }
       }
     }
 
@@ -72,21 +81,12 @@ class StrictNumberValidator extends RuleValidator {
   ValidationResult validate(GridState grid, List<GridPoint> area) {
     // Collect all number cells within this specific area, grouped by color.
     final byColor = <CellColor, List<GridPoint>>{};
-    var hasDiamond = false;
 
     for (final pt in area) {
       final cell = grid.getMechanic(pt);
       if (cell is NumberCell) {
         byColor.putIfAbsent(cell.color, () => []).add(pt);
-      } else if (cell is DiamondCell) {
-        hasDiamond = true;
       }
-    }
-
-    // If there is a diamond in the area, the DiamondValidator handles
-    // the pairing rules instead of this validator.
-    if (hasDiamond) {
-      return ValidationResult.success();
     }
 
     // If no number cells at all, the area is automatically valid.
@@ -139,22 +139,13 @@ class NumberColorValidator extends RuleValidator {
   ValidationResult validate(GridState grid, List<GridPoint> area) {
     final numberPoints = <GridPoint>[];
     final colors = <CellColor?>{};
-    var hasDiamond = false;
 
     for (final pt in area) {
       final cell = grid.getMechanic(pt);
       if (cell is NumberCell) {
         numberPoints.add(pt);
         colors.add(cell.color);
-      } else if (cell is DiamondCell) {
-        hasDiamond = true;
       }
-    }
-
-    // If an area has a diamond, it's allowed to have multiple colors
-    // (the DiamondValidator ensures they are all pairs).
-    if (hasDiamond) {
-      return ValidationResult.success();
     }
 
     // If there are different colors (or color + null) in the same area, it's an
@@ -204,3 +195,59 @@ class LockedCellValidator extends RuleValidator {
 }
 
 const lockedCellValidator = LockedCellValidator();
+
+/// Validates that each flower cell has the correct number of adjacent cells
+/// (up/down/left/right) matching its color.
+///
+/// A flower cell with `orangePetals` N must have exactly N adjacent cells
+/// that share its current lit/unlit state. Cells that are off the edge of
+/// the grid are ignored.
+class FlowerValidator extends RuleValidator {
+  const FlowerValidator();
+
+  @override
+  ValidationResult validate(GridState grid, List<GridPoint> area) {
+    final errors = <GridPoint>[];
+
+    for (final pt in area) {
+      final cell = grid.getMechanic(pt);
+      if (cell is FlowerCell) {
+        final isLit = grid.isLit(pt);
+        var matchingNeighbors = 0;
+        final x = grid.x(pt);
+        final y = grid.y(pt);
+
+        // Check the 4 orthogonal neighbors
+        if (y > 0 && grid.isLit(grid.pointAt(x, y - 1)) == isLit) {
+          matchingNeighbors++;
+        }
+        if (y < grid.height - 1 &&
+            grid.isLit(grid.pointAt(x, y + 1)) == isLit) {
+          matchingNeighbors++;
+        }
+        if (x > 0 && grid.isLit(grid.pointAt(x - 1, y)) == isLit) {
+          matchingNeighbors++;
+        }
+        if (x < grid.width - 1 && grid.isLit(grid.pointAt(x + 1, y)) == isLit) {
+          matchingNeighbors++;
+        }
+
+        if (matchingNeighbors != cell.orangePetals) {
+          errors.add(pt);
+        }
+      }
+    }
+
+    if (errors.isNotEmpty) {
+      return ValidationResult.failure(errors);
+    }
+
+    return ValidationResult.success();
+  }
+
+  @override
+  bool isApplicable(GridState grid) =>
+      grid.mechanics.any((cell) => cell is FlowerCell);
+}
+
+const flowerValidator = FlowerValidator();

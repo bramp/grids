@@ -64,7 +64,7 @@ class BlankCell extends Cell {
 }
 
 /// Represents a specific color for cells like diamonds or numbers.
-enum CellColor { red, black, blue, yellow, purple, white, cyan }
+enum CellColor { red, black, blue, yellow, purple, white, cyan, orange }
 
 /// The Diamond cell.
 class DiamondCell extends Cell {
@@ -134,4 +134,42 @@ class NumberCell extends Cell {
 
   @override
   String toString() => 'Number($number, color: $color, lock: $lockType)';
+}
+
+/// The Flower cell.
+class FlowerCell extends Cell {
+  const FlowerCell(this.orangePetals, {super.lockType = LockType.unlocked})
+    : assert(
+        orangePetals >= 0 && orangePetals <= 4,
+        'FlowerCell orangePetals must be between 0 and 4',
+      );
+  final int orangePetals;
+
+  // The remaining petals out of 4 are implicitly purple.
+  int get purplePetals => 4 - orangePetals;
+
+  @override
+  Cell lock({required bool isLit}) => FlowerCell(
+    orangePetals,
+    lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
+  );
+
+  @override
+  Cell withColor(CellColor? color) {
+    throw UnsupportedError('FlowerCell cannot have a color applied.');
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FlowerCell &&
+          runtimeType == other.runtimeType &&
+          orangePetals == other.orangePetals &&
+          lockType == other.lockType;
+
+  @override
+  int get hashCode => Object.hash(orangePetals, lockType);
+
+  @override
+  String toString() => 'Flower($orangePetals orange, lock: $lockType)';
 }

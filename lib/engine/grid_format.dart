@@ -114,6 +114,14 @@ class GridFormat {
         Cell cell;
         if (token == 'o') {
           cell = DiamondCell(color ?? defaultColor);
+        } else if (token.startsWith('F') &&
+            token.length == 2 &&
+            int.tryParse(token[1]) != null) {
+          final n = int.parse(token[1]);
+          if (n < 0 || n > 4) {
+            throw ArgumentError("FlowerCell petals must be 0-4. Got: '$token'");
+          }
+          cell = FlowerCell(n);
         } else if (int.tryParse(token) != null) {
           final n = int.parse(token);
           if (n == 0) {
@@ -178,6 +186,8 @@ class GridFormat {
         } else if (cell is DiamondCell) {
           final colorSymbol = _getSymbolColor(cell.color);
           token = '${colorSymbol ?? ''}o';
+        } else if (cell is FlowerCell) {
+          token = 'F${cell.orangePetals}';
         } else {
           token = '.';
         }
@@ -230,6 +240,7 @@ class GridFormat {
       CellColor.purple => 'P',
       CellColor.white => 'W',
       CellColor.cyan => 'C',
+      CellColor.orange => 'O',
     };
   }
 
@@ -239,6 +250,9 @@ class GridFormat {
       color = cell.color;
     } else if (cell is NumberCell) {
       color = cell.color;
+    } else if (cell is FlowerCell) {
+      // Flowers are represented with orange petals
+      return '\x1B[38;5;214m'; // approximate ANSI orange
     }
 
     if (color != null) {
@@ -250,6 +264,7 @@ class GridFormat {
         CellColor.purple => '\x1B[38;5;129m',
         CellColor.white => '\x1B[38;5;255m',
         CellColor.cyan => '\x1B[38;5;51m',
+        CellColor.orange => '\x1B[38;5;214m',
       };
     }
     return '\x1B[37m';
