@@ -303,5 +303,20 @@ class LevelRepository {
 
       '''),
     ),
+
+    // TODO(bramp): shrine_35 / shrine_36 is a start-end problem
+    // TODO(bramp): shrine_37
+
+    /*
+    Puzzle(
+      id: 'shrine_38',
+      initialGrid: GridFormat.parse('''
+         . . . . . . Y1
+         . . . Y5 W4 B3 W2
+         . . . K6 . . .
+
+      '''),
+    ),
+  */
   ];
 }
