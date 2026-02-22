@@ -6,6 +6,9 @@ import 'package:grids/engine/puzzle.dart';
 /// To add a known solution to a puzzle, run:
 ///   `dart run bin/solve.dart --mask PUZZLE_ID`
 /// and copy the output directly.
+//
+// TODO(bramp): Let's simplify a lot of these. If there is a single colour in
+// the puzzle, we don't need the colour prefix.
 class LevelRepository {
   /// Ordered list of levels for the main progression.
   /// https://steamcommunity.com/sharedfiles/filedetails/?id=2861109284
@@ -245,7 +248,7 @@ class LevelRepository {
       id: 'shrine_23',
       initialGrid: GridFormat.parse('''
          B1 B1 Y1 B1
-         Y1 Y1 Y1 B1
+        Y1 Y1 Y1 B1
          B1 B1 B1 Y1
          Y1 Y1 B1 Y1
       '''),
@@ -609,17 +612,17 @@ class LevelRepository {
     Puzzle(
       id: 'shrine_49',
       initialGrid: GridFormat.parse('''
-        Y-1  Y-1 Y-1 Y-1
-        (Y1) Y-1 Y-1 (Y1)
-        (Y1) Y-1 Y-1 (Y1)
-        (Y1)   Y1  Y1  (Y1)
+        -1   -1 -1  -1
+        (1)  -1 -1  (1)
+        (1)  -1 -1  (1)
+        (*1)  1  1  (*1)
       '''),
       knownSolutions: [
         GridFormat.parseMask('''
           . . . .
-          . . . .
-          . . . .
-          . . . .
+          . * * .
+          . * * .
+          * * * *
         '''),
       ],
     ),
@@ -770,15 +773,13 @@ class LevelRepository {
          .     .    .   (B4)   .    .
          .     .    .    .     .    .
          .     .    .    .    (*6)  .
-        (5)  (*)   .    .     .    (5)
+        (5)  (*)   .    .     .     5
       '''),
     ),
 
-    // TODO Shortcut #2 start to finish puzzle
-
-    // TODO Bonus_5 diamond puzzle
-
-    // TODO Gardens
+    // TODO(bramp): Shortcut #2 start to finish puzzle
+    // TODO(bramp): Bonus_5 diamond puzzle
+    // TODO(bramp): New puzzle type - Gardens / Flowers
 
     // Next puzzle here
   ];

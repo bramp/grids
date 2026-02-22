@@ -9,6 +9,7 @@ class PuzzleSolver {
   PuzzleSolver({PuzzleValidator? validator})
     : _validator = validator ?? PuzzleValidator();
 
+  // TODO(bramp): Based on the puzzle, we can enable/disable validators.
   final PuzzleValidator _validator;
 
   /// Returns all valid solutions for a given [puzzle].
@@ -126,6 +127,14 @@ class PuzzleSolver {
     final size = grid.mechanics.length;
     for (var i = 0; i < size; i++) {
       final pt = GridPoint(i);
+
+      // Do not attempt to toggle locked cells, even if it leaves the
+      // grid valid.
+      // Locked cells must retain their initial state.
+      if (grid.isLocked(pt)) {
+        continue;
+      }
+
       if (normalized.isLit(pt)) {
         final testGrid = normalized.setLit(pt, isLit: false);
         if (_validator.validate(testGrid).isValid &&

@@ -11,6 +11,7 @@ class PuzzleValidator {
       diamondValidator,
       strictNumberValidator,
       numberColorValidator,
+      lockedCellValidator,
     ],
   });
   final List<RuleValidator> validators;

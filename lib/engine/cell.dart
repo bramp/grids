@@ -1,13 +1,38 @@
 import 'package:meta/meta.dart';
 
+/// Represents the interaction state of a cell.
+enum LockType {
+  /// The cell can be toggled by the player.
+  unlocked,
+
+  /// The cell is fixed and must remain lit.
+  lockedLit,
+
+  /// The cell is fixed and must remain unlit.
+  lockedUnlit,
+}
+
 /// The base class for any cell or symbol placed on a cell.
 @immutable
 abstract class Cell {
-  const Cell({this.isLocked = false});
-  final bool isLocked;
+  const Cell({this.lockType = LockType.unlocked});
 
-  /// Returns a copy of this cell with isLocked set to true.
-  Cell lock();
+  /// The locking state of this cell.
+  final LockType lockType;
+
+  /// Helper to check if the cell is locked.
+  bool get isLocked => lockType != LockType.unlocked;
+
+  /// Helper to get the required lit state if locked.
+  bool? get lockedLit => switch (lockType) {
+    LockType.unlocked => null,
+    LockType.lockedLit => true,
+    LockType.lockedUnlit => false,
+  };
+
+  /// Returns a copy of this cell with a locked state.
+  /// [isLit] indicates whether the cell should be locked as lit or unlit.
+  Cell lock({required bool isLit});
 
   /// Returns a copy of this cell with the specified color.
   Cell withColor(CellColor? color);
@@ -15,10 +40,11 @@ abstract class Cell {
 
 /// A cell representing a blank space that can be locked (immutable).
 class BlankCell extends Cell {
-  const BlankCell({super.isLocked = false});
+  const BlankCell({super.lockType = LockType.unlocked});
 
   @override
-  Cell lock() => const BlankCell(isLocked: true);
+  Cell lock({required bool isLit}) =>
+      BlankCell(lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit);
 
   @override
   Cell withColor(CellColor? color) => this; // Blank cells don't have color.
@@ -28,13 +54,13 @@ class BlankCell extends Cell {
       identical(this, other) ||
       other is BlankCell &&
           runtimeType == other.runtimeType &&
-          isLocked == other.isLocked;
+          lockType == other.lockType;
 
   @override
-  int get hashCode => isLocked.hashCode;
+  int get hashCode => lockType.hashCode;
 
   @override
-  String toString() => 'Blank(locked: $isLocked)';
+  String toString() => 'Blank(lock: $lockType)';
 }
 
 /// Represents a specific color for cells like diamonds or numbers.
@@ -42,15 +68,18 @@ enum CellColor { red, black, blue, yellow, purple, white, cyan }
 
 /// The Diamond cell.
 class DiamondCell extends Cell {
-  const DiamondCell(this.color, {super.isLocked = false});
+  const DiamondCell(this.color, {super.lockType = LockType.unlocked});
   final CellColor color;
 
   @override
-  Cell lock() => DiamondCell(color, isLocked: true);
+  Cell lock({required bool isLit}) => DiamondCell(
+    color,
+    lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
+  );
 
   @override
   Cell withColor(CellColor? color) =>
-      DiamondCell(color ?? this.color, isLocked: isLocked);
+      DiamondCell(color ?? this.color, lockType: lockType);
 
   @override
   bool operator ==(Object other) =>
@@ -58,13 +87,13 @@ class DiamondCell extends Cell {
       other is DiamondCell &&
           runtimeType == other.runtimeType &&
           color == other.color &&
-          isLocked == other.isLocked;
+          lockType == other.lockType;
 
   @override
-  int get hashCode => color.hashCode ^ isLocked.hashCode;
+  int get hashCode => Object.hash(color, lockType);
 
   @override
-  String toString() => 'Diamond($color)';
+  String toString() => 'Diamond($color, lock: $lockType)';
 }
 
 /// The Strict Number cell.
@@ -72,17 +101,24 @@ class NumberCell extends Cell {
   const NumberCell(
     this.number, {
     this.color = CellColor.black,
-    super.isLocked = false,
+    super.lockType = LockType.unlocked,
   }) : assert(number != 0, 'NumberCell does not support 0');
   final int number;
   final CellColor color;
 
   @override
-  Cell lock() => NumberCell(number, color: color, isLocked: true);
+  Cell lock({required bool isLit}) => NumberCell(
+    number,
+    color: color,
+    lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
+  );
 
   @override
-  Cell withColor(CellColor? color) =>
-      NumberCell(number, color: color ?? this.color, isLocked: isLocked);
+  Cell withColor(CellColor? color) => NumberCell(
+    number,
+    color: color ?? this.color,
+    lockType: lockType,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -91,11 +127,11 @@ class NumberCell extends Cell {
           runtimeType == other.runtimeType &&
           number == other.number &&
           color == other.color &&
-          isLocked == other.isLocked;
+          lockType == other.lockType;
 
   @override
-  int get hashCode => number.hashCode ^ color.hashCode ^ isLocked.hashCode;
+  int get hashCode => Object.hash(number, color, lockType);
 
   @override
-  String toString() => 'Number($number, color: $color)';
+  String toString() => 'Number($number, color: $color, lock: $lockType)';
 }

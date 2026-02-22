@@ -136,7 +136,7 @@ class GridFormat {
         }
 
         if (isLocked) {
-          cell = cell.lock();
+          cell = cell.lock(isLit: isLit);
         }
 
         final index = y * width + x;
