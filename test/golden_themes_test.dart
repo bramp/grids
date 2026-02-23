@@ -25,6 +25,7 @@ void main() {
         o   Ro  Bo  Yo  Po   Wo   Co
         F0  F1  F2  F3  F4   F1*  F4*
         -   R-  B-  Y-  P-   W-   C-
+        /   R/  B/  Y/  P/   W/   C/
        (.) (1)  1* (R-) R-* (F2)  F2*
       ''');
 

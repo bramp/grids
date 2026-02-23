@@ -175,6 +175,23 @@ class CyberTheme extends PuzzleTheme {
     );
   }
 
+  @override
+  Widget buildDiagonalDashMechanic(
+    BuildContext context,
+    DiagonalDashCell cell,
+  ) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: CustomPaint(
+        key: ValueKey('diagonal_dash_${cell.color}'),
+        painter: _CyberDiagonalDashPainter(
+          color: _getColor(cell.color),
+        ),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+
   Color _getColor(CellColor color) {
     switch (color) {
       case CellColor.red:
@@ -353,6 +370,51 @@ class _CyberDashPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CyberDashPainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
+
+class _CyberDiagonalDashPainter extends CustomPainter {
+  const _CyberDiagonalDashPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final shadowPaint = Paint()
+      ..color = color.withValues(alpha: 0.6)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+
+    // A horizontal dash, rotated by 45 degrees
+    canvas
+      ..save()
+      ..translate(cx, cy)
+      ..rotate(-45 * 3.14159 / 180);
+
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset.zero,
+        width: size.width * 0.5,
+        height: size.height * 0.15,
+      ),
+      Radius.circular(size.height * 0.05),
+    );
+
+    canvas
+      ..drawRRect(rect, shadowPaint)
+      ..drawRRect(rect, paint)
+      ..restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _CyberDiagonalDashPainter oldDelegate) {
     return oldDelegate.color != color;
   }
 }

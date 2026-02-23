@@ -37,6 +37,8 @@ class GridCellWidget extends StatelessWidget {
       mechanicWidget = theme.buildFlowerMechanic(context, mechanic);
     } else if (mechanic is DashCell) {
       mechanicWidget = theme.buildDashMechanic(context, mechanic);
+    } else if (mechanic is DiagonalDashCell) {
+      mechanicWidget = theme.buildDiagonalDashMechanic(context, mechanic);
     }
 
     final paddedCell = Padding(

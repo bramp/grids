@@ -42,4 +42,7 @@ abstract class PuzzleTheme {
 
   /// Builds the visual representation of a Dash mechanic.
   Widget buildDashMechanic(BuildContext context, DashCell cell);
+
+  /// Builds the visual representation of a Diagonal Dash mechanic.
+  Widget buildDiagonalDashMechanic(BuildContext context, DiagonalDashCell cell);
 }

@@ -207,3 +207,33 @@ class DashCell extends Cell {
   @override
   String toString() => 'Dash($color, lock: $lockType)';
 }
+
+/// The Diagonal Dash cell (allows rotational matching).
+class DiagonalDashCell extends Cell {
+  const DiagonalDashCell(this.color, {super.lockType = LockType.unlocked});
+  final CellColor color;
+
+  @override
+  Cell lock({required bool isLit}) => DiagonalDashCell(
+    color,
+    lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
+  );
+
+  @override
+  Cell withColor(CellColor? color) =>
+      DiagonalDashCell(color ?? this.color, lockType: lockType);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DiagonalDashCell &&
+          runtimeType == other.runtimeType &&
+          color == other.color &&
+          lockType == other.lockType;
+
+  @override
+  int get hashCode => Object.hash(color, lockType);
+
+  @override
+  String toString() => 'DiagonalDash($color, lock: $lockType)';
+}

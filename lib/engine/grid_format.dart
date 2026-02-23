@@ -116,6 +116,8 @@ class GridFormat {
           cell = DiamondCell(color ?? defaultColor);
         } else if (token == '-') {
           cell = DashCell(color ?? defaultColor);
+        } else if (token == '/') {
+          cell = DiagonalDashCell(color ?? defaultColor);
         } else if (token.startsWith('F') &&
             token.length == 2 &&
             int.tryParse(token[1]) != null) {
@@ -193,6 +195,9 @@ class GridFormat {
         } else if (cell is DashCell) {
           final colorSymbol = _getSymbolColor(cell.color);
           token = '${colorSymbol ?? ''}-';
+        } else if (cell is DiagonalDashCell) {
+          final colorSymbol = _getSymbolColor(cell.color);
+          token = '${colorSymbol ?? ''}/';
         } else {
           token = '.';
         }
@@ -254,6 +259,8 @@ class GridFormat {
     if (cell is DiamondCell) {
       color = cell.color;
     } else if (cell is DashCell) {
+      color = cell.color;
+    } else if (cell is DiagonalDashCell) {
       color = cell.color;
     } else if (cell is NumberCell) {
       color = cell.color;
