@@ -3,6 +3,8 @@ import 'package:grids/engine/grid_state.dart';
 import 'package:grids/engine/rule_validator.dart';
 
 /// Validates that no locked cell has been toggled from its original state.
+///
+/// This is really to catch UI / Testing bugs.
 class LockedCellValidator extends RuleValidator {
   const LockedCellValidator();
 

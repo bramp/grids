@@ -35,6 +35,7 @@ class DashValidator extends RuleValidator {
     }
 
     // Helper functions for shape comparison
+    // TODO(bramp): Should this be a Set<GridPoint> ?
     Set<(int, int)> getShape(GridPoint dashPt) {
       final dashArea = allAreas.firstWhere((a) => a.contains(dashPt));
       final dashX = grid.x(dashPt);

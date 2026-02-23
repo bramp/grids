@@ -10,7 +10,6 @@ class PuzzleValidator {
     this.validators = const [
       diamondValidator,
       strictNumberValidator,
-      numberColorValidator,
       lockedCellValidator,
       flowerValidator,
       dashValidator,

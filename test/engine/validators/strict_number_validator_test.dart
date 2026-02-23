@@ -149,5 +149,45 @@ void main() {
         containsAll([const GridPoint(0), const GridPoint(1)]),
       );
     });
+    test('Numbers of same color in area is valid', () {
+      final grid = GridFormat.parse(
+        '''
+        R1 R2 .
+        .  .  .
+      ''',
+      );
+
+      // Area is 3, R1+R2 = 3. Valid!
+      final area = [const GridPoint(0), const GridPoint(1), const GridPoint(3)];
+      final result = strictNumberValidator.validate(grid, area);
+      expect(result.isValid, isTrue);
+    });
+
+    test('Numbers of different colors in area is invalid', () {
+      final grid = GridFormat.parse(
+        '''
+        R1 B2 .
+        .  .  .
+      ''',
+      );
+
+      final area = [const GridPoint(0), const GridPoint(1)];
+      final result = strictNumberValidator.validate(grid, area);
+      expect(result.isValid, isFalse);
+      expect(result.errors.length, 2);
+    });
+
+    test('Color and null color mixed in area is invalid', () {
+      final grid = GridFormat.parse(
+        '''
+        R1 2 .
+        .  . .
+      ''',
+      );
+
+      final area = [const GridPoint(0), const GridPoint(1)];
+      final result = strictNumberValidator.validate(grid, area);
+      expect(result.isValid, isFalse);
+    });
   });
 }
