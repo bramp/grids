@@ -40,10 +40,13 @@ class GridFormat {
         .toList();
     assert(rows.isNotEmpty, 'ASCII grid cannot be empty');
 
+    final tokenRegex = RegExp(r'\([^)]*\)|\S+');
+
     final parsedRows = rows.map((row) {
-      return row
-          .split(RegExp(r'\s+'))
-          .where((char) => char.isNotEmpty)
+      return tokenRegex
+          .allMatches(row)
+          .map((m) => m.group(0)!)
+          .where((token) => token.isNotEmpty)
           .toList();
     }).toList();
 
@@ -53,113 +56,134 @@ class GridFormat {
     final mechanics = List<Cell>.filled(width * height, const BlankCell());
     var bits = BigInt.zero;
 
-    for (var y = 0; y < height; y++) {
-      assert(
-        parsedRows[y].length == width,
-        'ASCII grid must have uniform row widths',
-      );
-      for (var x = 0; x < width; x++) {
-        var token = parsedRows[y][x];
+    try {
+      for (var y = 0; y < height; y++) {
+        if (parsedRows[y].length != width) {
+          throw ArgumentError(
+            'ASCII grid must have uniform row widths. '
+            'Row 0 has width $width, but row $y has width '
+            '${parsedRows[y].length}.',
+          );
+        }
+        for (var x = 0; x < width; x++) {
+          final token = parsedRows[y][x];
+          try {
+            var subToken = token;
 
-        // Strip ANSI escape codes
-        token = token.replaceAll(RegExp(r'\x1B\[[0-9;]*[mK]'), '');
+            // Strip ANSI escape codes
+            subToken = subToken.replaceAll(RegExp(r'\x1B\[[0-9;]*[mK]'), '');
 
-        var isLocked = false;
-        var isLit = false;
-        CellColor? color;
+            var isLocked = false;
+            var isLit = false;
+            CellColor? color;
 
-        const colorPrefixes = {
-          'R': CellColor.red,
-          'K': CellColor.black,
-          'Y': CellColor.yellow,
-          'B': CellColor.blue,
-          'P': CellColor.purple,
-          'W': CellColor.white,
-          'C': CellColor.cyan,
-        };
+            const colorPrefixes = {
+              'R': CellColor.red,
+              'K': CellColor.black,
+              'Y': CellColor.yellow,
+              'B': CellColor.blue,
+              'P': CellColor.purple,
+              'W': CellColor.white,
+              'C': CellColor.cyan,
+              'O': CellColor.orange,
+              'G': CellColor.green,
+            };
 
-        // Recursive modifier stripping
-        while (true) {
-          if (token.startsWith('(') && token.endsWith(')')) {
-            isLocked = true;
-            token = token.substring(1, token.length - 1).trim();
-            continue;
-          }
-          if (token.startsWith('*')) {
-            isLit = true;
-            token = token.substring(1).trim();
-            continue;
-          }
-          if (token.endsWith('*')) {
-            isLit = true;
-            token = token.substring(0, token.length - 1).trim();
-            continue;
-          }
+            // Recursive modifier stripping
+            while (true) {
+              if (subToken.startsWith('(') && subToken.endsWith(')')) {
+                isLocked = true;
+                subToken = subToken.substring(1, subToken.length - 1).trim();
+                continue;
+              }
+              if (subToken.startsWith('*')) {
+                isLit = true;
+                subToken = subToken.substring(1).trim();
+                continue;
+              }
+              if (subToken.endsWith('*')) {
+                isLit = true;
+                subToken = subToken.substring(0, subToken.length - 1).trim();
+                continue;
+              }
 
-          var foundColor = false;
-          if (token.length > 1) {
-            for (final prefix in colorPrefixes.keys) {
-              if (token.startsWith(prefix)) {
-                color = colorPrefixes[prefix];
-                token = token.substring(1).trim();
-                foundColor = true;
-                break;
+              var foundColor = false;
+              if (subToken.length > 1) {
+                for (final prefix in colorPrefixes.keys) {
+                  if (subToken.startsWith(prefix)) {
+                    color = colorPrefixes[prefix];
+                    subToken = subToken.substring(1).trim();
+                    foundColor = true;
+                    break;
+                  }
+                }
+              }
+              if (foundColor) continue;
+              break;
+            }
+
+            Cell cell;
+            if (subToken == 'o') {
+              cell = DiamondCell(color ?? defaultColor);
+            } else if (subToken == '-') {
+              cell = DashCell(color ?? defaultColor);
+            } else if (subToken == '/') {
+              cell = DiagonalDashCell(color ?? defaultColor);
+            } else if (subToken.startsWith('F') &&
+                subToken.length == 2 &&
+                int.tryParse(subToken[1]) != null) {
+              final n = int.parse(subToken[1]);
+              if (n < 0 || n > 4) {
+                throw ArgumentError(
+                  "FlowerCell petals must be 0-4. Got: '$subToken'",
+                );
+              }
+              cell = FlowerCell(n);
+            } else if (int.tryParse(subToken) != null) {
+              final n = int.parse(subToken);
+              if (n == 0) {
+                throw ArgumentError(
+                  "Number cell value '0' is not allowed in ASCII grid.",
+                );
+              }
+              cell = NumberCell(n, color: color ?? defaultColor);
+            } else if (subToken == '.' || subToken == '·' || subToken.isEmpty) {
+              cell = const BlankCell();
+            } else {
+              // Backward compatibility: lone color symbol = Diamond
+              final legacyColor = colorPrefixes[subToken];
+              if (legacyColor != null) {
+                cell = DiamondCell(legacyColor);
+              } else if (color != null) {
+                // Case where we had a color but unknown symbol?
+                // Fallback to Diamond if it's not a common symbol
+                cell = DiamondCell(color);
+              } else {
+                throw ArgumentError(
+                  "Unknown symbol '$subToken' in ASCII grid.",
+                );
               }
             }
-          }
-          if (foundColor) continue;
-          break;
-        }
 
-        Cell cell;
-        if (token == 'o') {
-          cell = DiamondCell(color ?? defaultColor);
-        } else if (token == '-') {
-          cell = DashCell(color ?? defaultColor);
-        } else if (token == '/') {
-          cell = DiagonalDashCell(color ?? defaultColor);
-        } else if (token.startsWith('F') &&
-            token.length == 2 &&
-            int.tryParse(token[1]) != null) {
-          final n = int.parse(token[1]);
-          if (n < 0 || n > 4) {
-            throw ArgumentError("FlowerCell petals must be 0-4. Got: '$token'");
-          }
-          cell = FlowerCell(n);
-        } else if (int.tryParse(token) != null) {
-          final n = int.parse(token);
-          if (n == 0) {
+            if (isLocked) {
+              cell = cell.lock(isLit: isLit);
+            }
+
+            final index = y * width + x;
+            mechanics[index] = cell;
+            if (isLit) {
+              bits |= BigInt.one << index;
+            }
+          } catch (e) {
             throw ArgumentError(
-              "Number cell value '0' is not allowed in ASCII grid.",
+              'Error parsing ASCII grid at row $y, col $x '
+              "(token: '$token'):\n$e",
             );
           }
-          cell = NumberCell(n, color: color ?? defaultColor);
-        } else if (token == '.' || token == '·' || token.isEmpty) {
-          cell = const BlankCell();
-        } else {
-          // Backward compatibility: lone color symbol = Diamond
-          final legacyColor = colorPrefixes[token];
-          if (legacyColor != null) {
-            cell = DiamondCell(legacyColor);
-          } else if (color != null) {
-            // Case where we had a color but unknown symbol?
-            // Fallback to Diamond if it's not a common symbol
-            cell = DiamondCell(color);
-          } else {
-            throw ArgumentError("Unknown symbol '$token' in ASCII grid.");
-          }
-        }
-
-        if (isLocked) {
-          cell = cell.lock(isLit: isLit);
-        }
-
-        final index = y * width + x;
-        mechanics[index] = cell;
-        if (isLit) {
-          bits |= BigInt.one << index;
         }
       }
+    } catch (e) {
+      throw ArgumentError('$e\n\nFull grid:\n$ascii');
     }
 
     return GridState.fromRaw(
@@ -251,6 +275,7 @@ class GridFormat {
       CellColor.white => 'W',
       CellColor.cyan => 'C',
       CellColor.orange => 'O',
+      CellColor.green => 'G',
     };
   }
 
@@ -279,6 +304,7 @@ class GridFormat {
         CellColor.white => '\x1B[38;5;255m',
         CellColor.cyan => '\x1B[38;5;51m',
         CellColor.orange => '\x1B[38;5;214m',
+        CellColor.green => '\x1B[38;5;46m',
       };
     }
     return '\x1B[37m';

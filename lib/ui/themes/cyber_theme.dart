@@ -210,6 +210,8 @@ class CyberTheme extends PuzzleTheme {
         return const Color(0xFF00FFCC); // Neon Cyan
       case CellColor.orange:
         return const Color(0xFFFF8800); // Neon Orange
+      case CellColor.green:
+        return const Color(0xFF39FF14); // Neon Green
     }
   }
 }
