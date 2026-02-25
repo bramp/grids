@@ -40,7 +40,10 @@ String _difficulty(int solutionCount, int playableCells) {
 
 void main(List<String> args) {
   final maskMode = args.contains('--mask');
-  final filteredArgs = args.where((a) => a != '--mask').toList();
+  final noColor = args.contains('--no-color');
+  final filteredArgs = args
+      .where((a) => a != '--mask' && a != '--no-color')
+      .toList();
 
   final levels = LevelRepository.levels;
   final solver = PuzzleSolver();
@@ -86,10 +89,10 @@ void main(List<String> args) {
       print('\n--- Solution #${i + 1} ---');
       if (maskMode) {
         print("        GridFormat.parseMask('''");
-        print(GridFormat.toMaskString(solutions[i], useColor: true));
+        print(GridFormat.toMaskString(solutions[i], useColor: !noColor));
         print("        '''),");
       } else {
-        print(solutions[i].toAsciiString(useColor: true));
+        print(solutions[i].toAsciiString(useColor: !noColor));
       }
     }
     return;
