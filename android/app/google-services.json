@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1065645902705",
+    "project_id": "grids-bramp-net",
+    "storage_bucket": "grids-bramp-net.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065645902705:android:d345571978e65b0abd44d0",
+        "android_client_info": {
+          "package_name": "com.example.grids"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH-GjGm1_kkxY_MIT_GZ9vOBK3RVf7KHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065645902705:android:4dfe7974da17d586bd44d0",
+        "android_client_info": {
+          "package_name": "net.bramp.grids"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH-GjGm1_kkxY_MIT_GZ9vOBK3RVf7KHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

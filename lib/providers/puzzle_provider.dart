@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:clock/clock.dart';
+
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_point.dart';
@@ -27,6 +33,9 @@ class PuzzleProvider extends ChangeNotifier {
   // Validation is only populated when the user explicitly taps "Check Answer"
   ValidationResult? _lastValidation;
 
+  DateTime? _levelStartTime;
+  int _solveAttempts = 0;
+
   Puzzle get currentPuzzle => _currentPuzzle;
   GridState get grid => _grid;
   ValidationResult? get validation => _lastValidation;
@@ -44,6 +53,8 @@ class PuzzleProvider extends ChangeNotifier {
     _currentPuzzle = LevelRepository.levels[loadIndex];
     _grid = _currentPuzzle.initialGrid;
     _lastValidation = null;
+    _levelStartTime = clock.now();
+    _solveAttempts = 0;
   }
 
   bool get hasPreviousLevel => _currentLevelIndex > 0;
@@ -93,14 +104,58 @@ class PuzzleProvider extends ChangeNotifier {
 
   /// Explicitly runs the validation rules against the current board state.
   void checkAnswer() {
+    _solveAttempts++;
     _lastValidation = _validator.validate(_grid);
-    if (_lastValidation?.isValid == true) {
+    final isValid = _lastValidation?.isValid == true;
+
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        final analytics = FirebaseAnalytics.instance;
+
+        // Log the check answer attempt
+        unawaited(
+          analytics.logEvent(
+            name: 'level_solve_attempt',
+            parameters: {
+              'level_id': _currentPuzzle.id,
+              'is_correct': isValid ? 1 : 0,
+              'attempt_number': _solveAttempts,
+            },
+          ),
+        );
+
+        if (isValid && _levelStartTime != null) {
+          final timeMs = clock
+              .now()
+              .difference(_levelStartTime!)
+              .inMilliseconds;
+          // Log a successful solve with timing details
+          unawaited(
+            analytics.logEvent(
+              name: 'level_complete',
+              parameters: {
+                'level_id': _currentPuzzle.id,
+                'time_ms': timeMs,
+                'total_attempts': _solveAttempts,
+              },
+            ),
+          );
+        }
+      }
+    } on Object catch (e) {
+      debugPrint('Analytics error: $e');
+    }
+
+    if (isValid) {
       if (_currentLevelIndex >= _maxUnlockedLevelIndex) {
         _maxUnlockedLevelIndex = _currentLevelIndex + 1;
       }
     }
     notifyListeners();
   }
+
+  String? get nextLevelId =>
+      hasNextLevel ? LevelRepository.levels[_currentLevelIndex + 1].id : null;
 
   /// Advances the game to the next available level puzzle.
   void nextLevel() {
@@ -109,6 +164,10 @@ class PuzzleProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  String? get previousLevelId => hasPreviousLevel
+      ? LevelRepository.levels[_currentLevelIndex - 1].id
+      : null;
 
   /// Goes back to the previous level.
   void previousLevel() {
@@ -132,11 +191,26 @@ class PuzzleProvider extends ChangeNotifier {
   /// The index of the currently active level.
   int get currentLevelIndex => _currentLevelIndex;
 
+  /// Loads a level by its ID.
+  void loadLevelById(String id) {
+    if (_currentPuzzle.id == id) return;
+    final index = LevelRepository.levels.indexWhere((l) => l.id == id);
+    if (index != -1) {
+      if (index > _maxUnlockedLevelIndex) {
+        _maxUnlockedLevelIndex = index;
+      }
+      _loadLevel(index);
+      notifyListeners();
+    }
+  }
+
   /// Loads a custom puzzle directly. Primarily for testing or debug.
   void loadCustomPuzzle(Puzzle puzzle) {
     _currentPuzzle = puzzle;
     _grid = puzzle.initialGrid;
     _lastValidation = null;
+    _levelStartTime = clock.now();
+    _solveAttempts = 0;
     notifyListeners();
   }
 }

@@ -1,14 +1,26 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/rule_validator.dart';
+import 'package:grids/firebase_options.dart';
 import 'package:grids/providers/puzzle_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on Object catch (e) {
+    debugPrint('Firebase initialization failed (not configured?): $e');
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -20,12 +32,33 @@ void main() {
   );
 }
 
+final _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      redirect: (context, state) {
+        final provider = context.read<PuzzleProvider>();
+        return '/level/${provider.currentPuzzle.id}';
+      },
+    ),
+    GoRoute(
+      path: '/level/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return GameScreen(levelId: id);
+      },
+    ),
+  ],
+);
+
 class GridsApp extends StatelessWidget {
   const GridsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router,
       title: 'Grids',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -34,13 +67,40 @@ class GridsApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const GameScreen(),
     );
   }
 }
 
-class GameScreen extends StatelessWidget {
-  const GameScreen({super.key});
+class GameScreen extends StatefulWidget {
+  const GameScreen({
+    required this.levelId,
+    super.key,
+  });
+
+  final String levelId;
+
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PuzzleProvider>().loadLevelById(widget.levelId);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant GameScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.levelId != oldWidget.levelId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<PuzzleProvider>().loadLevelById(widget.levelId);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +112,11 @@ class GameScreen extends StatelessWidget {
       (p) => p.validation,
     );
     final isSolved = context.select<PuzzleProvider, bool>((p) => p.isSolved);
-    final hasNext = context.select<PuzzleProvider, bool>((p) => p.hasNextLevel);
-    final hasPrev = context.select<PuzzleProvider, bool>(
-      (p) => p.hasPreviousLevel,
+    final nextLevelId = context.select<PuzzleProvider, String?>(
+      (p) => p.nextLevelId,
+    );
+    final prevLevelId = context.select<PuzzleProvider, String?>(
+      (p) => p.previousLevelId,
     );
 
     final themeProvider = context.watch<ThemeProvider>();
@@ -106,8 +168,8 @@ class GameScreen extends StatelessWidget {
               children: [
                 IconButton(
                   iconSize: 32,
-                  onPressed: hasPrev
-                      ? () => context.read<PuzzleProvider>().previousLevel()
+                  onPressed: prevLevelId != null
+                      ? () => context.go('/level/$prevLevelId')
                       : null,
                   icon: const Icon(Icons.arrow_back),
                 ),
@@ -136,8 +198,8 @@ class GameScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 IconButton(
                   iconSize: 32,
-                  onPressed: hasNext
-                      ? () => context.read<PuzzleProvider>().nextLevel()
+                  onPressed: nextLevelId != null
+                      ? () => context.go('/level/$nextLevelId')
                       : null,
                   icon: const Icon(Icons.arrow_forward),
                 ),
@@ -198,7 +260,7 @@ class _DebugLevelPicker extends StatelessWidget {
         icon: const Icon(Icons.bug_report, size: 20),
         onChanged: (index) {
           if (index != null) {
-            context.read<PuzzleProvider>().jumpToLevel(index);
+            context.go('/level/${levels[index].id}');
           }
         },
         items: List.generate(

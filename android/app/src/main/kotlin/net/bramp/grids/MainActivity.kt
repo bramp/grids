@@ -1,4 +1,4 @@
-package com.example.grids
+package net.bramp.grids
 
 import io.flutter.embedding.android.FlutterActivity
 
