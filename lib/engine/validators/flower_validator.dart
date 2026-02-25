@@ -25,18 +25,33 @@ class FlowerValidator extends RuleValidator {
         final y = grid.y(pt);
 
         // Check the 4 orthogonal neighbors
-        if (y > 0 && grid.isLit(grid.pointAt(x, y - 1)) == isLit) {
-          matchingNeighbors++;
+        if (y > 0) {
+          final neighbor = grid.pointAt(x, y - 1);
+          if (grid.getMechanic(neighbor) is! VoidCell &&
+              grid.isLit(neighbor) == isLit) {
+            matchingNeighbors++;
+          }
         }
-        if (y < grid.height - 1 &&
-            grid.isLit(grid.pointAt(x, y + 1)) == isLit) {
-          matchingNeighbors++;
+        if (y < grid.height - 1) {
+          final neighbor = grid.pointAt(x, y + 1);
+          if (grid.getMechanic(neighbor) is! VoidCell &&
+              grid.isLit(neighbor) == isLit) {
+            matchingNeighbors++;
+          }
         }
-        if (x > 0 && grid.isLit(grid.pointAt(x - 1, y)) == isLit) {
-          matchingNeighbors++;
+        if (x > 0) {
+          final neighbor = grid.pointAt(x - 1, y);
+          if (grid.getMechanic(neighbor) is! VoidCell &&
+              grid.isLit(neighbor) == isLit) {
+            matchingNeighbors++;
+          }
         }
-        if (x < grid.width - 1 && grid.isLit(grid.pointAt(x + 1, y)) == isLit) {
-          matchingNeighbors++;
+        if (x < grid.width - 1) {
+          final neighbor = grid.pointAt(x + 1, y);
+          if (grid.getMechanic(neighbor) is! VoidCell &&
+              grid.isLit(neighbor) == isLit) {
+            matchingNeighbors++;
+          }
         }
 
         if (matchingNeighbors != cell.orangePetals) {

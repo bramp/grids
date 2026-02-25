@@ -149,6 +149,8 @@ class GridFormat {
               cell = NumberCell(n, color: color ?? defaultColor);
             } else if (subToken == '.' || subToken == '·' || subToken.isEmpty) {
               cell = const BlankCell();
+            } else if (subToken == ' ' || subToken == 'x') {
+              cell = const VoidCell();
             } else {
               // Backward compatibility: lone color symbol = Diamond
               final legacyColor = colorPrefixes[subToken];
@@ -222,6 +224,8 @@ class GridFormat {
         } else if (cell is DiagonalDashCell) {
           final colorSymbol = _getSymbolColor(cell.color);
           token = '${colorSymbol ?? ''}/';
+        } else if (cell is VoidCell) {
+          token = ' ';
         } else {
           token = '.';
         }

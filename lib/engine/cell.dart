@@ -237,3 +237,25 @@ class DiagonalDashCell extends Cell {
   @override
   String toString() => 'DiagonalDash($color, lock: $lockType)';
 }
+
+/// A cell that is not part of the puzzle. It cannot be toggled and is ignored
+/// by validation and scoring. It effectively acts as a wall or a hole in the
+/// grid.
+class VoidCell extends Cell {
+  const VoidCell() : super(lockType: LockType.lockedUnlit);
+
+  @override
+  Cell lock({required bool isLit}) => this; // Always locked.
+
+  @override
+  Cell withColor(CellColor? color) => this;
+
+  @override
+  bool operator ==(Object other) => other is VoidCell;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() => 'Void()';
+}

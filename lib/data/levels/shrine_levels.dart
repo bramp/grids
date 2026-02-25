@@ -402,8 +402,8 @@ final shrineLevels = [
     id: 'shrine_38',
     note: 'Beginning of the negative numbers',
     initialGrid: GridFormat.parse('''
-        -2 . .
-        . . .
+         -2  .  .
+          .  .  .
         (*6) . (4)
       '''),
     knownSolutions: [
@@ -418,8 +418,8 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_39',
     initialGrid: GridFormat.parse('''
-        . . .
-        -3 . .
+         .   .  .
+        -3   .  .
         (*6) . (4)
       '''),
     knownSolutions: [
@@ -433,8 +433,8 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_40',
     initialGrid: GridFormat.parse('''
-        . . .
-        -4 . .
+          .  .  .
+         -4  .  .
         (*6) . (4)
       '''),
     knownSolutions: [
@@ -463,8 +463,8 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_42',
     initialGrid: GridFormat.parse('''
-        -3 . .
-        . -3 .
+         -3   .  .
+          .  -3  .
         (*6) (6) .
       '''),
     knownSolutions: [
@@ -568,10 +568,10 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_48',
     initialGrid: GridFormat.parse('''
-        -1 .  .  -1
-        (1)  .  .   (1)
-        (1)   .  .   (1)
-        1 .  .  1
+        -1   .  .  -1
+        (1)  .  .  (1)
+        (1)  .  .  (1)
+       (*1)  .  . (*1)
       ''', defaultColor: CellColor.yellow),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -622,17 +622,17 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_51',
     initialGrid: GridFormat.parse('''
-          9 . . -1
+           9 . . -1
           -1 . . -1
           -1 . . -1
-          -1 . . 9
+          -1 . .  9
         ''', defaultColor: CellColor.yellow),
     knownSolutions: [
       GridFormat.parseMask('''
           . . . .
+          . * * .
+          . * * .
           . . . .
-          . * * .
-          . * * .
         '''),
     ],
   ),
@@ -640,10 +640,10 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_52',
     initialGrid: GridFormat.parse('''
-          -7 .  .  3
-          .   9 .  .
-          .   .  9 .
-          3  .  .  -7
+         -7  .  .  3
+          .  9  .  .
+          .  .  9  .
+          3  .  . -7
         ''', defaultColor: CellColor.yellow),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -658,16 +658,15 @@ final shrineLevels = [
   Puzzle(
     id: 'shrine_53',
     initialGrid: GridFormat.parse('''
-          1   .  1  -1
-          -1  .   .  -1
-          -1 -1 1  -1
-          -1  .   .  -1
-          -1  .   .  -1
+           1  .  1  -1
+          -1  .  .  -1
+          -1 -1  1  -1
+          -1  .  .  -1
           -1  1  .   9
         ''', defaultColor: CellColor.yellow),
     knownSolutions: [
       GridFormat.parseMask('''
-          . . . .
+          * . * .
           . . . .
           . . * .
           . . . .
@@ -690,11 +689,11 @@ final shrineLevels = [
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          . . * . .
-          . . * * *
+          . * * . .
+          . * . * *
           * . . . *
-          * * * * *
-          . . * . .
+          * * . * .
+          . . * * .
         '''),
     ],
   ),
@@ -749,6 +748,16 @@ final shrineLevels = [
          .     .    .    .    (*6)  .
         (5)  (*)   .    .     .     5
       '''),
+    knownSolutions: [
+      GridFormat.parseMask('''
+          . . . . . .
+          . * * * . .
+          . * . . * .
+          . * . . * .
+          . * * * * .
+          . * . . . .
+        '''),
+    ],
   ),
 
   // TODO(bramp): Shortcut #2 start to finish puzzle

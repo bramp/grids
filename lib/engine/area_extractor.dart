@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
 
@@ -28,7 +29,9 @@ class AreaExtractor {
     final areas = <List<GridPoint>>[];
 
     for (var i = 0; i < size; i++) {
-      if (visited[i] == 1) continue;
+      if (visited[i] == 1 || grid.getMechanic(GridPoint(i)) is VoidCell) {
+        continue;
+      }
 
       final targetLitState = grid.isLit(GridPoint(i));
       final currentArea = <GridPoint>[];
@@ -49,28 +52,36 @@ class AreaExtractor {
         // Check neighbors
         if (cy > 0) {
           final ni = indexValue - width;
-          if (visited[ni] == 0 && grid.isLit(GridPoint(ni)) == targetLitState) {
+          if (visited[ni] == 0 &&
+              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
+              grid.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }
         }
         if (cy < height - 1) {
           final ni = indexValue + width;
-          if (visited[ni] == 0 && grid.isLit(GridPoint(ni)) == targetLitState) {
+          if (visited[ni] == 0 &&
+              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
+              grid.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }
         }
         if (cx > 0) {
           final ni = indexValue - 1;
-          if (visited[ni] == 0 && grid.isLit(GridPoint(ni)) == targetLitState) {
+          if (visited[ni] == 0 &&
+              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
+              grid.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }
         }
         if (cx < width - 1) {
           final ni = indexValue + 1;
-          if (visited[ni] == 0 && grid.isLit(GridPoint(ni)) == targetLitState) {
+          if (visited[ni] == 0 &&
+              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
+              grid.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }

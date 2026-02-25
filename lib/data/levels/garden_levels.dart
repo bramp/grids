@@ -5,24 +5,24 @@ final gardenLevels = [
   Puzzle(
     id: 'garden_1',
     initialGrid: GridFormat.parse('''
-        . . .
-        . (F1) .
-        . . .
+        x   .   x
+        . (*F1) .
+        x   .   x
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
+          x * x
           . * .
-          * . *
-          . . .
+          x . x
         '''),
     ],
   ),
   Puzzle(
     id: 'garden_2',
     initialGrid: GridFormat.parse('''
-        . . .
+        .   .   .
         . (*F2) .
-        . . .
+        .   .   .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -66,24 +66,24 @@ final gardenLevels = [
     id: 'garden_5',
     initialGrid: GridFormat.parse('''
         . . .
-        . (*F0) .
+        . (F0) .
         . . .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          . . .
           . * .
-          . . .
+          * . *
+          . * .
         '''),
     ],
   ),
-
+  // TODO garden_6 though garden_11 are the same puzzles, but with different background colours. We should maybe drop them.
   Puzzle(
     id: 'garden_6',
     initialGrid: GridFormat.parse('''
-        . . .
+        .   .   .
         . (*F3) .
-        . . .
+        .   .   .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -96,9 +96,9 @@ final gardenLevels = [
   Puzzle(
     id: 'garden_7',
     initialGrid: GridFormat.parse('''
-        . . .
+        .  .   .
         . (F3) .
-        . . .
+        .  .   .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -126,13 +126,13 @@ final gardenLevels = [
   Puzzle(
     id: 'garden_9',
     initialGrid: GridFormat.parse('''
-        . . .
-        . (*F2) .
-        . . .
+        .   .   .
+        . (*F1) .
+        .   .   .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          . * .
+          . . .
           * * .
           . . .
         '''),
@@ -142,14 +142,14 @@ final gardenLevels = [
     id: 'garden_10',
     initialGrid: GridFormat.parse('''
         . . .
-        . (F1) .
+        . (*F2) .
         . . .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
           . . .
-          * . *
-          . * .
+          * * *
+          . . .
         '''),
     ],
   ),
@@ -168,21 +168,7 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
-    id: 'garden_12',
-    initialGrid: GridFormat.parse('''
-        . . .
-        . (*F1) .
-        . . .
-      '''),
-    knownSolutions: [
-      GridFormat.parseMask('''
-          . * .
-          . * .
-          . . .
-        '''),
-    ],
-  ),
+  // Skipped garden_12 as it's a more complex puzzle
   Puzzle(
     id: 'garden_13',
     initialGrid: GridFormat.parse('''
