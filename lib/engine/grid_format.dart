@@ -209,26 +209,15 @@ class GridFormat {
         final cell = grid.mechanics[index];
         final isLit = grid.isLit(GridPoint(index));
 
-        var token = '';
-        if (cell is NumberCell) {
-          final colorSymbol = _getSymbolColor(cell.color);
-          token = '${colorSymbol ?? ''}${cell.number}';
-        } else if (cell is DiamondCell) {
-          final colorSymbol = _getSymbolColor(cell.color);
-          token = '${colorSymbol ?? ''}o';
-        } else if (cell is FlowerCell) {
-          token = 'F${cell.orangePetals}';
-        } else if (cell is DashCell) {
-          final colorSymbol = _getSymbolColor(cell.color);
-          token = '${colorSymbol ?? ''}-';
-        } else if (cell is DiagonalDashCell) {
-          final colorSymbol = _getSymbolColor(cell.color);
-          token = '${colorSymbol ?? ''}/';
-        } else if (cell is VoidCell) {
-          token = ' ';
-        } else {
-          token = '.';
-        }
+        var token = switch (cell) {
+          NumberCell() => '${_getSymbolColor(cell.color) ?? ''}${cell.number}',
+          DiamondCell() => '${_getSymbolColor(cell.color) ?? ''}o',
+          FlowerCell() => 'F${cell.orangePetals}',
+          DashCell() => '${_getSymbolColor(cell.color) ?? ''}-',
+          DiagonalDashCell() => '${_getSymbolColor(cell.color) ?? ''}/',
+          VoidCell() => 'x',
+          BlankCell() => '.',
+        };
 
         if (isLit) token = '$token*';
         if (cell.isLocked) token = '($token)';
@@ -284,16 +273,17 @@ class GridFormat {
   }
 
   static String _getAnsiForeground(Cell cell) {
-    CellColor? color;
-    if (cell is DiamondCell) {
-      color = cell.color;
-    } else if (cell is DashCell) {
-      color = cell.color;
-    } else if (cell is DiagonalDashCell) {
-      color = cell.color;
-    } else if (cell is NumberCell) {
-      color = cell.color;
-    } else if (cell is FlowerCell) {
+    final color = switch (cell) {
+      DiamondCell() => cell.color,
+      DashCell() => cell.color,
+      DiagonalDashCell() => cell.color,
+      NumberCell() => cell.color,
+      FlowerCell() => null, // Handled separately
+      BlankCell() => null,
+      VoidCell() => null,
+    };
+
+    if (cell is FlowerCell) {
       // Flowers are represented with orange petals
       return '\x1B[38;5;214m'; // approximate ANSI orange
     }

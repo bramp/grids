@@ -18,7 +18,7 @@ enum LockType {
 // returns true if the cell matches that color. This handles the flower cell
 // matching logic.
 @immutable
-abstract class Cell {
+sealed class Cell {
   const Cell({this.lockType = LockType.unlocked});
 
   /// The locking state of this cell.

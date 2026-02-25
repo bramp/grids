@@ -28,23 +28,18 @@ class GridCellWidget extends StatelessWidget {
 
     final theme = context.watch<ThemeProvider>().activeTheme;
 
+    final mechanicWidget = switch (mechanic) {
+      NumberCell() => theme.buildNumberMechanic(context, mechanic),
+      DiamondCell() => theme.buildDiamondMechanic(context, mechanic),
+      FlowerCell() => theme.buildFlowerMechanic(context, mechanic),
+      DashCell() => theme.buildDashMechanic(context, mechanic),
+      DiagonalDashCell() => theme.buildDiagonalDashMechanic(context, mechanic),
+      BlankCell() => const SizedBox.shrink(),
+      VoidCell() => const SizedBox.shrink(),
+    };
+
     if (mechanic is VoidCell) {
-      return const SizedBox.shrink();
-    }
-    // TODO Should this be a switch to ensure we always catch all cases.
-    Widget mechanicWidget = const SizedBox.shrink();
-    if (mechanic is NumberCell) {
-      mechanicWidget = theme.buildNumberMechanic(context, mechanic);
-    } else if (mechanic is DiamondCell) {
-      mechanicWidget = theme.buildDiamondMechanic(context, mechanic);
-    } else if (mechanic is FlowerCell) {
-      mechanicWidget = theme.buildFlowerMechanic(context, mechanic);
-    } else if (mechanic is DashCell) {
-      mechanicWidget = theme.buildDashMechanic(context, mechanic);
-    } else if (mechanic is DiagonalDashCell) {
-      mechanicWidget = theme.buildDiagonalDashMechanic(context, mechanic);
-    } else {
-      throw Exception('Unknown mechanic type: ${mechanic.runtimeType}');
+      return mechanicWidget;
     }
 
     final paddedCell = Padding(

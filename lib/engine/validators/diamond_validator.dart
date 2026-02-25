@@ -18,24 +18,30 @@ class DiamondValidator extends RuleValidator {
 
     for (final pt in area) {
       final cell = grid.getMechanic(pt);
-      if (cell is DiamondCell) {
-        hasDiamond = true;
-        colorMap.putIfAbsent(cell.color, () => []).add(pt);
-      } else if (cell is NumberCell) {
-        colorMap.putIfAbsent(cell.color, () => []).add(pt);
-      } else if (cell is DashCell) {
-        colorMap.putIfAbsent(cell.color, () => []).add(pt);
-      } else if (cell is DiagonalDashCell) {
-        colorMap.putIfAbsent(cell.color, () => []).add(pt);
-      } else if (cell is FlowerCell) {
-        // A flower can be considered orange and purple for matching purposes
-        // in diamond pairing areas.
-        if (cell.orangePetals > 0) {
-          colorMap.putIfAbsent(CellColor.orange, () => []).add(pt);
-        }
-        if (cell.purplePetals > 0) {
-          colorMap.putIfAbsent(CellColor.purple, () => []).add(pt);
-        }
+      // TODO I think we need a ColorCell class to handle this logic.
+      switch (cell) {
+        case DiamondCell():
+          hasDiamond = true;
+          colorMap.putIfAbsent(cell.color, () => []).add(pt);
+        case NumberCell():
+          colorMap.putIfAbsent(cell.color, () => []).add(pt);
+        case DashCell():
+          colorMap.putIfAbsent(cell.color, () => []).add(pt);
+        case DiagonalDashCell():
+          colorMap.putIfAbsent(cell.color, () => []).add(pt);
+        case FlowerCell():
+          // A flower can be considered orange and purple for matching purposes
+          // in diamond pairing areas.
+          if (cell.orangePetals > 0) {
+            colorMap.putIfAbsent(CellColor.orange, () => []).add(pt);
+          }
+          if (cell.purplePetals > 0) {
+            colorMap.putIfAbsent(CellColor.purple, () => []).add(pt);
+          }
+        case BlankCell():
+        case VoidCell():
+          // Ignored for diamond pairing
+          break;
       }
     }
 
