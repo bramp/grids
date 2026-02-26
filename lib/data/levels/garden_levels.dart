@@ -188,13 +188,13 @@ final gardenLevels = [
     id: 'garden_14',
     initialGrid: GridFormat.parse('''
         (*.) .  (*.)
-         .  (*F3) .
+         .  (F1) .
         (*.) .  (*.)
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
           * * *
-          . * *
+          . . *
           * * *
         '''),
     ],
@@ -202,9 +202,9 @@ final gardenLevels = [
   Puzzle(
     id: 'garden_15',
     initialGrid: GridFormat.parse('''
-        . .  . .
+        .   .    .   .
         . (*F1) (F1) .
-        . .  . .
+        .   .    .   .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -217,17 +217,17 @@ final gardenLevels = [
   Puzzle(
     id: 'garden_16',
     initialGrid: GridFormat.parse('''
-        (*F1) . . (*F1)
-        . . . .
-        . . . .
-        (*F1) . . (*F1)
+        (*F1) .  . (*F1)
+          .   .  .   .
+          .   .  .   .
+        (*F1) .  . (*F1)
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * * . .
+          * * . *
           . . . *
           * . . .
-          . . * *
+          * . * *
         '''),
     ],
   ),
@@ -311,86 +311,88 @@ final gardenLevels = [
   Puzzle(
     id: 'garden_22',
     initialGrid: GridFormat.parse('''
-        (F0) . .
-        .   F2 .
-        .   . (F2)
+        F0  .  .
+        .  F2  .
+        .   .  F0
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * . *
-          . * *
-          * * *
+          . * .
+          * . .
+          . . *
         '''),
     ],
   ),
 
+  // TODO Do Garden 24 - 29 walking puzzles
   Puzzle(
     id: 'garden_shortcut_1',
     initialGrid: GridFormat.parse('''
-        Oo Wo Oo Wo Po
-        Po  . Oo Wo Wo
-        Po Wo Po Wo Oo
+        F0 F0 F0 F0
+        F0 F0 F0 F0
+        F0 F0 F0 F0
+        F0 F0 F0 F0
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * . * . *
-          * . * . .
-          * . * . *
+          . * . *
+          * . * .
+          . * . *
+          * . * .
         '''),
     ],
   ),
   Puzzle(
     id: 'garden_shortcut_2',
     initialGrid: GridFormat.parse('''
-        Co . . Co
-        Co . . Co
-        Co . . Co
-        Co . . Co
+        F1 F1 F1 F1
+        F1 F1 F1 F1
+        F1 F1 F1 F1
+        F1 F1 F1 F1
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          . . . .
-          * * * *
-          . * * .
-          . * * .
+          * * . .
+          . . * *
+          * * . .
+          . . * *
         '''),
     ],
   ),
   Puzzle(
     id: 'garden_shortcut_3',
     initialGrid: GridFormat.parse('''
-        (*Co) Yo   Yo   Yo  (*Co)
-          .   (Yo)  .    Yo    .
-          .   (Yo)  .    Yo    .
-        (*Co) Yo   Yo   Yo  (*Co)
+        F2 F2 F2 F2
+        F2 F2 F2 F2
+        F2 F2 F2 F2
+        F2 F2 F2 F2
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * * * * *
-          * . * . *
-          * . * . *
-          * * * * *
+          * * . .
+          * * . .
+          . . * *
+          . . * *
         '''),
     ],
   ),
   Puzzle(
     id: 'garden_shortcut_4',
     initialGrid: GridFormat.parse('''
-        Co .  Co Yo
-        Yo Co .  Yo
-        Yo Yo .  .
-        Yo Yo Yo Co
+        .  .  F3  .   .  .
+        F1 F0 (*) .   F4 F1
+        F2 .  .   F1  .  .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * * * *
-          * * . *
-          * * . .
-          * * * *
+          . * * * * .
+          * . * * * *
+          * * . . * .
         '''),
     ],
   ),
 
+  /*
   Puzzle(
     id: 'garden_bonus_1',
     initialGrid: GridFormat.parse('''
@@ -725,4 +727,5 @@ final gardenLevels = [
         '''),
     ],
   ),
+  */
 ];
