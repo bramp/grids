@@ -47,9 +47,14 @@ void main() {
         (1) .
         .   .
       ''',
-      ).setLit(const GridPoint(0), isLit: true);
+      );
+      final invalidGrid = grid.copyWith(
+        state: grid.state.setLit(const GridPoint(0), isLit: true),
+      );
 
-      final result = lockedCellValidator.validate(grid, [const GridPoint(0)]);
+      final result = lockedCellValidator.validate(invalidGrid, [
+        const GridPoint(0),
+      ]);
       expect(result.isValid, isFalse);
       expect(result.errors, [const GridPoint(0)]);
     });
@@ -60,9 +65,14 @@ void main() {
         (1*) .
         .    .
       ''',
-      ).setLit(const GridPoint(0), isLit: false);
+      );
+      final invalidGrid = grid.copyWith(
+        state: grid.state.setLit(const GridPoint(0), isLit: false),
+      );
 
-      final result = lockedCellValidator.validate(grid, [const GridPoint(0)]);
+      final result = lockedCellValidator.validate(invalidGrid, [
+        const GridPoint(0),
+      ]);
       expect(result.isValid, isFalse);
       expect(result.errors, [const GridPoint(0)]);
     });

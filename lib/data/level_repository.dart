@@ -2,7 +2,7 @@ import 'package:grids/data/levels/garden_levels.dart';
 import 'package:grids/data/levels/mill_levels.dart';
 import 'package:grids/data/levels/mine_levels.dart';
 import 'package:grids/data/levels/shrine_levels.dart';
-import 'package:grids/engine/puzzle.dart';
+import 'package:grids/engine/level.dart';
 
 /// A hardcoded repository of levels to build the initial game progression.
 ///
@@ -13,7 +13,7 @@ import 'package:grids/engine/puzzle.dart';
 class LevelRepository {
   /// Ordered list of levels for the main progression.
   /// https://steamcommunity.com/sharedfiles/filedetails/?id=2861109284
-  static final List<Puzzle> levels = [
+  static final List<Level> levels = [
     ...shrineLevels,
     ...mineLevels,
     ...millLevels,

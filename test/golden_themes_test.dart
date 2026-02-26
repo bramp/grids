@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grids/engine/grid_format.dart';
-import 'package:grids/engine/puzzle.dart';
-import 'package:grids/providers/puzzle_provider.dart';
+import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:provider/provider.dart';
@@ -29,8 +28,8 @@ void main() {
        (.) (1)  1* (R-) R-* (F2)  F2*
       ''');
 
-      final puzzleProvider = PuzzleProvider()
-        ..loadCustomPuzzle(Puzzle(id: 'golden_demo', initialGrid: demoGrid))
+      final puzzleProvider = LevelProvider()
+        ..loadCustomPuzzle(demoGrid)
         // Force validation to show error highlights or solved states
         ..checkAnswer();
 

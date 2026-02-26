@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/rule_validator.dart';
 import 'package:grids/firebase_options.dart';
-import 'package:grids/providers/puzzle_provider.dart';
+import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
@@ -24,7 +24,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => PuzzleProvider()),
+        ChangeNotifierProvider(create: (_) => LevelProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const GridsApp(),
@@ -38,8 +38,8 @@ final _router = GoRouter(
     GoRoute(
       path: '/',
       redirect: (context, state) {
-        final provider = context.read<PuzzleProvider>();
-        return '/level/${provider.currentPuzzle.id}';
+        final provider = context.read<LevelProvider>();
+        return '/level/${provider.currentLevel.id}';
       },
     ),
     GoRoute(
@@ -88,7 +88,7 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PuzzleProvider>().loadLevelById(widget.levelId);
+      context.read<LevelProvider>().loadLevelById(widget.levelId);
     });
   }
 
@@ -97,7 +97,7 @@ class _GameScreenState extends State<GameScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.levelId != oldWidget.levelId) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<PuzzleProvider>().loadLevelById(widget.levelId);
+        context.read<LevelProvider>().loadLevelById(widget.levelId);
       });
     }
   }
@@ -105,17 +105,17 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     // Watch relevant provider state
-    final puzzleName = context.select<PuzzleProvider, String>(
-      (p) => p.currentPuzzle.id,
+    final puzzleName = context.select<LevelProvider, String>(
+      (p) => p.currentLevel.id,
     );
-    final validation = context.select<PuzzleProvider, ValidationResult?>(
+    final validation = context.select<LevelProvider, ValidationResult?>(
       (p) => p.validation,
     );
-    final isSolved = context.select<PuzzleProvider, bool>((p) => p.isSolved);
-    final nextLevelId = context.select<PuzzleProvider, String?>(
+    final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
+    final nextLevelId = context.select<LevelProvider, String?>(
       (p) => p.nextLevelId,
     );
-    final prevLevelId = context.select<PuzzleProvider, String?>(
+    final prevLevelId = context.select<LevelProvider, String?>(
       (p) => p.previousLevelId,
     );
 
@@ -179,7 +179,7 @@ class _GameScreenState extends State<GameScreen> {
                     height: 56,
                     child: FilledButton.tonal(
                       onPressed: () =>
-                          context.read<PuzzleProvider>().checkAnswer(),
+                          context.read<LevelProvider>().checkAnswer(),
                       style: isSolved
                           ? FilledButton.styleFrom(
                               backgroundColor: Colors.green,
@@ -248,7 +248,7 @@ class _DebugLevelPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<PuzzleProvider>();
+    final provider = context.watch<LevelProvider>();
     final levels = LevelRepository.levels;
     final currentIndex = provider.currentLevelIndex;
 

@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grids/engine/cell.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 
 void main() {
   group('PuzzleValidator', () {
     test('Blank grid is instantly valid', () {
-      final grid = GridState.empty(width: 3, height: 3);
+      final grid = Puzzle.empty(width: 3, height: 3);
       final puzzle = PuzzleValidator();
 
       final result = puzzle.validate(grid);
@@ -16,7 +16,7 @@ void main() {
 
     test('Complex valid puzzle combination', () {
       // Let's create a 3x3 grid.
-      final state = GridState.empty(width: 3, height: 3);
+      final state = Puzzle.empty(width: 3, height: 3);
       var grid = state
           .toggle(state.pointAt(1, 0))
           .toggle(state.pointAt(2, 0))
@@ -46,7 +46,7 @@ void main() {
       '(multiple rules fail independently across areas)',
       () {
         // Create a totally blank 3x3 grid (1 unlit area of size 9)
-        final state = GridState.empty(width: 3, height: 3);
+        final state = Puzzle.empty(width: 3, height: 3);
         final grid = state
             // Fails: One single red diamond.
             // Under new pairing rules, since a diamond exists in the area,

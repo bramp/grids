@@ -91,18 +91,18 @@ void main() {
     ''');
 
     test('toMaskString consistency', () {
-      final ascii = '''
+      const ascii = '''
         . * .
         * . *
         . * .
       ''';
       final grid = GridFormat.parse(ascii);
-      final mask = GridFormat.toMaskString(grid);
+      final mask = GridFormat.toMaskString(grid.state);
 
       // parseMask should return the same bits
-      final bits = GridFormat.parseMask(mask);
+      final solution = GridFormat.parseMask(mask);
       expect(
-        bits,
+        solution.bits,
         grid.bits,
         reason: 'parseMask should match the original grid bits',
       );
@@ -117,7 +117,7 @@ void main() {
       final grid1 = GridFormat.parse('(*)');
       final grid2 = GridFormat.parse('(.*)');
 
-      expect(grid1.getMechanic(const GridPoint(0)), isA<BlankCell>());
+      expect(grid1.getCell(const GridPoint(0)), isA<BlankCell>());
       expect(grid1.isLocked(const GridPoint(0)), isTrue);
       expect(grid1.isLit(const GridPoint(0)), isTrue);
       expect(grid1.mechanics[0], grid2.mechanics[0]);
@@ -125,7 +125,8 @@ void main() {
   });
 }
 
-/// Normalizes the ASCII output for comparison by trimming lines and removing extra whitespace.
+/// Normalizes the ASCII output for comparison by trimming lines and
+/// removing extra whitespace.
 String _normalizeOutput(String output) {
   return output
       .trim()

@@ -1,6 +1,6 @@
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/rule_validator.dart';
 
 /// Validates that all dash cells of the same color are located in identically
@@ -10,9 +10,9 @@ class DashValidator extends RuleValidator {
   const DashValidator();
 
   @override
-  ValidationResult validate(GridState grid, List<GridPoint> area) {
+  ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
     final areaHasDash = area.any((pt) {
-      final mechanic = grid.getMechanic(pt);
+      final mechanic = puzzle.getMechanic(pt);
       return mechanic is DashCell || mechanic is DiagonalDashCell;
     });
 
@@ -21,12 +21,12 @@ class DashValidator extends RuleValidator {
     }
 
     final errors = <GridPoint>[];
-    final allAreas = grid.extractContiguousAreas();
+    final allAreas = puzzle.extractContiguousAreas();
 
     // Find all unique dash colors in THIS area to test
     final colorsToCheck = <CellColor>{};
     for (final pt in area) {
-      final mechanic = grid.getMechanic(pt);
+      final mechanic = puzzle.getMechanic(pt);
       if (mechanic is DashCell) {
         colorsToCheck.add(mechanic.color);
       } else if (mechanic is DiagonalDashCell) {
@@ -38,11 +38,11 @@ class DashValidator extends RuleValidator {
     // TODO(bramp): Should this be a Set<GridPoint> ?
     Set<(int, int)> getShape(GridPoint dashPt) {
       final dashArea = allAreas.firstWhere((a) => a.contains(dashPt));
-      final dashX = grid.x(dashPt);
-      final dashY = grid.y(dashPt);
-      return dashArea
-          .map((pt) => (grid.x(pt) - dashX, grid.y(pt) - dashY))
-          .toSet();
+      final (dashX, dashY) = puzzle.xy(dashPt);
+      return dashArea.map((pt) {
+        final (x, y) = puzzle.xy(pt);
+        return (x - dashX, y - dashY);
+      }).toSet();
     }
 
     String canonicalize(Set<(int, int)> shape) {
@@ -68,8 +68,8 @@ class DashValidator extends RuleValidator {
     for (final color in colorsToCheck) {
       // Find all dashes of this color on the ENTIRE board
       final globalDashes = <GridPoint>[];
-      for (var i = 0; i < grid.mechanics.length; i++) {
-        final mechanic = grid.mechanics[i];
+      for (var i = 0; i < puzzle.mechanics.length; i++) {
+        final mechanic = puzzle.mechanics[i];
         if ((mechanic is DashCell && mechanic.color == color) ||
             (mechanic is DiagonalDashCell && mechanic.color == color)) {
           globalDashes.add(GridPoint(i));
@@ -87,7 +87,7 @@ class DashValidator extends RuleValidator {
       GridPoint? strictRefPt;
       GridPoint? diagRefPt;
       for (final pt in globalDashes) {
-        if (grid.getMechanic(pt) is DashCell) {
+        if (puzzle.getMechanic(pt) is DashCell) {
           strictRefPt ??= pt;
         } else {
           diagRefPt ??= pt;
@@ -106,7 +106,7 @@ class DashValidator extends RuleValidator {
       for (final pt in globalDashes) {
         final shape = getShape(pt);
         final sig = canonicalize(shape);
-        final mechanic = grid.getMechanic(pt);
+        final mechanic = puzzle.getMechanic(pt);
         if (mechanic is DashCell) {
           if (sig != strictSig) {
             allMatch = false;
@@ -126,7 +126,7 @@ class DashValidator extends RuleValidator {
       if (!allMatch) {
         errors.addAll(
           area.where((pt) {
-            final mechanic = grid.getMechanic(pt);
+            final mechanic = puzzle.getMechanic(pt);
             return (mechanic is DashCell && mechanic.color == color) ||
                 (mechanic is DiagonalDashCell && mechanic.color == color);
           }),
@@ -142,8 +142,8 @@ class DashValidator extends RuleValidator {
   }
 
   @override
-  bool isApplicable(GridState grid) =>
-      grid.mechanics.any((c) => c is DashCell || c is DiagonalDashCell);
+  bool isApplicable(Puzzle puzzle) =>
+      puzzle.mechanics.any((c) => c is DashCell || c is DiagonalDashCell);
 }
 
 const dashValidator = DashValidator();

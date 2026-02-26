@@ -1,31 +1,107 @@
+import 'package:grids/engine/area_extractor.dart';
+import 'package:grids/engine/cell.dart';
+import 'package:grids/engine/grid.dart';
+import 'package:grids/engine/grid_format.dart';
+import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
 import 'package:meta/meta.dart';
 
-/// Represents a specific level or puzzle in the game.
+/// Represents a specific playable board state (grid structure + active state).
 @immutable
 class Puzzle {
+  /// Constructor for a puzzle composed of a grid and its state.
   const Puzzle({
-    required this.id,
-    required this.initialGrid,
-    this.knownSolutions = const [],
-    this.note,
-    this.metadata = const {},
+    required this.grid,
+    required this.state,
   });
 
-  /// Unique identifier for the puzzle.
-  final String id;
+  /// Factory for a completely empty puzzle, used mainly for testing.
+  factory Puzzle.empty({required int width, required int height}) {
+    return Puzzle(
+      grid: Grid.empty(width: width, height: height),
+      state: GridState(width: width, height: height, bits: BigInt.zero),
+    );
+  }
 
-  /// The starting layout of the grid, including all mechanics.
-  final GridState initialGrid;
+  /// The static structural layout of the puzzle.
+  final Grid grid;
 
-  /// A list of known valid solutions represented as bitsets of the lit state.
-  final List<BigInt> knownSolutions;
+  /// The transient mutable state (which cells are lit).
+  final GridState state;
 
-  /// Optional developer note for context about the puzzle
-  /// (e.g. unsupported mechanics, design intent, source).
-  /// Not shown to the player.
-  final String? note;
+  // Forwarders for convenience
+  int get width => grid.width;
+  int get height => grid.height;
+  List<Cell> get mechanics => grid.mechanics;
+  Cell getCell(GridPoint pt) => grid.getCell(pt);
+  Cell getMechanic(GridPoint pt) => getCell(
+    pt,
+  ); // Proxy for compatibility // TODO(bramp): Remove this method.
+  bool isLocked(GridPoint pt) => grid.isLocked(pt);
+  bool isValidXY(int x, int y) => grid.isValidXY(x, y);
+  bool isValid(GridPoint pt) => grid.isValid(pt);
+  GridPoint pointAt(int x, int y) => grid.pointAt(x, y);
+  (int, int) xy(GridPoint pt) => grid.xy(pt);
 
-  /// Additional optional metadata (e.g. difficulty, author).
-  final Map<String, dynamic> metadata;
+  /// Helper method for tests/setup to place a cell immutably.
+  /// This actually modifies the underlying structural [Grid], so use
+  /// cautiously in a gameplay setting to avoid structurally mutating puzzles!
+  @visibleForTesting
+  Puzzle withMechanic(GridPoint pt, Cell cell) {
+    final newMechanics = List<Cell>.from(grid.mechanics);
+    newMechanics[pt] = cell;
+    return copyWith(
+      grid: Grid(width: width, height: height, mechanics: newMechanics),
+    );
+  }
+
+  bool isLit(GridPoint pt) => state.isLit(pt);
+  BigInt get bits => state.bits;
+
+  Puzzle setLit(GridPoint pt, {required bool isLit}) {
+    if (isLocked(pt)) return this;
+    return Puzzle(
+      grid: grid,
+      state: state.setLit(pt, isLit: isLit),
+    );
+  }
+
+  Puzzle toggle(GridPoint pt) {
+    if (isLocked(pt)) return this;
+    return Puzzle(
+      grid: grid,
+      state: state.toggle(pt),
+    );
+  }
+
+  Puzzle copyWith({
+    Grid? grid,
+    GridState? state,
+  }) {
+    return Puzzle(
+      grid: grid ?? this.grid,
+      state: state ?? this.state,
+    );
+  }
+
+  static final _areaCache = Expando<List<List<GridPoint>>>();
+
+  List<List<GridPoint>> extractContiguousAreas() {
+    return _areaCache[this] ??= AreaExtractor.extract(this);
+  }
+
+  String toAsciiString({bool useColor = false}) {
+    return GridFormat.toAsciiString(this, useColor: useColor);
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Puzzle &&
+          runtimeType == other.runtimeType &&
+          grid == other.grid &&
+          state == other.state;
+
+  @override
+  int get hashCode => grid.hashCode ^ state.hashCode;
 }

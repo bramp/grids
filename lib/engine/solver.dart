@@ -20,31 +20,29 @@ class PuzzleSolver {
   ///
   /// Note: This is a brute-force solver. Puzzles with many playable cells (>25)
   /// will take significant time to solve.
-  List<GridState> solve(Puzzle puzzle, {bool deduplicate = true}) {
-    final grid = puzzle.initialGrid;
-
+  List<Puzzle> solve(Puzzle puzzle, {bool deduplicate = true}) {
     // Optimize validation by only using rules relevant to this specific puzzle.
-    final optimizedValidator = _validator.filter(grid);
+    final optimizedValidator = _validator.filter(puzzle);
 
     final playableIndices = <GridPoint>[];
 
-    for (var i = 0; i < grid.mechanics.length; i++) {
+    for (var i = 0; i < puzzle.mechanics.length; i++) {
       final pt = GridPoint(i);
-      if (!grid.isLocked(pt)) {
+      if (!puzzle.isLocked(pt)) {
         playableIndices.add(pt);
       }
     }
 
-    final solutions = <GridState>[];
+    final solutions = <Puzzle>[];
     final seenSignatures = <String>{};
 
     final bitMasks = playableIndices.map((pt) => BigInt.one << pt).toList();
 
     _backtrack(
-      grid,
+      puzzle,
       bitMasks,
       0,
-      grid.bits,
+      puzzle.bits,
       solutions,
       seenSignatures,
       deduplicate,
@@ -55,17 +53,23 @@ class PuzzleSolver {
   }
 
   void _backtrack(
-    GridState initialGrid,
+    Puzzle basePuzzle,
     List<BigInt> bitMasks,
     int index,
     BigInt currentBits,
-    List<GridState> solutions,
+    List<Puzzle> solutions,
     Set<String> seenSignatures,
     bool deduplicate,
     PuzzleValidator validator,
   ) {
     if (index == bitMasks.length) {
-      final current = initialGrid.withBits(currentBits);
+      final current = basePuzzle.copyWith(
+        state: GridState(
+          width: basePuzzle.width,
+          height: basePuzzle.height,
+          bits: currentBits,
+        ),
+      );
       if (validator.validate(current).isValid) {
         if (!deduplicate) {
           solutions.add(current);
@@ -84,7 +88,7 @@ class PuzzleSolver {
 
     // Try bit off
     _backtrack(
-      initialGrid,
+      basePuzzle,
       bitMasks,
       index + 1,
       currentBits & ~bit,
@@ -96,7 +100,7 @@ class PuzzleSolver {
 
     // Try bit on
     _backtrack(
-      initialGrid,
+      basePuzzle,
       bitMasks,
       index + 1,
       currentBits | bit,
@@ -107,15 +111,17 @@ class PuzzleSolver {
     );
   }
 
-  String _getSignature(GridState grid) {
-    final areas = grid.extractContiguousAreas();
+  String _getSignature(Puzzle puzzle) {
+    final areas = puzzle.extractContiguousAreas();
     final mechanicAreas = <String>[];
 
     for (final area in areas) {
-      final hasMechanic = area.any((pt) => grid.getMechanic(pt) is! BlankCell);
+      final hasMechanic = area.any(
+        (pt) => puzzle.getMechanic(pt) is! BlankCell,
+      );
       if (hasMechanic) {
         final sortedPts = area.toList()..sort();
-        final litState = grid.isLit(sortedPts.first) ? '1' : '0';
+        final litState = puzzle.isLit(sortedPts.first) ? '1' : '0';
         final pointsStr = sortedPts.join('|');
         mechanicAreas.add('$litState:$pointsStr');
       }
@@ -128,18 +134,18 @@ class PuzzleSolver {
   /// Returns a clean copy of the grid where unnecessary lit cells are turned
   /// off. It verifies that any change does not break validity or the core
   /// mechanic signature.
-  GridState _normalize(GridState grid, PuzzleValidator validator) {
-    var normalized = grid;
-    final originalSignature = _getSignature(grid);
+  Puzzle _normalize(Puzzle puzzle, PuzzleValidator validator) {
+    var normalized = puzzle;
+    final originalSignature = _getSignature(puzzle);
 
-    final size = grid.mechanics.length;
+    final size = puzzle.mechanics.length;
     for (var i = 0; i < size; i++) {
       final pt = GridPoint(i);
 
       // Do not attempt to toggle locked cells, even if it leaves the
       // grid valid.
       // Locked cells must retain their initial state.
-      if (grid.isLocked(pt)) {
+      if (puzzle.isLocked(pt)) {
         continue;
       }
 

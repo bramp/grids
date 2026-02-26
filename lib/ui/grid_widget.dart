@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/providers/puzzle_provider.dart';
+import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_cell_widget.dart';
 import 'package:provider/provider.dart';
@@ -11,11 +11,12 @@ class GridWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Read dimensions from the provider, listening for changes
-    final width = context.select<PuzzleProvider, int>((p) => p.grid.width);
-    final height = context.select<PuzzleProvider, int>((p) => p.grid.height);
+    // TODO(bramp): Should we be selecting on both width and height?
+    final width = context.select<LevelProvider, int>((p) => p.puzzle.width);
+    final height = context.select<LevelProvider, int>((p) => p.puzzle.height);
     final theme = context.watch<ThemeProvider>().activeTheme;
-    final puzzleId = context.select<PuzzleProvider, String>(
-      (p) => p.currentPuzzle.id,
+    final puzzleId = context.select<LevelProvider, String>(
+      (p) => p.currentLevel.id,
     );
 
     // We use a LayoutBuilder to ensure the grid cells remain perfectly square
@@ -60,8 +61,8 @@ class GridWidget extends StatelessWidget {
                 width,
                 height,
               ),
-              onPointerUp: (_) => context.read<PuzzleProvider>().endDrag(),
-              onPointerCancel: (_) => context.read<PuzzleProvider>().endDrag(),
+              onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
+              onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
               behavior: HitTestBehavior.opaque,
               child: Container(
                 key: ValueKey(puzzleId),
@@ -116,9 +117,9 @@ class GridWidget extends StatelessWidget {
     final y = (localPosition.dy / cellHeight).floor();
 
     final point = GridPoint(y * gridWidth + x);
-    final provider = context.read<PuzzleProvider>();
+    final provider = context.read<LevelProvider>();
 
-    if (provider.grid.isValid(point)) {
+    if (provider.puzzle.isValid(point)) {
       provider.dragToggleCell(point);
     }
   }

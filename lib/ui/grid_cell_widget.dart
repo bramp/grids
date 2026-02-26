@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/providers/puzzle_provider.dart';
+import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -13,17 +13,17 @@ class GridCellWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // Only rebuild this specific widget if its own lit state or error state
     // changes
-    final isLit = context.select<PuzzleProvider, bool>(
-      (p) => p.grid.isLit(point),
+    final isLit = context.select<LevelProvider, bool>(
+      (p) => p.puzzle.isLit(point),
     );
-    final hasError = context.select<PuzzleProvider, bool>(
+    final hasError = context.select<LevelProvider, bool>(
       (p) => p.validation?.errors.contains(point) ?? false,
     );
-    final mechanic = context.select<PuzzleProvider, Cell>(
-      (p) => p.grid.getMechanic(point),
+    final mechanic = context.select<LevelProvider, Cell>(
+      (p) => p.puzzle.getMechanic(point),
     );
-    final isLocked = context.select<PuzzleProvider, bool>(
-      (p) => p.grid.isLocked(point),
+    final isLocked = context.select<LevelProvider, bool>(
+      (p) => p.puzzle.isLocked(point),
     );
 
     final theme = context.watch<ThemeProvider>().activeTheme;

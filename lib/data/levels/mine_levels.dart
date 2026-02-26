@@ -1,11 +1,11 @@
-import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/grid_format.dart';
+import 'package:grids/engine/level.dart';
 
 final mineLevels = [
-  Puzzle(
+  Level(
     id: 'mine_1',
     note: 'Learn that diamonds need to be connected',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o
         o
       '''),
@@ -16,9 +16,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o
         .
         .
@@ -33,9 +33,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_3',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . o
         . . .
         o . .
@@ -48,9 +48,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         () . o
         . () .
         o . ()
@@ -63,9 +63,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_5',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o o
         o o
       '''),
@@ -76,9 +76,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_6',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*o) .  o
           .  .  .
           o  . (*o)
@@ -92,9 +92,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_7',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          .  (o)  .
          o   .   o
          .  (o)  .
@@ -108,9 +108,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_8',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o o
         o o
         o o
@@ -123,9 +123,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_9',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o o o .
         . . . .
         . o o o
@@ -138,9 +138,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_10',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (o)  .  o  o
          .   .  .  .
          .   .  .  .
@@ -155,9 +155,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_11',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o o o o
         o o o o
         o o o o
@@ -172,9 +172,9 @@ final mineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'mine_12',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . o o o
         . o . o
         o . o o
@@ -188,9 +188,9 @@ final mineLevels = [
     ],
   ),
   // TODO(bramp): mine_13 is a walking puzzle
-  Puzzle(
+  Level(
     id: 'mine_13',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o . o
         . . .
         o . o
@@ -206,10 +206,10 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_14',
     note: 'Introduction to multiple colours',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
           Bo   Yo    Ko
           .    .     .
         (*Bo) (Yo) (*Ko)
@@ -223,10 +223,10 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_15',
     note: 'Introduction to colours can mix',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          Yo   .   Bo
           .   .   .
         (*Bo) .   Yo
@@ -240,9 +240,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_16',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Yo  Bo  Yo
         Bo  Yo  Yo
         Yo  Yo  .
@@ -256,9 +256,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_17',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Bo  Yo  .
         Bo  Yo  Yo
         Yo  Yo  Yo
@@ -272,9 +272,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_18',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Ko  Yo  Bo
         .   Yo  Yo
         Bo  Yo  Ko
@@ -288,9 +288,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_19',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Ko  Yo . (*Ko)
         Yo . . .
         . . . Yo
@@ -306,9 +306,9 @@ final mineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_20',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Ko  Yo  Yo  Ko
         Yo  .   .   Yo
         Yo  .   .   Yo
@@ -316,9 +316,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_21',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Ko  Yo  Yo  .
         Yo  .   .   Yo
         Yo  .   .   Yo
@@ -326,9 +326,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_22',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .     Wo    .     Wo    (*Bo)
         Wo    ()    .     (Yo)  Wo
         .     .     Yo    Ko    .
@@ -337,9 +337,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_23',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .     .     Bo    (Ko) (Yo)
         .     Yo    .     .     (*Wo)
         .     Ko    .     Ko    .
@@ -353,9 +353,9 @@ final mineLevels = [
   // TODO(bramp): mine_27 is a walking puzzle
   // TODO(bramp): mine_28 is a walking puzzle
   // Skipped mine_29 / mine_30 are simple walking puzzles
-  Puzzle(
+  Level(
     id: 'mine_31',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Yo (*)    Yo   (*Yo)
         Yo   (*Yo) .    .
         .    .    .    .
@@ -363,9 +363,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_32',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .    .    Yo   Yo
         (*Yo) ()   .    Yo
         Yo   .    .    .
@@ -373,9 +373,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_33',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Yo   .    .    Yo
         Yo   .    .    Yo
         Yo   .    .    (*)
@@ -383,9 +383,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_34',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .    Yo   Yo   Yo   .
         Yo   ()   Yo   ()   Yo
         Yo   Yo   .    Yo   Yo
@@ -394,9 +394,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_35',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .    Yo   Yo   Yo   .
         Yo   .    (Yo) .    Yo
         .    (*Yo) .    (Yo) .
@@ -405,9 +405,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_36',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Ko   Ko   .    .    .    .    .
         .    (*Ko) .    Wo   .    .    .
         .    .    Yo   (*Ko) .    .    .
@@ -418,9 +418,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_shortcut_1',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Yo Wo Yo Wo Po
         Po .  Yo Wo Wo
         Po Wo Po Wo Yo
@@ -428,9 +428,9 @@ final mineLevels = [
   ),
 
   // TODO(bramp): mine_shortcut_2 is a walking puzzle
-  Puzzle(
+  Level(
     id: 'mine_shortcut_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         o . . o
         o . . o
         o . . o
@@ -438,9 +438,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_shortcut_3',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*Co) Yo   Yo   Yo   (*Co)
         .    (Yo) .    Yo   .
         .    (Yo) .    Yo   .
@@ -448,9 +448,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_shortcut_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Co .  Co Yo
         Yo Co .  Yo
         Yo Yo .  .
@@ -458,9 +458,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_1',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         W1 .  .  .  .
         .  .  .  Y6 .
         .  . (W1) . .
@@ -469,18 +469,18 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .  Y3
         .  Y2 .
         Y1 .  .
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_3',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .  Wo .
         Wo .  .  Wo
         .  Y1 .  .
@@ -488,9 +488,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Yo .  B2 W4
         .  Yo .  .
         B2 .  .  Yo
@@ -498,9 +498,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_5',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         B7 .  Yo Yo
         .  .  Yo Yo
         Wo Wo .  .
@@ -508,9 +508,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_6',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Bo .  .  Bo
         .  Ro Ro Y3
         .  Ro Ro .
@@ -518,9 +518,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_7',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Bo .  .  Y6
         .  .  .  .
         .  .  .  .
@@ -528,9 +528,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_8',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .  Wo B3
         Yo .  .  Wo
         .  Wo .  .
@@ -538,9 +538,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_9',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         W4 .  .  Wo
         .  Wo .  .
         .  .  Wo .
@@ -548,9 +548,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_10',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*Y5) .  .  Yo
         .    Yo .  .
         .    .  Yo .
@@ -558,9 +558,9 @@ final mineLevels = [
       '''),
   ),
 
-  Puzzle(
+  Level(
     id: 'mine_bonus_11',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Po Yo Yo Yo
         Po Po Yo Po
         Po Yo Po Po

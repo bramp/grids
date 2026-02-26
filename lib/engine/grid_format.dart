@@ -1,17 +1,18 @@
 import 'package:grids/engine/cell.dart';
+import 'package:grids/engine/grid.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 
-/// Utility class for parsing and printing [GridState] objects using ASCII
-/// representations.
+/// Utility class for parsing and printing puzzles using ASCII representations.
 class GridFormat {
-  /// Parses an ASCII lit/unlit mask into a bitset.
+  /// Parses an ASCII lit/unlit mask into a GridState.
   /// Characters containing `*` are considered lit.
-  static BigInt parseMask(String ascii) {
-    return parse(ascii).bits;
+  static GridState parseMask(String ascii) {
+    return parse(ascii).state;
   }
 
-  /// Parses an ASCII grid representation into a GridState.
+  /// Parses an ASCII grid representation into a Puzzle.
   ///
   /// The format supports modifiers:
   /// - `*` (Asterisk): Indicates the cell starts as "lit" (pre-lit). Can be
@@ -28,7 +29,7 @@ class GridFormat {
   ///
   /// Legacy support:
   /// - A lone color prefix (e.g., `R`) is treated as a Diamond of that color.
-  static GridState parse(
+  static Puzzle parse(
     String ascii, {
     CellColor defaultColor = CellColor.black,
   }) {
@@ -188,26 +189,24 @@ class GridFormat {
       throw ArgumentError('$e\n\nFull grid:\n$ascii');
     }
 
-    return GridState.fromRaw(
-      width: width,
-      height: height,
-      mechanics: mechanics,
-      bits: bits,
+    return Puzzle(
+      grid: Grid(width: width, height: height, mechanics: mechanics),
+      state: GridState(width: width, height: height, bits: bits),
     );
   }
 
   /// Returns a beautiful debug ASCII representation of the grid.
-  static String toAsciiString(GridState grid, {bool useColor = false}) {
+  static String toAsciiString(Puzzle puzzle, {bool useColor = false}) {
     final tokens = List.generate(
-      grid.width,
-      (_) => List<String>.filled(grid.height, ''),
+      puzzle.width,
+      (_) => List<String>.filled(puzzle.height, ''),
     );
 
-    for (var y = 0; y < grid.height; y++) {
-      for (var x = 0; x < grid.width; x++) {
-        final index = y * grid.width + x;
-        final cell = grid.mechanics[index];
-        final isLit = grid.isLit(GridPoint(index));
+    for (var y = 0; y < puzzle.height; y++) {
+      for (var x = 0; x < puzzle.width; x++) {
+        final index = y * puzzle.width + x;
+        final cell = puzzle.mechanics[index];
+        final isLit = puzzle.isLit(GridPoint(index));
 
         var token = switch (cell) {
           NumberCell() => '${_getSymbolColor(cell.color) ?? ''}${cell.number}',
@@ -227,24 +226,24 @@ class GridFormat {
     }
 
     var maxWidth = 0;
-    for (var x = 0; x < grid.width; x++) {
-      for (var y = 0; y < grid.height; y++) {
+    for (var x = 0; x < puzzle.width; x++) {
+      for (var y = 0; y < puzzle.height; y++) {
         if (tokens[x][y].length > maxWidth) maxWidth = tokens[x][y].length;
       }
     }
 
     final buffer = StringBuffer();
-    for (var y = 0; y < grid.height; y++) {
-      for (var x = 0; x < grid.width; x++) {
+    for (var y = 0; y < puzzle.height; y++) {
+      for (var x = 0; x < puzzle.width; x++) {
         final token = tokens[x][y];
         final leftPadding = (maxWidth - token.length) ~/ 2;
         final rightPadding = maxWidth - token.length - leftPadding;
         final alignedToken = ' ' * leftPadding + token + ' ' * rightPadding;
 
         if (useColor) {
-          final index = y * grid.width + x;
-          final cell = grid.mechanics[index];
-          final isLit = grid.isLit(GridPoint(index));
+          final index = y * puzzle.width + x;
+          final cell = puzzle.mechanics[index];
+          final isLit = puzzle.isLit(GridPoint(index));
           final fg = _getAnsiForeground(cell);
           final bg = isLit ? '\x1B[48;5;18m' : '\x1B[40m';
           buffer.write('$bg$fg$alignedToken\x1B[0m ');
@@ -315,7 +314,7 @@ class GridFormat {
     for (var y = 0; y < grid.height; y++) {
       buffer.write('          ');
       for (var x = 0; x < grid.width; x++) {
-        final pt = grid.pointAt(x, y);
+        final pt = GridPoint(y * grid.width + x);
         final lit = grid.isLit(pt);
         if (useColor) buffer.write(lit ? litColor : unlitColor);
         buffer.write(lit ? '*' : '.');

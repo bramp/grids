@@ -1,10 +1,10 @@
-import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/grid_format.dart';
+import 'package:grids/engine/level.dart';
 
 final gardenLevels = [
-  Puzzle(
+  Level(
     id: 'garden_1',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         x   .   x
         . (*F1) .
         x   .   x
@@ -17,9 +17,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .   .   .
         . (*F2) .
         .   .   .
@@ -32,9 +32,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_3',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . (*F3) .
         . . .
@@ -47,9 +47,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . (*F4) .
         . . .
@@ -62,9 +62,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_5',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . (F0) .
         . . .
@@ -77,10 +77,11 @@ final gardenLevels = [
         '''),
     ],
   ),
-  // TODO garden_6 though garden_11 are the same puzzles, but with different background colours. We should maybe drop them.
-  Puzzle(
+  // TODOgarden_6 though garden_11 are the same puzzles, but with different
+  // background colours. We should maybe drop them.
+  Level(
     id: 'garden_6',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .   .   .
         . (*F3) .
         .   .   .
@@ -93,9 +94,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_7',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .   .
         . (F3) .
         .  .   .
@@ -108,9 +109,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_8',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . (*F1) .
         . . .
@@ -123,9 +124,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_9',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .   .   .
         . (*F1) .
         .   .   .
@@ -138,9 +139,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_10',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . (*F2) .
         . . .
@@ -153,9 +154,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_11',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . (*F4) .
         . . .
@@ -169,9 +170,9 @@ final gardenLevels = [
     ],
   ),
   // Skipped garden_12 as it's a more complex puzzle
-  Puzzle(
+  Level(
     id: 'garden_13',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . .
         . F1 .
         . . .
@@ -184,9 +185,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_14',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*.) .  (*.)
          .  (F1) .
         (*.) .  (*.)
@@ -199,9 +200,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_15',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .   .    .   .
         . (*F1) (F1) .
         .   .    .   .
@@ -214,9 +215,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_16',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*F1) .  . (*F1)
           .   .  .   .
           .   .  .   .
@@ -231,9 +232,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_17',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*F1) . . (F1)
         . . . .
         . . . .
@@ -248,9 +249,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_18',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . F1 .
         F1 . F1
         . F1 .
@@ -263,9 +264,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_19',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . (*F1) .
         (*F2) . (*F1)
         . (*F2) .
@@ -278,9 +279,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_20',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*F1) .  .
         F3   .  F3
         .    .  (*F1)
@@ -293,9 +294,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_21',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F0 . .
         .  . .
         .  . F0
@@ -308,9 +309,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_22',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F0  .  .
         .  F2  .
         .   .  F0
@@ -324,10 +325,10 @@ final gardenLevels = [
     ],
   ),
 
-  // TODO Do Garden 24 - 29 walking puzzles
-  Puzzle(
+  // TODODo Garden 24 - 29 walking puzzles
+  Level(
     id: 'garden_shortcut_1',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F0 F0 F0 F0
         F0 F0 F0 F0
         F0 F0 F0 F0
@@ -342,9 +343,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_shortcut_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F1 F1 F1 F1
         F1 F1 F1 F1
         F1 F1 F1 F1
@@ -359,9 +360,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_shortcut_3',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F2 F2 F2 F2
         F2 F2 F2 F2
         F2 F2 F2 F2
@@ -376,9 +377,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_shortcut_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .  F3  .   .  .
         F1 F0 (*) .   F4 F1
         F2 .  .   F1  .  .
@@ -393,9 +394,9 @@ final gardenLevels = [
   ),
 
   /*
-  Puzzle(
+  Level(
     id: 'garden_bonus_1',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         P9 . . .
         . O/ . .
         . . Wo .
@@ -410,9 +411,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . P4 .
         . F4 .
         . F2 .
@@ -427,9 +428,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_3',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . P/ .
         . F3 .
         . F3 .
@@ -444,9 +445,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         P9 .  .  F1
         .  .  F1 .
         .  F1 F0 .
@@ -461,9 +462,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_5',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .  .  P8
         .  .  F2 .
         .  F2 .  .
@@ -479,9 +480,9 @@ final gardenLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'garden_bonus_6',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . . . P1
         P2 . (F3) .
         (F1) . . F2
@@ -496,9 +497,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_7',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         P4 .  .  F3 .
         .  .  P4 .  .
         .  .  F4 .  .
@@ -515,9 +516,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_8',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Oo . Wo . (Oo)
         Oo . (Wo) . Oo
         Oo . Wo . Oo
@@ -532,9 +533,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_9',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F1 .  .  F1
         Wo Wo Wo Wo
         Wo Wo Wo Wo
@@ -549,9 +550,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_10',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F3 .  .  .
         .  F3 .  .
         .  .  F3 .
@@ -567,9 +568,9 @@ final gardenLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'garden_bonus_11',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  W  Oo W  .
         W  F0 Oo F0 W
         W  Oo .  Oo W
@@ -586,9 +587,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_12',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Oo Oo Oo Oo
         Oo .  .  Oo
         Oo .  .  Oo
@@ -603,9 +604,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_13',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F1 .  F1
         .  F4 .
         F1 .  F1
@@ -618,9 +619,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_14',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F1 F1 F1
         F1 F0 F1
         F1 F1 F1
@@ -633,9 +634,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_15',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         F1 F2 F1
         F2 F4 F2
         F1 F2 F1
@@ -649,9 +650,9 @@ final gardenLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'garden_bonus_16',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Oo .  .  .  Oo F1
         .  .  .  .  F1 .
         .  .  .  F1 .  .
@@ -670,9 +671,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_17',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .  .  .  .  .  .
         .  .  .  Po .  .
         Oo .  .  F0 .  .
@@ -691,9 +692,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_18',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Wo .  .  .  .  Ko
         .  (Po) .  .  (Oo) .
         .  .  .  F1 .  .
@@ -712,9 +713,9 @@ final gardenLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'garden_bonus_20',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (P-) .  O- .  .
         .    .  .  .  .
         O-   .  .  .  (P-)

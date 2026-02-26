@@ -1,11 +1,11 @@
 import 'package:grids/engine/cell.dart';
-import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/grid_format.dart';
+import 'package:grids/engine/level.dart';
 
 final shrineLevels = [
-  Puzzle(
+  Level(
     id: 'shrine_1',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . .
         1 .
       '''),
@@ -16,9 +16,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_2',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . 1
         1 .
       '''),
@@ -30,9 +30,9 @@ final shrineLevels = [
     ],
   ),
   // TODO(bramp): shrine_3 is a start and end - which is not supported yet.
-  Puzzle(
+  Level(
     id: 'shrine_4',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         . 1
         . 1
         1 .
@@ -47,9 +47,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_5',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (.) 1
          1  .
          1  .
@@ -64,9 +64,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_6',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*1) .  . (1)
          .   1  .  .
          .   .  1  .
@@ -83,9 +83,9 @@ final shrineLevels = [
   ),
   /*
     TODO(bramp): shrine_7 is a start and end - which is not supported yet.
-    Puzzle(
-      id: 'shrine_7',
-      initialGrid: GridFormat.parse('''
+    Level(
+    id: 'shrine_7',
+      puzzle: GridFormat.parse('''
          .   .   1
          .   .   .
         (*1) .   .
@@ -108,9 +108,9 @@ final shrineLevels = [
     ),
     */
   // TODO(bramp): level 8 is a walking path problem
-  Puzzle(
+  Level(
     id: 'shrine_9',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          .   .
          2   .
       '''),
@@ -122,9 +122,9 @@ final shrineLevels = [
     ],
   ),
   // TODO(bramp): level 10-16 are walking path problems
-  Puzzle(
+  Level(
     id: 'shrine_17',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          B1
          Y1
       '''),
@@ -135,9 +135,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_18',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          (B1) Y1
           Y1 (*Y1)
       '''),
@@ -148,9 +148,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_19',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          Y1 Y1 B1 B1
          B1 Y1 B1 Y1
          B1 Y1 B1 Y1
@@ -165,9 +165,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_20',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          .  .  .  .
          .  .  B1 Y1
          Y1 B1 .  .
@@ -182,9 +182,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_21',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          .  .  B1  .
          .  .  B1 B1
          Y1 Y1 .  .
@@ -199,9 +199,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_22',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          K1 Y1 P1 W1
          Y1 B1 K1 P1
          P1 W1 B1 W1
@@ -218,9 +218,9 @@ final shrineLevels = [
   ),
   /*
      shrine_23 / shrine_24 requires a start and end - which is not supported yet.
-    Puzzle(
-      id: 'shrine_23',
-      initialGrid: GridFormat.parse('''
+    Level(
+    id: 'shrine_23',
+      puzzle: GridFormat.parse('''
          B1 B1 Y1 B1
         Y1 Y1 Y1 B1
          B1 B1 B1 Y1
@@ -229,9 +229,9 @@ final shrineLevels = [
     ),
     // shrine 24 is a repeat of 23.
     */
-  Puzzle(
+  Level(
     id: 'shrine_25',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          .  .  .
          B4 . Y4
          .  .  .
@@ -244,9 +244,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_26',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . . .
          B4 . Y3
          . . .
@@ -259,9 +259,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_27',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . . .
          . B4 Y2
          . . .
@@ -274,9 +274,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_28',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . . .
          . B4 Y1
          . . .
@@ -289,9 +289,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_29',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          B3 . Y2
          . . .
          Y2 . B2
@@ -305,9 +305,9 @@ final shrineLevels = [
     ],
   ),
   // TODO(bramp): shrine_30 is an start-end problem
-  Puzzle(
+  Level(
     id: 'shrine_30',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . . B3
          . . Y2
          . . B4
@@ -328,9 +328,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_31',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . .  .  .
          . .  .  .
          . B4 Y4 .
@@ -345,9 +345,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_32',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . .   .  .
          . Y4  B4 .
          . .   W4 .
@@ -362,9 +362,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_33',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . .  .  . .  .
          . K3 W3 . B3 Y3
          . B3 Y3 . K3 W3
@@ -380,9 +380,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_34',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          . . . . . . Y1
          . . . Y5 W4 B3 W2
          . . . K6 . . .
@@ -398,10 +398,10 @@ final shrineLevels = [
 
   // TODO(bramp): shrine_35 / shrine_36 is a start-end problem
   // TODO(bramp): shrine_37 is a start-end problem
-  Puzzle(
+  Level(
     id: 'shrine_38',
     note: 'Beginning of the negative numbers',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          -2  .  .
           .  .  .
         (*6) . (4)
@@ -415,9 +415,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_39',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          .   .  .
         -3   .  .
         (*6) . (4)
@@ -430,9 +430,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_40',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
           .  .  .
          -4  .  .
         (*6) . (4)
@@ -445,9 +445,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_41',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         .     .  -2
         .     .  -1
         (*5) .  (6)
@@ -460,9 +460,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_42',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          -3   .  .
           .  -3  .
         (*6) (6) .
@@ -475,9 +475,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_43',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Y6 . . .
         . 3 -1 .
         . -1 3 .
@@ -492,9 +492,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_44',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         6 . . .
         . Y3 -1 .
         . -1 Y3 .
@@ -509,9 +509,9 @@ final shrineLevels = [
         '''),
     ],
   ),
-  Puzzle(
+  Level(
     id: 'shrine_45',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (*4) .    .     .
         .    (3)  -1   .
         .     -1  (3)  .
@@ -527,10 +527,10 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_46',
     note: 'Learn if a area sums to zero, the area can be any size',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Y1 . Y1 -2
         .  . .  .
         Y1 . Y1 .
@@ -546,10 +546,10 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_47',
     note: 'Learn that areas can never have a net negative sum',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         Y-1 .  B1  -1
         Y1  .  .   .
         .   .  .   Y1
@@ -565,9 +565,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_48',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         -1   .  .  -1
         (1)  .  .  (1)
         (1)  .  .  (1)
@@ -583,9 +583,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_49',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         -1   -1 -1  -1
         (1)  -1 -1  (1)
         (1)  -1 -1  (1)
@@ -601,9 +601,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_50',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
           (1)  -1 (*1) -1
           (*1) -1 (1) -1
           (1)  -1 (*1) -1
@@ -619,9 +619,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_51',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
            9 . . -1
           -1 . . -1
           -1 . . -1
@@ -637,9 +637,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_52',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
          -7  .  .  3
           .  9  .  .
           .  .  9  .
@@ -655,9 +655,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_53',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
            1  .  1  -1
           -1  .  .  -1
           -1 -1  1  -1
@@ -677,9 +677,9 @@ final shrineLevels = [
   // TODO(bramp): shrine_54 is a start-end problem
   // TODO(bramp): shrine_55 is a start-end problem
   // TODO(bramp): shrine_56 is a previous start-end problem
-  Puzzle(
+  Level(
     id: 'shrine_57',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (2)  .  (*3)  .  (2)
         .    .   .   .  .
         (*3) .  (5)  .  (*3)
@@ -697,9 +697,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_58',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (3)  .  (*3) .  (3)
         .    .   .   .   .
         (*3) .   .   .  (*3)
@@ -717,9 +717,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_59',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (2)  .   .    .   (2)
          .   .   .    .    .
          .   .  (*6)  .    .
@@ -737,9 +737,9 @@ final shrineLevels = [
     ],
   ),
 
-  Puzzle(
+  Level(
     id: 'shrine_60',
-    initialGrid: GridFormat.parse('''
+    puzzle: GridFormat.parse('''
         (5)    .    .    .     .   (5)
          .   (*6)   .    .     .    .
          .     .    .   (B4)   .    .

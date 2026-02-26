@@ -1,7 +1,7 @@
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 
-/// The result returned from validating a specific region of the grid.
+/// The result returned from validating a specific region of the puzzle.
 class ValidationResult {
   ValidationResult._(this.isValid, this.errors);
 
@@ -18,18 +18,18 @@ class ValidationResult {
   final List<GridPoint> errors;
 }
 
-/// A rule that can be applied to a contiguous area of the grid.
+/// A rule that can be applied to a contiguous area of the puzzle.
 abstract class RuleValidator {
   const RuleValidator();
 
-  /// Validates a single contiguous area from a grid.
+  /// Validates a single contiguous area from a puzzle.
   ///
   /// Returns a [ValidationResult] indicating if the area satisfies the rule.
-  ValidationResult validate(GridState grid, List<GridPoint> area);
+  ValidationResult validate(Puzzle puzzle, List<GridPoint> area);
 
-  /// Returns true if this rule is relevant to the given [grid].
+  /// Returns true if this rule is relevant to the given [puzzle].
   ///
   /// For example, a diamond rule is only applicable if the grid contains
   /// at least one diamond cell.
-  bool isApplicable(GridState grid);
+  bool isApplicable(Puzzle puzzle);
 }

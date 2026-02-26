@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 
 /// Utility class to extract contiguous areas of like-lit cells.
 class AreaExtractor {
@@ -9,9 +9,9 @@ class AreaExtractor {
   static Int32List _queueBuffer = Int32List(0);
 
   /// Identifies all contiguous areas where cells share the same lit/unlit state.
-  static List<List<GridPoint>> extract(GridState grid) {
-    final width = grid.width;
-    final height = grid.height;
+  static List<List<GridPoint>> extract(Puzzle puzzle) {
+    final width = puzzle.width;
+    final height = puzzle.height;
     final size = width * height;
 
     if (_visitedBuffer.length < size) {
@@ -29,11 +29,11 @@ class AreaExtractor {
     final areas = <List<GridPoint>>[];
 
     for (var i = 0; i < size; i++) {
-      if (visited[i] == 1 || grid.getMechanic(GridPoint(i)) is VoidCell) {
+      if (visited[i] == 1 || puzzle.getMechanic(GridPoint(i)) is VoidCell) {
         continue;
       }
 
-      final targetLitState = grid.isLit(GridPoint(i));
+      final targetLitState = puzzle.isLit(GridPoint(i));
       final currentArea = <GridPoint>[];
 
       var head = 0;
@@ -53,8 +53,8 @@ class AreaExtractor {
         if (cy > 0) {
           final ni = indexValue - width;
           if (visited[ni] == 0 &&
-              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
-              grid.isLit(GridPoint(ni)) == targetLitState) {
+              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }
@@ -62,8 +62,8 @@ class AreaExtractor {
         if (cy < height - 1) {
           final ni = indexValue + width;
           if (visited[ni] == 0 &&
-              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
-              grid.isLit(GridPoint(ni)) == targetLitState) {
+              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }
@@ -71,8 +71,8 @@ class AreaExtractor {
         if (cx > 0) {
           final ni = indexValue - 1;
           if (visited[ni] == 0 &&
-              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
-              grid.isLit(GridPoint(ni)) == targetLitState) {
+              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }
@@ -80,8 +80,8 @@ class AreaExtractor {
         if (cx < width - 1) {
           final ni = indexValue + 1;
           if (visited[ni] == 0 &&
-              grid.getMechanic(GridPoint(ni)) is! VoidCell &&
-              grid.isLit(GridPoint(ni)) == targetLitState) {
+              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
           }

@@ -1,6 +1,6 @@
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/rule_validator.dart';
 
 /// Validates that diamonds are always part of a pair of the same color.
@@ -12,13 +12,13 @@ class DiamondValidator extends RuleValidator {
   const DiamondValidator();
 
   @override
-  ValidationResult validate(GridState grid, List<GridPoint> area) {
+  ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
     final colorMap = <CellColor, List<GridPoint>>{};
     var hasDiamond = false;
 
     for (final pt in area) {
-      final cell = grid.getMechanic(pt);
-      // TODO I think we need a ColorCell class to handle this logic.
+      final cell = puzzle.getMechanic(pt);
+      // TODOI think we need a ColorCell class to handle this logic.
       switch (cell) {
         case DiamondCell():
           hasDiamond = true;
@@ -67,8 +67,8 @@ class DiamondValidator extends RuleValidator {
   }
 
   @override
-  bool isApplicable(GridState grid) =>
-      grid.mechanics.any((cell) => cell is DiamondCell);
+  bool isApplicable(Puzzle puzzle) =>
+      puzzle.mechanics.any((cell) => cell is DiamondCell);
 }
 
 const diamondValidator = DiamondValidator();

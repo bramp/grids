@@ -27,9 +27,9 @@ void main() {
     for (final level in levels) {
       group(level.id, () {
         for (var i = 0; i < level.knownSolutions.length; i++) {
-          final solutionBits = level.knownSolutions[i];
           test('solution #$i is valid', () {
-            final solutionGrid = level.initialGrid.withBits(solutionBits);
+            final solution = level.knownSolutions[i];
+            final solutionGrid = level.puzzle.copyWith(state: solution);
             final result = validator.validate(solutionGrid);
             expect(
               result.isValid,

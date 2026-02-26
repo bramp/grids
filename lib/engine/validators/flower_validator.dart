@@ -1,6 +1,6 @@
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/rule_validator.dart';
 
 /// Validates that each flower cell has the correct number of adjacent cells
@@ -13,43 +13,42 @@ class FlowerValidator extends RuleValidator {
   const FlowerValidator();
 
   @override
-  ValidationResult validate(GridState grid, List<GridPoint> area) {
+  ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
     final errors = <GridPoint>[];
 
     for (final pt in area) {
-      final cell = grid.getMechanic(pt);
+      final cell = puzzle.getMechanic(pt);
       if (cell is FlowerCell) {
-        final isLit = grid.isLit(pt);
+        final isLit = puzzle.isLit(pt);
         var matchingNeighbors = 0;
-        final x = grid.x(pt);
-        final y = grid.y(pt);
+        final (x, y) = puzzle.xy(pt);
 
         // Check the 4 orthogonal neighbors
         if (y > 0) {
-          final neighbor = grid.pointAt(x, y - 1);
-          if (grid.getMechanic(neighbor) is! VoidCell &&
-              grid.isLit(neighbor) == isLit) {
+          final neighbor = puzzle.pointAt(x, y - 1);
+          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
-        if (y < grid.height - 1) {
-          final neighbor = grid.pointAt(x, y + 1);
-          if (grid.getMechanic(neighbor) is! VoidCell &&
-              grid.isLit(neighbor) == isLit) {
+        if (y < puzzle.height - 1) {
+          final neighbor = puzzle.pointAt(x, y + 1);
+          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x > 0) {
-          final neighbor = grid.pointAt(x - 1, y);
-          if (grid.getMechanic(neighbor) is! VoidCell &&
-              grid.isLit(neighbor) == isLit) {
+          final neighbor = puzzle.pointAt(x - 1, y);
+          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
-        if (x < grid.width - 1) {
-          final neighbor = grid.pointAt(x + 1, y);
-          if (grid.getMechanic(neighbor) is! VoidCell &&
-              grid.isLit(neighbor) == isLit) {
+        if (x < puzzle.width - 1) {
+          final neighbor = puzzle.pointAt(x + 1, y);
+          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
@@ -68,8 +67,8 @@ class FlowerValidator extends RuleValidator {
   }
 
   @override
-  bool isApplicable(GridState grid) =>
-      grid.mechanics.any((cell) => cell is FlowerCell);
+  bool isApplicable(Puzzle puzzle) =>
+      puzzle.mechanics.any((cell) => cell is FlowerCell);
 }
 
 const flowerValidator = FlowerValidator();

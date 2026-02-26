@@ -1,5 +1,5 @@
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/rule_validator.dart';
 import 'package:grids/engine/validators.dart';
 
@@ -20,28 +20,28 @@ class PuzzleValidator {
   final List<RuleValidator> validators;
 
   /// Returns a new [PuzzleValidator] containing only the rules relevant to
-  /// the given [grid].
+  /// the given [puzzle].
   ///
   /// This optimizes validation by skipping rules for mechanics that are not
   /// present in the puzzle.
-  PuzzleValidator filter(GridState grid) {
-    final relevant = validators.where((v) => v.isApplicable(grid)).toList();
+  PuzzleValidator filter(Puzzle puzzle) {
+    final relevant = validators.where((v) => v.isApplicable(puzzle)).toList();
     return PuzzleValidator(validators: relevant);
   }
 
   /// Evaluates an entire grid state.
   ///
   /// Returns a [ValidationResult] representing the entire board.
-  ValidationResult validate(GridState grid) {
+  ValidationResult validate(Puzzle puzzle) {
     var allValid = true;
     final allErrors = <GridPoint>{};
 
-    final areas = grid.extractContiguousAreas();
+    final areas = puzzle.extractContiguousAreas();
 
     // Evaluate every contiguous area against every rule cell
     for (final area in areas) {
       for (final validator in validators) {
-        final result = validator.validate(grid, area);
+        final result = validator.validate(puzzle, area);
         if (!result.isValid) {
           allValid = false;
           allErrors.addAll(result.errors);

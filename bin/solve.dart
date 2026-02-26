@@ -5,14 +5,14 @@ import 'package:collection/collection.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/solver.dart';
 
 /// Returns the number of playable (non-locked) cells in the grid.
-int _countPlayable(GridState grid) {
+int _countPlayable(Puzzle puzzle) {
   var count = 0;
-  for (var i = 0; i < grid.mechanics.length; i++) {
-    if (!grid.isLocked(GridPoint(i))) {
+  for (var i = 0; i < puzzle.mechanics.length; i++) {
+    if (!puzzle.isLocked(GridPoint(i))) {
       count++;
     }
   }
@@ -50,21 +50,22 @@ void main(List<String> args) {
 
   if (filteredArgs.isNotEmpty) {
     final targetId = filteredArgs[0];
-    final puzzle = levels.firstWhereOrNull((l) => l.id == targetId);
+    final level = levels.firstWhereOrNull((l) => l.id == targetId);
 
-    if (puzzle == null) {
-      print('Error: Puzzle "$targetId" not found.');
+    if (level == null) {
+      print('Error: Level "$targetId" not found.');
       print('Available IDs: ${levels.map((l) => l.id).join(', ')}');
       return;
     }
 
-    final grid = puzzle.initialGrid;
-    final playable = _countPlayable(grid);
+    final puzzle = level.puzzle;
+
+    final playable = _countPlayable(puzzle);
     final searchSpace = pow(2, playable);
 
     print(
-      'Solving ${puzzle.id} '
-      '(${grid.width}x${grid.height}, '
+      'Solving ${level.id} '
+      '(${puzzle.width}x${puzzle.height}, '
       '$playable playable cells, '
       '$searchSpace possible states)...',
     );
@@ -89,7 +90,8 @@ void main(List<String> args) {
       print('\n--- Solution #${i + 1} ---');
       if (maskMode) {
         print("        GridFormat.parseMask('''");
-        print(GridFormat.toMaskString(solutions[i], useColor: !noColor));
+        // We know knownSolutions are GridStates but solver returns List<Puzzle>
+        print(GridFormat.toMaskString(solutions[i].state, useColor: !noColor));
         print("        '''),");
       } else {
         print(solutions[i].toAsciiString(useColor: !noColor));
@@ -118,9 +120,9 @@ void main(List<String> args) {
   print(header);
   print('─' * header.length);
 
-  for (final puzzle in levels) {
-    final grid = puzzle.initialGrid;
-    final playable = _countPlayable(grid);
+  for (final level in levels) {
+    final puzzle = level.puzzle;
+    final playable = _countPlayable(puzzle);
     final searchSpace = pow(2, playable);
 
     final stopwatch = Stopwatch()..start();
@@ -131,11 +133,11 @@ void main(List<String> args) {
         ? '${(solutions.length / searchSpace * 100).toStringAsFixed(2)}%'
         : 'N/A';
     final difficulty = _difficulty(solutions.length, playable);
-    final size = '${grid.width}x${grid.height}';
+    final size = '${puzzle.width}x${puzzle.height}';
     final time = '${stopwatch.elapsedMilliseconds}ms';
 
     print(
-      '${puzzle.id.padRight(15)}'
+      '${level.id.padRight(15)}'
       '${size.padRight(6)}'
       '${playable.toString().padRight(6)}'
       '${searchSpace.toString().padRight(14)}'

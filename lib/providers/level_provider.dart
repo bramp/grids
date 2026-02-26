@@ -7,22 +7,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/grid_state.dart';
+import 'package:grids/engine/level.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 import 'package:grids/engine/rule_validator.dart';
 
 /// The active puzzle grid that the user is interacting with.
-class PuzzleProvider extends ChangeNotifier {
-  PuzzleProvider() {
+class LevelProvider extends ChangeNotifier {
+  LevelProvider() {
     _loadLevel(_currentLevelIndex);
   }
   final PuzzleValidator _validator = PuzzleValidator();
 
   int _currentLevelIndex = 0;
   int _maxUnlockedLevelIndex = 0;
-  late Puzzle _currentPuzzle;
-  late GridState _grid;
+  late Level _currentLevel;
+  late Puzzle _puzzle;
 
   // Track cells that have been flipped during the current drag event.
   final Set<GridPoint> _currentlyDraggedCells = {};
@@ -36,8 +36,8 @@ class PuzzleProvider extends ChangeNotifier {
   DateTime? _levelStartTime;
   int _solveAttempts = 0;
 
-  Puzzle get currentPuzzle => _currentPuzzle;
-  GridState get grid => _grid;
+  Level get currentLevel => _currentLevel;
+  Puzzle get puzzle => _puzzle;
   ValidationResult? get validation => _lastValidation;
 
   bool get isSolved => _lastValidation?.isValid ?? false;
@@ -50,8 +50,8 @@ class PuzzleProvider extends ChangeNotifier {
     }
 
     _currentLevelIndex = loadIndex;
-    _currentPuzzle = LevelRepository.levels[loadIndex];
-    _grid = _currentPuzzle.initialGrid;
+    _currentLevel = LevelRepository.levels[loadIndex];
+    _puzzle = _currentLevel.puzzle;
     _lastValidation = null;
     _levelStartTime = clock.now();
     _solveAttempts = 0;
@@ -64,7 +64,7 @@ class PuzzleProvider extends ChangeNotifier {
 
   /// Toggles the specified cell, updating validation and notifying listeners.
   void toggleCell(GridPoint pt) {
-    _grid = _grid.toggle(pt);
+    _puzzle = _puzzle.toggle(pt);
     _lastValidation = null; // Clear previous validation attempt
     notifyListeners();
   }
@@ -77,8 +77,8 @@ class PuzzleProvider extends ChangeNotifier {
 
     // First cell dictates the painting action for this entire drag operation
     if (_currentlyDraggedCells.isEmpty) {
-      _grid = _grid.toggle(pt);
-      _dragActionLit = _grid.isLit(pt);
+      _puzzle = _puzzle.toggle(pt);
+      _dragActionLit = _puzzle.isLit(pt);
       _currentlyDraggedCells.add(pt);
       _lastValidation = null;
       notifyListeners();
@@ -86,9 +86,9 @@ class PuzzleProvider extends ChangeNotifier {
     }
 
     // For all passing cells, force them to match the active drag's action state
-    final isCurrentlyLit = _grid.isLit(pt);
+    final isCurrentlyLit = _puzzle.isLit(pt);
     if (isCurrentlyLit != _dragActionLit) {
-      _grid = _grid.toggle(pt);
+      _puzzle = _puzzle.toggle(pt);
       _lastValidation = null;
       notifyListeners();
     }
@@ -105,7 +105,7 @@ class PuzzleProvider extends ChangeNotifier {
   /// Explicitly runs the validation rules against the current board state.
   void checkAnswer() {
     _solveAttempts++;
-    _lastValidation = _validator.validate(_grid);
+    _lastValidation = _validator.validate(_puzzle);
     final isValid = _lastValidation?.isValid == true;
 
     try {
@@ -117,7 +117,7 @@ class PuzzleProvider extends ChangeNotifier {
           analytics.logEvent(
             name: 'level_solve_attempt',
             parameters: {
-              'level_id': _currentPuzzle.id,
+              'level_id': _currentLevel.id,
               'is_correct': isValid ? 1 : 0,
               'attempt_number': _solveAttempts,
             },
@@ -134,7 +134,7 @@ class PuzzleProvider extends ChangeNotifier {
             analytics.logEvent(
               name: 'level_complete',
               parameters: {
-                'level_id': _currentPuzzle.id,
+                'level_id': _currentLevel.id,
                 'time_ms': timeMs,
                 'total_attempts': _solveAttempts,
               },
@@ -193,7 +193,7 @@ class PuzzleProvider extends ChangeNotifier {
 
   /// Loads a level by its ID.
   void loadLevelById(String id) {
-    if (_currentPuzzle.id == id) return;
+    if (_currentLevel.id == id) return;
     final index = LevelRepository.levels.indexWhere((l) => l.id == id);
     if (index != -1) {
       if (index > _maxUnlockedLevelIndex) {
@@ -206,8 +206,8 @@ class PuzzleProvider extends ChangeNotifier {
 
   /// Loads a custom puzzle directly. Primarily for testing or debug.
   void loadCustomPuzzle(Puzzle puzzle) {
-    _currentPuzzle = puzzle;
-    _grid = puzzle.initialGrid;
+    _currentLevel = Level(id: 'custom', puzzle: puzzle);
+    _puzzle = puzzle;
     _lastValidation = null;
     _levelStartTime = clock.now();
     _solveAttempts = 0;
