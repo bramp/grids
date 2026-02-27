@@ -18,30 +18,11 @@ class DiamondValidator extends RuleValidator {
 
     for (final pt in area) {
       final cell = puzzle.getCell(pt);
-      // TODOI think we need a ColorCell class to handle this logic.
-      switch (cell) {
-        case DiamondCell():
-          hasDiamond = true;
-          colorMap.putIfAbsent(cell.color, () => []).add(pt);
-        case NumberCell():
-          colorMap.putIfAbsent(cell.color, () => []).add(pt);
-        case DashCell():
-          colorMap.putIfAbsent(cell.color, () => []).add(pt);
-        case DiagonalDashCell():
-          colorMap.putIfAbsent(cell.color, () => []).add(pt);
-        case FlowerCell():
-          // A flower can be considered orange and purple for matching purposes
-          // in diamond pairing areas.
-          if (cell.orangePetals > 0) {
-            colorMap.putIfAbsent(CellColor.orange, () => []).add(pt);
-          }
-          if (cell.purplePetals > 0) {
-            colorMap.putIfAbsent(CellColor.purple, () => []).add(pt);
-          }
-        case BlankCell():
-        case VoidCell():
-          // Ignored for diamond pairing
-          break;
+      if (cell is DiamondCell) {
+        hasDiamond = true;
+      }
+      for (final color in cell.colors) {
+        colorMap.putIfAbsent(color, () => []).add(pt);
       }
     }
 
