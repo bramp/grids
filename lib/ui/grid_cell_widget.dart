@@ -20,7 +20,7 @@ class GridCellWidget extends StatelessWidget {
       (p) => p.validation?.errors.contains(point) ?? false,
     );
     final mechanic = context.select<LevelProvider, Cell>(
-      (p) => p.puzzle.getMechanic(point),
+      (p) => p.puzzle.getCell(point),
     );
     final isLocked = context.select<LevelProvider, bool>(
       (p) => p.puzzle.isLocked(point),

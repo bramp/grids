@@ -12,7 +12,7 @@ class DashValidator extends RuleValidator {
   @override
   ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
     final areaHasDash = area.any((pt) {
-      final mechanic = puzzle.getMechanic(pt);
+      final mechanic = puzzle.getCell(pt);
       return mechanic is DashCell || mechanic is DiagonalDashCell;
     });
 
@@ -26,7 +26,7 @@ class DashValidator extends RuleValidator {
     // Find all unique dash colors in THIS area to test
     final colorsToCheck = <CellColor>{};
     for (final pt in area) {
-      final mechanic = puzzle.getMechanic(pt);
+      final mechanic = puzzle.getCell(pt);
       if (mechanic is DashCell) {
         colorsToCheck.add(mechanic.color);
       } else if (mechanic is DiagonalDashCell) {
@@ -87,7 +87,7 @@ class DashValidator extends RuleValidator {
       GridPoint? strictRefPt;
       GridPoint? diagRefPt;
       for (final pt in globalDashes) {
-        if (puzzle.getMechanic(pt) is DashCell) {
+        if (puzzle.getCell(pt) is DashCell) {
           strictRefPt ??= pt;
         } else {
           diagRefPt ??= pt;
@@ -106,7 +106,7 @@ class DashValidator extends RuleValidator {
       for (final pt in globalDashes) {
         final shape = getShape(pt);
         final sig = canonicalize(shape);
-        final mechanic = puzzle.getMechanic(pt);
+        final mechanic = puzzle.getCell(pt);
         if (mechanic is DashCell) {
           if (sig != strictSig) {
             allMatch = false;
@@ -126,7 +126,7 @@ class DashValidator extends RuleValidator {
       if (!allMatch) {
         errors.addAll(
           area.where((pt) {
-            final mechanic = puzzle.getMechanic(pt);
+            final mechanic = puzzle.getCell(pt);
             return (mechanic is DashCell && mechanic.color == color) ||
                 (mechanic is DiagonalDashCell && mechanic.color == color);
           }),

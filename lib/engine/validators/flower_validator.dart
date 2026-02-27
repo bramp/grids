@@ -17,7 +17,7 @@ class FlowerValidator extends RuleValidator {
     final errors = <GridPoint>[];
 
     for (final pt in area) {
-      final cell = puzzle.getMechanic(pt);
+      final cell = puzzle.getCell(pt);
       if (cell is FlowerCell) {
         final isLit = puzzle.isLit(pt);
         var matchingNeighbors = 0;
@@ -26,28 +26,28 @@ class FlowerValidator extends RuleValidator {
         // Check the 4 orthogonal neighbors
         if (y > 0) {
           final neighbor = puzzle.pointAt(x, y - 1);
-          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+          if (puzzle.getCell(neighbor) is! VoidCell &&
               puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (y < puzzle.height - 1) {
           final neighbor = puzzle.pointAt(x, y + 1);
-          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+          if (puzzle.getCell(neighbor) is! VoidCell &&
               puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x > 0) {
           final neighbor = puzzle.pointAt(x - 1, y);
-          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+          if (puzzle.getCell(neighbor) is! VoidCell &&
               puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x < puzzle.width - 1) {
           final neighbor = puzzle.pointAt(x + 1, y);
-          if (puzzle.getMechanic(neighbor) is! VoidCell &&
+          if (puzzle.getCell(neighbor) is! VoidCell &&
               puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }

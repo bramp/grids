@@ -13,7 +13,7 @@ class LockedCellValidator extends RuleValidator {
     final errors = <GridPoint>[];
 
     for (final pt in area) {
-      final cell = puzzle.getMechanic(pt);
+      final cell = puzzle.getCell(pt);
       if (cell.isLocked) {
         // If the cell is locked, it must match its intended lit state.
         if (puzzle.isLit(pt) != cell.lockedLit) {

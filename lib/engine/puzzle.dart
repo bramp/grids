@@ -34,9 +34,6 @@ class Puzzle {
   int get height => grid.height;
   List<Cell> get mechanics => grid.mechanics;
   Cell getCell(GridPoint pt) => grid.getCell(pt);
-  Cell getMechanic(GridPoint pt) => getCell(
-    pt,
-  ); // Proxy for compatibility // TODO(bramp): Remove this method.
   bool isLocked(GridPoint pt) => grid.isLocked(pt);
   bool isValidXY(int x, int y) => grid.isValidXY(x, y);
   bool isValid(GridPoint pt) => grid.isValid(pt);

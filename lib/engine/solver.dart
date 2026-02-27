@@ -117,7 +117,7 @@ class PuzzleSolver {
 
     for (final area in areas) {
       final hasMechanic = area.any(
-        (pt) => puzzle.getMechanic(pt) is! BlankCell,
+        (pt) => puzzle.getCell(pt) is! BlankCell,
       );
       if (hasMechanic) {
         final sortedPts = area.toList()..sort();

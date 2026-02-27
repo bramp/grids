@@ -22,7 +22,7 @@ class StrictNumberValidator extends RuleValidator {
     final byColor = <CellColor, List<GridPoint>>{};
 
     for (final pt in area) {
-      final cell = puzzle.getMechanic(pt);
+      final cell = puzzle.getCell(pt);
       if (cell is NumberCell) {
         byColor.putIfAbsent(cell.color, () => []).add(pt);
       }
@@ -43,7 +43,7 @@ class StrictNumberValidator extends RuleValidator {
 
     var requiredAreaSize = 0;
     for (final pt in numberPoints) {
-      requiredAreaSize += (puzzle.getMechanic(pt) as NumberCell).number;
+      requiredAreaSize += (puzzle.getCell(pt) as NumberCell).number;
     }
 
     if (requiredAreaSize < 0) {

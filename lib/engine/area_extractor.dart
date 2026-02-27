@@ -29,7 +29,7 @@ class AreaExtractor {
     final areas = <List<GridPoint>>[];
 
     for (var i = 0; i < size; i++) {
-      if (visited[i] == 1 || puzzle.getMechanic(GridPoint(i)) is VoidCell) {
+      if (visited[i] == 1 || puzzle.getCell(GridPoint(i)) is VoidCell) {
         continue;
       }
 
@@ -53,7 +53,7 @@ class AreaExtractor {
         if (cy > 0) {
           final ni = indexValue - width;
           if (visited[ni] == 0 &&
-              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.getCell(GridPoint(ni)) is! VoidCell &&
               puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
@@ -62,7 +62,7 @@ class AreaExtractor {
         if (cy < height - 1) {
           final ni = indexValue + width;
           if (visited[ni] == 0 &&
-              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.getCell(GridPoint(ni)) is! VoidCell &&
               puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
@@ -71,7 +71,7 @@ class AreaExtractor {
         if (cx > 0) {
           final ni = indexValue - 1;
           if (visited[ni] == 0 &&
-              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.getCell(GridPoint(ni)) is! VoidCell &&
               puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;
@@ -80,7 +80,7 @@ class AreaExtractor {
         if (cx < width - 1) {
           final ni = indexValue + 1;
           if (visited[ni] == 0 &&
-              puzzle.getMechanic(GridPoint(ni)) is! VoidCell &&
+              puzzle.getCell(GridPoint(ni)) is! VoidCell &&
               puzzle.isLit(GridPoint(ni)) == targetLitState) {
             visited[ni] = 1;
             queue[tail++] = ni;

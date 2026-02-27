@@ -393,31 +393,32 @@ final gardenLevels = [
     ],
   ),
 
-  /*
   Level(
     id: 'garden_bonus_1',
     puzzle: GridFormat.parse('''
         P9 . . .
-        . O/ . .
-        . . Wo .
-        . . . Wo
+        . O3 . .
+        . . W1 .
+        . . . W1
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
           * * * *
           * . . *
           * . * .
-          * * * *
+          * * . *
         '''),
     ],
   ),
+
+  /*
   Level(
     id: 'garden_bonus_2',
     puzzle: GridFormat.parse('''
         . P4 .
-        . F4 .
-        . F2 .
-        . O4 .
+        . F3 .
+        . F3 .
+        . Y4 .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''

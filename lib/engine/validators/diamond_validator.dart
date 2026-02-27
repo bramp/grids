@@ -17,7 +17,7 @@ class DiamondValidator extends RuleValidator {
     var hasDiamond = false;
 
     for (final pt in area) {
-      final cell = puzzle.getMechanic(pt);
+      final cell = puzzle.getCell(pt);
       // TODOI think we need a ColorCell class to handle this logic.
       switch (cell) {
         case DiamondCell():
