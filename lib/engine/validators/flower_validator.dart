@@ -14,7 +14,7 @@ class FlowerValidator extends RuleValidator {
 
   @override
   ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
-    final errors = <GridPoint>[];
+    final errors = <ValidationError>[];
 
     for (final pt in area) {
       final cell = puzzle.getCell(pt);
@@ -26,35 +26,38 @@ class FlowerValidator extends RuleValidator {
         // Check the 4 orthogonal neighbors
         if (y > 0) {
           final neighbor = puzzle.pointAt(x, y - 1);
-          if (puzzle.getCell(neighbor) is! VoidCell &&
-              puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (y < puzzle.height - 1) {
           final neighbor = puzzle.pointAt(x, y + 1);
-          if (puzzle.getCell(neighbor) is! VoidCell &&
-              puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x > 0) {
           final neighbor = puzzle.pointAt(x - 1, y);
-          if (puzzle.getCell(neighbor) is! VoidCell &&
-              puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x < puzzle.width - 1) {
           final neighbor = puzzle.pointAt(x + 1, y);
-          if (puzzle.getCell(neighbor) is! VoidCell &&
-              puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
 
         if (matchingNeighbors != cell.orangePetals) {
-          errors.add(pt);
+          errors.add(
+            ValidationError(
+              pt,
+              'Flower cell at $pt requires exactly ${cell.orangePetals} '
+              'neighbors matching its ${isLit ? 'lit' : 'unlit'} state, but '
+              'found $matchingNeighbors.',
+            ),
+          );
         }
       }
     }

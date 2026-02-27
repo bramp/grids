@@ -56,7 +56,7 @@ void main() {
         const GridPoint(0),
       ]);
       expect(result.isValid, isFalse);
-      expect(result.errors, [const GridPoint(0)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
     });
 
     test('Locked lit cell that is toggled unlit is invalid', () {
@@ -74,7 +74,7 @@ void main() {
         const GridPoint(0),
       ]);
       expect(result.isValid, isFalse);
-      expect(result.errors, [const GridPoint(0)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
     });
   });
 }

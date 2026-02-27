@@ -33,14 +33,14 @@ class Grid {
   /// Returns the cell at the given point.
 
   Cell getCell(GridPoint pt) {
-    if (pt < 0 || pt >= mechanics.length) return const BlankCell();
+    if (!isValid(pt)) return const VoidCell();
     return mechanics[pt];
   }
 
   /// Returns true if the cell at the given point is locked and cannot be
   /// toggled by the user.
   bool isLocked(GridPoint pt) {
-    if (pt < 0 || pt >= mechanics.length) return false;
+    if (!isValid(pt)) return false;
     return mechanics[pt].isLocked;
   }
 

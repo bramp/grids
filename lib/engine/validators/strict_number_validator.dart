@@ -35,7 +35,19 @@ class StrictNumberValidator extends RuleValidator {
 
     // If there is more than 1 color, it strictly violates the NumberColor rule
     if (byColor.length > 1) {
-      return ValidationResult.failure(byColor.values.expand((v) => v).toList());
+      final errors = <ValidationError>[];
+      for (final color in byColor.keys) {
+        for (final pt in byColor[color]!) {
+          errors.add(
+            ValidationError(
+              pt,
+              'Multiple colors of numbers in the same area. '
+              'Found color ${color.name}.',
+            ),
+          );
+        }
+      }
+      return ValidationResult.failure(errors);
     }
 
     // At this point we have exactly 1 color group
@@ -48,12 +60,32 @@ class StrictNumberValidator extends RuleValidator {
 
     if (requiredAreaSize < 0) {
       // Negative regions are never allowed.
-      return ValidationResult.failure(numberPoints);
+      return ValidationResult.failure(
+        numberPoints
+            .map(
+              (pt) => ValidationError(
+                pt,
+                'Number cells sum to a negative value ($requiredAreaSize), '
+                'which is not allowed.',
+              ),
+            )
+            .toList(),
+      );
     }
 
     if (requiredAreaSize > 0 && area.length != requiredAreaSize) {
       // Area isn't the required size; mark all number cells as errors.
-      return ValidationResult.failure(numberPoints);
+      return ValidationResult.failure(
+        numberPoints
+            .map(
+              (pt) => ValidationError(
+                pt,
+                'Area size is ${area.length}, but number cells '
+                'require exactly $requiredAreaSize.',
+              ),
+            )
+            .toList(),
+      );
     }
 
     // If requiredAreaSize == 0, the sum of negative and positive is zero.

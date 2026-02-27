@@ -31,12 +31,21 @@ class DiamondValidator extends RuleValidator {
       return ValidationResult.success();
     }
 
-    final errors = <GridPoint>[];
+    final errors = <ValidationError>[];
 
     // Every color present in a diamond area must have exactly two members.
     for (final entry in colorMap.entries) {
       if (entry.value.length != 2) {
-        errors.addAll(entry.value);
+        final colorName = entry.key.name;
+        for (final pt in entry.value) {
+          errors.add(
+            ValidationError(
+              pt,
+              'Area with diamonds must have exactly 2 mechanics of color '
+              '$colorName, but found ${entry.value.length}.',
+            ),
+          );
+        }
       }
     }
 

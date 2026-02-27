@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grids/data/level_repository.dart';
-import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/puzzle_validator.dart';
+
+import 'matchers.dart';
 
 void main() {
   final validator = PuzzleValidator();
@@ -29,18 +30,10 @@ void main() {
         for (var i = 0; i < level.knownSolutions.length; i++) {
           test('solution #$i is valid', () {
             final solution = level.knownSolutions[i];
-            final solutionGrid = level.puzzle.copyWith(state: solution);
-            final result = validator.validate(solutionGrid);
+            final puzzle = level.puzzle.copyWith(state: solution);
             expect(
-              result.isValid,
-              isTrue,
-              reason:
-                  '${level.id} solution #$i should be valid:\n'
-                  '${GridFormat.toAsciiString(
-                    solutionGrid,
-                    useColor: true,
-                    errors: result.errors.toSet(),
-                  )}',
+              puzzle,
+              isValidPuzzle(validator),
             );
           });
         }

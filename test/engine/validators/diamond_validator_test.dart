@@ -55,7 +55,7 @@ void main() {
 
       final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isFalse);
-      expect(result.errors, contains(const GridPoint(0)));
+      expect(result.errors.map((e) => e.point), contains(const GridPoint(0)));
     });
 
     test('Three diamonds of same color is invalid', () {
@@ -106,7 +106,7 @@ void main() {
       final result = diamondValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       // Validates ONLY the blue diamond as the error (index 3)
-      expect(result.errors, [const GridPoint(3)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(3)]);
     });
 
     test('Dashes and Numbers pair properly with diamonds', () {

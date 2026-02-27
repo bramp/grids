@@ -1,72 +1,54 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:grids/engine/cell.dart';
+
+import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
+
+import 'matchers.dart';
 
 void main() {
   group('PuzzleValidator', () {
     test('Blank grid is instantly valid', () {
-      final grid = Puzzle.empty(width: 3, height: 3);
-      final puzzle = PuzzleValidator();
+      final puzzle = Puzzle.empty(width: 3, height: 3);
+      final validator = PuzzleValidator();
 
-      final result = puzzle.validate(grid);
-      expect(result.isValid, isTrue);
-      expect(result.errors, isEmpty);
+      expect(puzzle, isValidPuzzle(validator));
     });
 
     test('Complex valid puzzle combination', () {
-      // Let's create a 3x3 grid.
-      final state = Puzzle.empty(width: 3, height: 3);
-      var grid = state
-          .toggle(state.pointAt(1, 0))
-          .toggle(state.pointAt(2, 0))
-          .toggle(state.pointAt(1, 1))
-          .toggle(state.pointAt(2, 1))
-          .toggle(state.pointAt(1, 2))
-          .toggle(state.pointAt(2, 2));
+      final puzzle = GridFormat.parse('''
+        3 *  *.
+        . *R *.
+        . *. *R
+      ''');
 
-      grid = grid
-          // A number '3' inside the unlit column (size 3)
-          .withMechanic(state.pointAt(0, 0), const NumberCell(3))
-          // Two red diamonds in the lit area (size 6)
-          .withMechanic(state.pointAt(1, 1), const DiamondCell(CellColor.red))
-          .withMechanic(
-            state.pointAt(2, 2),
-            const DiamondCell(CellColor.red),
-          );
-
-      final puzzle = PuzzleValidator();
-      final result = puzzle.validate(grid);
-
-      expect(result.isValid, isTrue);
+      final validator = PuzzleValidator();
+      expect(puzzle, isValidPuzzle(validator));
     });
 
     test(
       'Complex invalid puzzle combination '
       '(multiple rules fail independently across areas)',
       () {
-        // Create a totally blank 3x3 grid (1 unlit area of size 9)
-        final state = Puzzle.empty(width: 3, height: 3);
-        final grid = state
-            // Fails: One single red diamond.
-            // Under new pairing rules, since a diamond exists in the area,
-            // ALL colors in the area (Red and Black) must be pairs.
-            .withMechanic(
-              state.pointAt(0, 0),
-              const DiamondCell(CellColor.red),
-            )
-            // Fails:
-            // 1. Diamond rule: Black color (from NumberCell) is not a pair.
-            // 2. Number rule: Tries to be a '3' block but is in an area of 9.
-            .withMechanic(state.pointAt(2, 2), const NumberCell(3));
+        final puzzle = GridFormat.parse('''
+          R . .
+          . . .
+          . . 3
+        '''); // By default all unlit, making an area of 9
 
-        final puzzle = PuzzleValidator();
-        final result = puzzle.validate(grid);
+        final validator = PuzzleValidator();
+        final result = validator.validate(puzzle);
 
         expect(result.isValid, isFalse);
         expect(
-          result.errors,
-          containsAll([state.pointAt(0, 0), state.pointAt(2, 2)]),
+          result.errors.map((e) => e.point),
+          containsAll([
+            puzzle.pointAt(0, 0), // Red diamond rule failure
+            puzzle.pointAt(
+              2,
+              2,
+            ), // Black diamond rule / number cell rule failure
+          ]),
         );
       },
     );

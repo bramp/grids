@@ -1,4 +1,3 @@
-import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/rule_validator.dart';
 import 'package:grids/engine/validators.dart';
@@ -34,7 +33,7 @@ class PuzzleValidator {
   /// Returns a [ValidationResult] representing the entire board.
   ValidationResult validate(Puzzle puzzle) {
     var allValid = true;
-    final allErrors = <GridPoint>{};
+    final allErrors = <ValidationError>{};
 
     final areas = puzzle.extractContiguousAreas();
 

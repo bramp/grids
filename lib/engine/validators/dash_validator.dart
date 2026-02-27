@@ -20,7 +20,7 @@ class DashValidator extends RuleValidator {
       return ValidationResult.success();
     }
 
-    final errors = <GridPoint>[];
+    final errors = <ValidationError>[];
     final allAreas = puzzle.extractContiguousAreas();
 
     // Find all unique dash colors in THIS area to test
@@ -123,13 +123,20 @@ class DashValidator extends RuleValidator {
       // color in the CURRENT area are marked as errors. (Other areas will
       // catch theirs)
       if (!allMatch) {
-        errors.addAll(
-          area.where((pt) {
-            final mechanic = puzzle.getCell(pt);
-            return (mechanic is DashCell || mechanic is DiagonalDashCell) &&
-                mechanic.color == color;
-          }),
-        );
+        final invalidDashes = area.where((pt) {
+          final mechanic = puzzle.getCell(pt);
+          return (mechanic is DashCell || mechanic is DiagonalDashCell) &&
+              mechanic.color == color;
+        });
+        for (final pt in invalidDashes) {
+          errors.add(
+            ValidationError(
+              pt,
+              'Dash area shape or relative position does not match '
+              'other dashes of color ${color.name}.',
+            ),
+          );
+        }
       }
     }
 

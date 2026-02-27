@@ -17,7 +17,7 @@ class GridCellWidget extends StatelessWidget {
       (p) => p.puzzle.isLit(point),
     );
     final hasError = context.select<LevelProvider, bool>(
-      (p) => p.validation?.errors.contains(point) ?? false,
+      (p) => p.validation?.errors.any((e) => e.point == point) ?? false,
     );
     final mechanic = context.select<LevelProvider, Cell>(
       (p) => p.puzzle.getCell(point),

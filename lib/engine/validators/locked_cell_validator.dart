@@ -10,14 +10,20 @@ class LockedCellValidator extends RuleValidator {
 
   @override
   ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
-    final errors = <GridPoint>[];
+    final errors = <ValidationError>[];
 
     for (final pt in area) {
       final cell = puzzle.getCell(pt);
       if (cell.isLocked) {
         // If the cell is locked, it must match its intended lit state.
-        if (puzzle.isLit(pt) != cell.lockedLit) {
-          errors.add(pt);
+        if (puzzle.isLit(pt) != cell.lockedLit!) {
+          errors.add(
+            ValidationError(
+              pt,
+              'Locked cell at $pt must be '
+              '${cell.lockedLit == true ? 'lit' : 'unlit'}.',
+            ),
+          );
         }
       }
     }

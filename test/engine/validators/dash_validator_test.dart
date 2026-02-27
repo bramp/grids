@@ -51,7 +51,7 @@ void main() {
 
       final result = dashValidator.validate(grid, area1);
       expect(result.isValid, isFalse);
-      expect(result.errors, [const GridPoint(0)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
     });
 
     test(
@@ -71,7 +71,7 @@ void main() {
 
         final result = dashValidator.validate(grid, area1);
         expect(result.isValid, isFalse);
-        expect(result.errors, [const GridPoint(0)]);
+        expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
       },
     );
 
@@ -88,7 +88,7 @@ void main() {
       final area1 = [const GridPoint(0), const GridPoint(1)];
       final result = dashValidator.validate(grid, area1);
       expect(result.isValid, isFalse);
-      expect(result.errors, [const GridPoint(0)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
     });
 
     test('Diagonal dash can match rotated strict dash', () {

@@ -47,7 +47,7 @@ void main() {
 
       final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isFalse);
-      expect(result.errors, [const GridPoint(0)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
     });
 
     test('Multiple numbers sum correctly', () {
@@ -130,7 +130,7 @@ void main() {
       final area = [const GridPoint(0)];
       final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isFalse);
-      expect(result.errors, [const GridPoint(0)]);
+      expect(result.errors.map((e) => e.point), [const GridPoint(0)]);
     });
 
     test('Net negative sum (multiple cells) is always invalid', () {
@@ -145,7 +145,7 @@ void main() {
       final result = strictNumberValidator.validate(grid, area);
       expect(result.isValid, isFalse);
       expect(
-        result.errors,
+        result.errors.map((e) => e.point),
         containsAll([const GridPoint(0), const GridPoint(1)]),
       );
     });
