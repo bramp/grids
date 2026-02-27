@@ -192,7 +192,11 @@ class GridFormat {
   }
 
   /// Returns a beautiful debug ASCII representation of the grid.
-  static String toAsciiString(Puzzle puzzle, {bool useColor = false}) {
+  static String toAsciiString(
+    Puzzle puzzle, {
+    bool useColor = false,
+    Set<GridPoint> errors = const {},
+  }) {
     final tokens = List.generate(
       puzzle.width,
       (_) => List<String>.filled(puzzle.height, ''),
@@ -239,12 +243,28 @@ class GridFormat {
         if (useColor) {
           final index = y * puzzle.width + x;
           final cell = puzzle.mechanics[index];
-          final isLit = puzzle.isLit(GridPoint(index));
+          final pt = GridPoint(index);
+          final isLit = puzzle.isLit(pt);
+          final hasError = errors.contains(pt);
           final fg = _getAnsiForeground(cell);
-          final bg = isLit ? '\x1B[48;5;18m' : '\x1B[40m';
+          final bg = hasError
+              ? '\x1B[41m' // Red background for errors
+              : (isLit ? '\x1B[48;5;18m' : '\x1B[40m');
           buffer.write('$bg$fg$alignedToken\x1B[0m ');
         } else {
-          buffer.write('$alignedToken ');
+          final isError = errors.contains(GridPoint(y * puzzle.width + x));
+          if (isError) {
+            final trimmed = token; // use original unpadded token
+            final leftSpace = leftPadding > 0 ? leftPadding - 1 : 0;
+            final rightSpace = rightPadding > 0 ? rightPadding - 1 : 0;
+
+            final prefix = leftPadding > 0 ? '${' ' * leftSpace}[' : '[';
+            final postfix = rightPadding > 0 ? ']${' ' * rightSpace}' : ']';
+
+            buffer.write('$prefix$trimmed$postfix ');
+          } else {
+            buffer.write('$alignedToken ');
+          }
         }
       }
       buffer.writeln();

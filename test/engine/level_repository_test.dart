@@ -36,7 +36,11 @@ void main() {
               isTrue,
               reason:
                   '${level.id} solution #$i should be valid:\n'
-                  '${GridFormat.toAsciiString(solutionGrid)}',
+                  '${GridFormat.toAsciiString(
+                    solutionGrid,
+                    useColor: true,
+                    errors: result.errors.toSet(),
+                  )}',
             );
           });
         }
