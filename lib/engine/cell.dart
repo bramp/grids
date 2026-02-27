@@ -36,11 +36,19 @@ sealed class Cell {
   /// Returns a copy of this cell with the specified color.
   Cell withColor(CellColor? color);
 
-  /// Returns true if the cell matches the specified [color].
-  bool matches(CellColor color) => false;
-
   /// Returns the colors that this cell matches.
   Iterable<CellColor> get colors => const [];
+}
+
+/// A base class for cells that have a primary color.
+sealed class ColoredCell extends Cell {
+  const ColoredCell({super.lockType});
+
+  /// The primary color of this cell.
+  CellColor get color;
+
+  @override
+  Iterable<CellColor> get colors => [color];
 }
 
 /// A cell representing a blank space that can be locked (immutable).
@@ -72,16 +80,11 @@ class BlankCell extends Cell {
 enum CellColor { red, black, blue, yellow, purple, white, cyan, orange, green }
 
 /// The Diamond cell.
-class DiamondCell extends Cell {
+class DiamondCell extends ColoredCell {
   const DiamondCell(this.color, {super.lockType = LockType.unlocked});
 
+  @override
   final CellColor color;
-
-  @override
-  bool matches(CellColor color) => this.color == color;
-
-  @override
-  Iterable<CellColor> get colors => [color];
 
   @override
   Cell lock({required bool isLit}) => DiamondCell(
@@ -109,7 +112,7 @@ class DiamondCell extends Cell {
 }
 
 /// The Strict Number cell.
-class NumberCell extends Cell {
+class NumberCell extends ColoredCell {
   const NumberCell(
     this.number, {
     this.color = CellColor.black,
@@ -117,13 +120,9 @@ class NumberCell extends Cell {
   }) : assert(number != 0, 'NumberCell does not support 0');
 
   final int number;
+
+  @override
   final CellColor color;
-
-  @override
-  bool matches(CellColor color) => this.color == color;
-
-  @override
-  Iterable<CellColor> get colors => [color];
 
   @override
   Cell lock({required bool isLit}) => NumberCell(
@@ -168,13 +167,6 @@ class FlowerCell extends Cell {
   int get purplePetals => 4 - orangePetals;
 
   @override
-  bool matches(CellColor color) {
-    if (color == CellColor.orange) return orangePetals > 0;
-    if (color == CellColor.purple) return purplePetals > 0;
-    return false;
-  }
-
-  @override
   Iterable<CellColor> get colors => [
     if (orangePetals > 0) CellColor.orange,
     if (purplePetals > 0) CellColor.purple,
@@ -207,16 +199,11 @@ class FlowerCell extends Cell {
 }
 
 /// The Dash cell.
-class DashCell extends Cell {
+class DashCell extends ColoredCell {
   const DashCell(this.color, {super.lockType = LockType.unlocked});
 
+  @override
   final CellColor color;
-
-  @override
-  bool matches(CellColor color) => this.color == color;
-
-  @override
-  Iterable<CellColor> get colors => [color];
 
   @override
   Cell lock({required bool isLit}) => DashCell(
@@ -244,16 +231,11 @@ class DashCell extends Cell {
 }
 
 /// The Diagonal Dash cell (allows rotational matching).
-class DiagonalDashCell extends Cell {
+class DiagonalDashCell extends ColoredCell {
   const DiagonalDashCell(this.color, {super.lockType = LockType.unlocked});
 
+  @override
   final CellColor color;
-
-  @override
-  bool matches(CellColor color) => this.color == color;
-
-  @override
-  Iterable<CellColor> get colors => [color];
 
   @override
   Cell lock({required bool isLit}) => DiagonalDashCell(
