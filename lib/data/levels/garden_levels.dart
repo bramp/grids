@@ -77,8 +77,8 @@ final gardenLevels = [
         '''),
     ],
   ),
-  // TODOgarden_6 though garden_11 are the same puzzles, but with different
-  // background colours. We should maybe drop them.
+  // TODO(bramp): garden_6 though garden_11 are the same puzzles, but with
+  // different background colours. We should maybe drop them.
   Level(
     id: 'garden_6',
     puzzle: GridFormat.parse('''
