@@ -27,9 +27,9 @@ class DashValidator extends RuleValidator {
     final colorsToCheck = <CellColor>{};
     for (final pt in area) {
       final mechanic = puzzle.getCell(pt);
-      if (mechanic is ColoredCell &&
-          (mechanic is DashCell || mechanic is DiagonalDashCell)) {
-        colorsToCheck.add(mechanic.color);
+      if ((mechanic is DashCell || mechanic is DiagonalDashCell) &&
+          mechanic.color != null) {
+        colorsToCheck.add(mechanic.color!);
       }
     }
 
@@ -69,8 +69,7 @@ class DashValidator extends RuleValidator {
       final globalDashes = <GridPoint>[];
       for (var i = 0; i < puzzle.mechanics.length; i++) {
         final mechanic = puzzle.mechanics[i];
-        if (mechanic is ColoredCell &&
-            (mechanic is DashCell || mechanic is DiagonalDashCell) &&
+        if ((mechanic is DashCell || mechanic is DiagonalDashCell) &&
             mechanic.color == color) {
           globalDashes.add(GridPoint(i));
         }
@@ -127,8 +126,7 @@ class DashValidator extends RuleValidator {
         errors.addAll(
           area.where((pt) {
             final mechanic = puzzle.getCell(pt);
-            return mechanic is ColoredCell &&
-                (mechanic is DashCell || mechanic is DiagonalDashCell) &&
+            return (mechanic is DashCell || mechanic is DiagonalDashCell) &&
                 mechanic.color == color;
           }),
         );

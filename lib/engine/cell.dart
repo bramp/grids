@@ -33,22 +33,11 @@ sealed class Cell {
   /// [isLit] indicates whether the cell should be locked as lit or unlit.
   Cell lock({required bool isLit});
 
+  /// The primary color of this cell, if any.
+  CellColor? get color => null;
+
   /// Returns the colors that this cell matches for validation purposes.
-  Iterable<CellColor> get colors => const [];
-}
-
-/// A base class for cells that have a primary color.
-sealed class ColoredCell extends Cell {
-  const ColoredCell({super.lockType});
-
-  /// The primary color of this cell.
-  CellColor get color;
-
-  /// Returns a copy of this cell with the specified color.
-  ColoredCell withColor(CellColor? color);
-
-  @override
-  Iterable<CellColor> get colors => [color];
+  Iterable<CellColor> get colors => color == null ? const [] : [color!];
 }
 
 /// A cell representing a blank space that can be locked (immutable).
@@ -77,7 +66,7 @@ class BlankCell extends Cell {
 enum CellColor { red, black, blue, yellow, purple, white, cyan, orange, green }
 
 /// The Diamond cell.
-class DiamondCell extends ColoredCell {
+class DiamondCell extends Cell {
   const DiamondCell(this.color, {super.lockType = LockType.unlocked});
 
   @override
@@ -88,10 +77,6 @@ class DiamondCell extends ColoredCell {
     color,
     lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
   );
-
-  @override
-  ColoredCell withColor(CellColor? color) =>
-      DiamondCell(color ?? this.color, lockType: lockType);
 
   @override
   bool operator ==(Object other) =>
@@ -109,7 +94,7 @@ class DiamondCell extends ColoredCell {
 }
 
 /// The Strict Number cell.
-class NumberCell extends ColoredCell {
+class NumberCell extends Cell {
   const NumberCell(
     this.number, {
     this.color = CellColor.black,
@@ -126,13 +111,6 @@ class NumberCell extends ColoredCell {
     number,
     color: color,
     lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
-  );
-
-  @override
-  ColoredCell withColor(CellColor? color) => NumberCell(
-    number,
-    color: color ?? this.color,
-    lockType: lockType,
   );
 
   @override
@@ -191,7 +169,7 @@ class FlowerCell extends Cell {
 }
 
 /// The Dash cell.
-class DashCell extends ColoredCell {
+class DashCell extends Cell {
   const DashCell(this.color, {super.lockType = LockType.unlocked});
 
   @override
@@ -202,10 +180,6 @@ class DashCell extends ColoredCell {
     color,
     lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
   );
-
-  @override
-  ColoredCell withColor(CellColor? color) =>
-      DashCell(color ?? this.color, lockType: lockType);
 
   @override
   bool operator ==(Object other) =>
@@ -223,7 +197,7 @@ class DashCell extends ColoredCell {
 }
 
 /// The Diagonal Dash cell (allows rotational matching).
-class DiagonalDashCell extends ColoredCell {
+class DiagonalDashCell extends Cell {
   const DiagonalDashCell(this.color, {super.lockType = LockType.unlocked});
 
   @override
@@ -234,10 +208,6 @@ class DiagonalDashCell extends ColoredCell {
     color,
     lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
   );
-
-  @override
-  ColoredCell withColor(CellColor? color) =>
-      DiagonalDashCell(color ?? this.color, lockType: lockType);
 
   @override
   bool operator ==(Object other) =>
