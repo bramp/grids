@@ -33,10 +33,7 @@ sealed class Cell {
   /// [isLit] indicates whether the cell should be locked as lit or unlit.
   Cell lock({required bool isLit});
 
-  /// Returns a copy of this cell with the specified color.
-  Cell withColor(CellColor? color);
-
-  /// Returns the colors that this cell matches.
+  /// Returns the colors that this cell matches for validation purposes.
   Iterable<CellColor> get colors => const [];
 }
 
@@ -46,6 +43,9 @@ sealed class ColoredCell extends Cell {
 
   /// The primary color of this cell.
   CellColor get color;
+
+  /// Returns a copy of this cell with the specified color.
+  ColoredCell withColor(CellColor? color);
 
   @override
   Iterable<CellColor> get colors => [color];
@@ -58,9 +58,6 @@ class BlankCell extends Cell {
   @override
   Cell lock({required bool isLit}) =>
       BlankCell(lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit);
-
-  @override
-  Cell withColor(CellColor? color) => this; // Blank cells don't have color.
 
   @override
   bool operator ==(Object other) =>
@@ -93,7 +90,7 @@ class DiamondCell extends ColoredCell {
   );
 
   @override
-  Cell withColor(CellColor? color) =>
+  ColoredCell withColor(CellColor? color) =>
       DiamondCell(color ?? this.color, lockType: lockType);
 
   @override
@@ -132,7 +129,7 @@ class NumberCell extends ColoredCell {
   );
 
   @override
-  Cell withColor(CellColor? color) => NumberCell(
+  ColoredCell withColor(CellColor? color) => NumberCell(
     number,
     color: color ?? this.color,
     lockType: lockType,
@@ -179,11 +176,6 @@ class FlowerCell extends Cell {
   );
 
   @override
-  Cell withColor(CellColor? color) {
-    throw UnsupportedError('FlowerCell cannot have a color applied.');
-  }
-
-  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is FlowerCell &&
@@ -212,7 +204,7 @@ class DashCell extends ColoredCell {
   );
 
   @override
-  Cell withColor(CellColor? color) =>
+  ColoredCell withColor(CellColor? color) =>
       DashCell(color ?? this.color, lockType: lockType);
 
   @override
@@ -244,7 +236,7 @@ class DiagonalDashCell extends ColoredCell {
   );
 
   @override
-  Cell withColor(CellColor? color) =>
+  ColoredCell withColor(CellColor? color) =>
       DiagonalDashCell(color ?? this.color, lockType: lockType);
 
   @override
@@ -270,9 +262,6 @@ class VoidCell extends Cell {
 
   @override
   Cell lock({required bool isLit}) => this; // Always locked.
-
-  @override
-  Cell withColor(CellColor? color) => this;
 
   @override
   bool operator ==(Object other) => other is VoidCell;
