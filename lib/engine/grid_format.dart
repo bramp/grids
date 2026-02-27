@@ -109,7 +109,7 @@ class GridFormat {
               }
 
               var foundColor = false;
-              if (subToken.length > 1) {
+              if (subToken.isNotEmpty) {
                 for (final prefix in colorPrefixes.keys) {
                   if (subToken.startsWith(prefix)) {
                     color = colorPrefixes[prefix];
@@ -148,24 +148,20 @@ class GridFormat {
                 );
               }
               cell = NumberCell(n, color: color ?? defaultColor);
-            } else if (subToken == '.' || subToken == '·' || subToken.isEmpty) {
+            } else if (subToken == '.' || subToken == '·') {
               cell = const BlankCell();
             } else if (subToken == ' ' || subToken == 'x') {
               cell = const VoidCell();
-            } else {
-              // Backward compatibility: lone color symbol = Diamond
-              final legacyColor = colorPrefixes[subToken];
-              if (legacyColor != null) {
-                cell = DiamondCell(legacyColor);
-              } else if (color != null) {
-                // Case where we had a color but unknown symbol?
-                // Fallback to Diamond if it's not a common symbol
+            } else if (subToken.isEmpty) {
+              if (color != null) {
                 cell = DiamondCell(color);
               } else {
-                throw ArgumentError(
-                  "Unknown symbol '$subToken' in ASCII grid.",
-                );
+                cell = const BlankCell();
               }
+            } else {
+              throw ArgumentError(
+                "Unknown symbol '$subToken' in ASCII grid.",
+              );
             }
 
             if (isLocked) {

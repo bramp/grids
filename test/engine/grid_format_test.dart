@@ -122,6 +122,51 @@ void main() {
       expect(grid1.isLit(const GridPoint(0)), isTrue);
       expect(grid1.mechanics[0], grid2.mechanics[0]);
     });
+
+    group('Strict Color Parsing', () {
+      test('reject invalid input with trailing dots', () {
+        expect(
+          () => GridFormat.parse('Y3.'),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              contains("Unknown symbol '3.'"),
+            ),
+          ),
+        );
+      });
+
+      test('allow lone color prefix as Diamond', () {
+        final grid = GridFormat.parse('Y');
+        final cell = grid.mechanics[0];
+        expect(cell, isA<DiamondCell>());
+        expect((cell as DiamondCell).color, CellColor.yellow);
+      });
+
+      test('allow colored symbol with no separator', () {
+        final grid = GridFormat.parse('Y1');
+        final cell = grid.mechanics[0];
+        expect(cell, isA<NumberCell>());
+        expect((cell as NumberCell).color, CellColor.yellow);
+        expect(cell.number, 1);
+      });
+
+      test('allow colored diamond with o symbol', () {
+        final grid = GridFormat.parse('Yo');
+        final cell = grid.mechanics[0];
+        expect(cell, isA<DiamondCell>());
+        expect((cell as DiamondCell).color, CellColor.yellow);
+      });
+
+      test('allow colored locked Diamond in parentheses', () {
+        final grid = GridFormat.parse('(Y)');
+        final cell = grid.mechanics[0];
+        expect(cell, isA<DiamondCell>());
+        expect((cell as DiamondCell).color, CellColor.yellow);
+        expect(cell.isLocked, isTrue);
+      });
+    });
   });
 }
 
