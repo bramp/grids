@@ -1,4 +1,15 @@
 /// Build information provided via --dart-define.
+///
+/// Example:
+/// ```bash
+///
+/// COMMIT_HASH=$(git rev-parse --short HEAD)
+/// BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+///
+/// flutter test --exclude-tags mac \
+///   --dart-define=COMMIT_HASH=$COMMIT_HASH \
+///   --dart-define=BUILD_DATE="$BUILD_DATE"
+/// ```
 class BuildInfo {
   const BuildInfo._();
 
@@ -9,6 +20,7 @@ class BuildInfo {
   );
 
   /// The build date and time.
+  // TODO(bramp): Convert this to a real date type.
   static const String buildDate = String.fromEnvironment(
     'BUILD_DATE',
     defaultValue: 'unknown',
