@@ -789,33 +789,65 @@ final gardenLevels = [
   Level(
     id: 'garden_bonus_23',
     puzzle: GridFormat.parse('''
-        .
+        .  F1  .  . .  .   . .
+        .  F2  F0 . .  .   . .
+       F1  F3  .  . Y- F0  . .
+       . (*Y-) .  . .  .   . .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          .
+          . . * . . * . *
+          * * . * . . . *
+          . * * * . * . .
+          . * . * * . * *
         '''),
     ],
   ),
   Level(
     id: 'garden_bonus_24',
     puzzle: GridFormat.parse('''
-        .
+        F2 . . . P- . .
+        . B- . . . Y/ .
+        . . . (*) . F4 .
+        . . P- F0 . . .
+        . . . B- F4 . .
+        F0 Y/ . . . . .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          .
+          * * . * . * *
+          * . . . * . *
+          . * . * . . .
+          . . * . * . .
+          . . . * * * .
+          * . * . * . *
         '''),
     ],
   ),
   Level(
     id: 'garden_bonus_25',
     puzzle: GridFormat.parse('''
-        .
+        . . . . . . . . .
+        . . F1 . . . F2 . .
+        . . . . . . . . .
+        F2 . . . Y/ . . . .
+        . . . Y/ (F0) Y/ . . .
+        . . . F0 Y/ . . . .
+        . . F1 F1 . . . . .
+        . . . F0 . . . F2 .
+        . F1 . . F3 . . . .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          .
+          . * * * * * * . .
+          . * . * * . * * *
+          * * . * * * . . *
+          * . * . * . * * *
+          * * * * . * * * *
+          * * * . * . * . *
+          * . . * * * . * *
+          * * * . * * . * .
+          . . * * * * * * .
         '''),
     ],
   ),
