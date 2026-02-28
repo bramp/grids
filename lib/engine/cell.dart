@@ -63,7 +63,30 @@ class BlankCell extends Cell {
 }
 
 /// Represents a specific color for cells like diamonds or numbers.
-enum CellColor { red, black, blue, yellow, purple, white, cyan, green }
+enum CellColor {
+  red('R'),
+  black('K'),
+  blue('B'),
+  yellow('Y'),
+  purple('P'),
+  white('W'),
+  cyan('C'),
+  green('G')
+  ;
+
+  const CellColor(this.symbol);
+
+  /// The character prefix used for this color in ASCII representations.
+  final String symbol;
+
+  /// Returns the CellColor matching the given symbol, or null if not found.
+  static CellColor? fromSymbol(String symbol) {
+    for (final color in values) {
+      if (color.symbol == symbol) return color;
+    }
+    return null;
+  }
+}
 
 /// The Diamond cell.
 class DiamondCell extends Cell {

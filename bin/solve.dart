@@ -90,8 +90,7 @@ void main(List<String> args) {
       print('\n--- Solution #${i + 1} ---');
       if (maskMode) {
         print("        GridFormat.parseMask('''");
-        // We know knownSolutions are GridStates but solver returns List<Puzzle>
-        print(GridFormat.toMaskString(solutions[i].state, useColor: !noColor));
+        print(GridFormat.toMaskString(solutions[i], useColor: !noColor));
         print("        '''),");
       } else {
         print(solutions[i].toAsciiString(useColor: !noColor));

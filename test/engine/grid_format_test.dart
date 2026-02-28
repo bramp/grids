@@ -97,9 +97,9 @@ void main() {
         . * .
       ''';
       final grid = GridFormat.parse(ascii);
-      final mask = GridFormat.toMaskString(grid.state);
+      final mask = GridFormat.toMaskString(grid);
 
-      // parseMask should return the same bits
+      // parseMask should return a GridState with the same bits
       final solution = GridFormat.parseMask(mask);
       expect(
         solution.bits,
@@ -108,7 +108,7 @@ void main() {
       );
 
       // toMaskString output should be parseable
-      final gridFromMask = GridFormat.parse(mask);
+      final gridFromMask = GridFormat.parseMask(mask);
       expect(gridFromMask.bits, grid.bits);
     });
 

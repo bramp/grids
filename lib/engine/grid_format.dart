@@ -7,10 +7,60 @@ import 'package:grids/engine/puzzle.dart';
 /// Utility class for parsing and printing puzzles using ASCII representations.
 class GridFormat {
   /// Parses an ASCII lit/unlit mask into a GridState.
-  /// Characters containing `*` are considered lit.
+  /// Only `.` (unlit), `*` (lit), and `x` (void) are allowed.
   static GridState parseMask(String ascii) {
-    return parse(ascii).state;
+    final rows = ascii
+        .trim()
+        .split('\n')
+        .map((r) => r.trim())
+        .where((r) => r.isNotEmpty)
+        .toList();
+    assert(rows.isNotEmpty, 'ASCII mask cannot be empty');
+
+    final tokenRegex = RegExp(r'\S+');
+
+    final parsedRows = rows.map((row) {
+      return tokenRegex.allMatches(row).map((m) => m.group(0)!).toList();
+    }).toList();
+
+    final height = parsedRows.length;
+    final width = parsedRows[0].length;
+
+    var bits = BigInt.zero;
+    for (var y = 0; y < height; y++) {
+      if (parsedRows[y].length != width) {
+        throw ArgumentError(
+          'ASCII mask must have uniform row widths. '
+          'Row 0 has width $width, but row $y has width '
+          '${parsedRows[y].length}.',
+        );
+      }
+      for (var x = 0; x < width; x++) {
+        final token = parsedRows[y][x];
+        if (isLit(token)) {
+          bits |= BigInt.one << (y * width + x);
+        } else if (isBlank(token) || isVoid(token)) {
+          // Unlit or Void
+        } else {
+          throw ArgumentError(
+            "Invalid character '$token' in mask at row $y, col $x. "
+            "Only '.', '*', and 'x' are allowed.",
+          );
+        }
+      }
+    }
+
+    return GridState(width: width, height: height, bits: bits);
   }
+
+  /// Returns true if the token represents a lit marker.
+  static bool isLit(String token) => token == '*';
+
+  /// Returns true if the token represents a blank marker.
+  static bool isBlank(String token) => token == '.' || token == '·';
+
+  /// Returns true if the token represents a void (unplayable) marker.
+  static bool isVoid(String token) => token == ' ' || token == 'x';
 
   /// Parses an ASCII grid representation into a Puzzle.
   ///
@@ -78,17 +128,6 @@ class GridFormat {
             var isLit = false;
             CellColor? color;
 
-            const colorPrefixes = {
-              'R': CellColor.red,
-              'K': CellColor.black,
-              'Y': CellColor.yellow,
-              'B': CellColor.blue,
-              'P': CellColor.purple,
-              'W': CellColor.white,
-              'C': CellColor.cyan,
-              'G': CellColor.green,
-            };
-
             // Recursive modifier stripping
             while (true) {
               if (subToken.startsWith('(') && subToken.endsWith(')')) {
@@ -107,18 +146,14 @@ class GridFormat {
                 continue;
               }
 
-              var foundColor = false;
               if (subToken.isNotEmpty) {
-                for (final prefix in colorPrefixes.keys) {
-                  if (subToken.startsWith(prefix)) {
-                    color = colorPrefixes[prefix];
-                    subToken = subToken.substring(1).trim();
-                    foundColor = true;
-                    break;
-                  }
+                final potentialColor = CellColor.fromSymbol(subToken[0]);
+                if (potentialColor != null) {
+                  color = potentialColor;
+                  subToken = subToken.substring(1).trim();
+                  continue;
                 }
               }
-              if (foundColor) continue;
               break;
             }
 
@@ -147,9 +182,9 @@ class GridFormat {
                 );
               }
               cell = NumberCell(n, color: color ?? defaultColor);
-            } else if (subToken == '.' || subToken == '·') {
+            } else if (isBlank(subToken)) {
               cell = const BlankCell();
-            } else if (subToken == ' ' || subToken == 'x') {
+            } else if (isVoid(subToken)) {
               cell = const VoidCell();
             } else if (subToken.isEmpty) {
               if (color != null) {
@@ -273,16 +308,7 @@ class GridFormat {
 
   static String? _getSymbolColor(CellColor? color) {
     if (color == null || color == CellColor.black) return null;
-    return switch (color) {
-      CellColor.red => 'R',
-      CellColor.black => 'K',
-      CellColor.blue => 'B',
-      CellColor.yellow => 'Y',
-      CellColor.purple => 'P',
-      CellColor.white => 'W',
-      CellColor.cyan => 'C',
-      CellColor.green => 'G',
-    };
+    return color.symbol;
   }
 
   static String _getAnsiForeground(Cell cell) {
@@ -318,23 +344,38 @@ class GridFormat {
 
   /// Returns a plain mask string suitable for pasting into [parseMask].
   ///
-  /// Each lit cell is represented as `*` and each unlit cell as `.`.
-  static String toMaskString(GridState grid, {bool useColor = false}) {
+  /// Each lit cell is represented as `*`, unlit as `.` and void as `x`.
+  static String toMaskString(Puzzle puzzle, {bool useColor = false}) {
     const reset = '\x1B[0m';
     const litColor = '\x1B[32m'; // green
     const unlitColor = '\x1B[90m'; // dark gray
+    const voidColor = '\x1B[31m'; // red (for void)
     final buffer = StringBuffer();
-    for (var y = 0; y < grid.height; y++) {
+    for (var y = 0; y < puzzle.height; y++) {
       buffer.write('          ');
-      for (var x = 0; x < grid.width; x++) {
-        final pt = GridPoint(y * grid.width + x);
-        final lit = grid.isLit(pt);
-        if (useColor) buffer.write(lit ? litColor : unlitColor);
-        buffer.write(lit ? '*' : '.');
+      for (var x = 0; x < puzzle.width; x++) {
+        final pt = GridPoint(y * puzzle.width + x);
+        final lit = puzzle.isLit(pt);
+        final isVoidCell = puzzle.getCell(pt) is VoidCell;
+
+        if (useColor) {
+          if (isVoidCell) {
+            buffer.write(voidColor);
+          } else {
+            buffer.write(lit ? litColor : unlitColor);
+          }
+        }
+
+        if (isVoidCell) {
+          buffer.write('x');
+        } else {
+          buffer.write(lit ? '*' : '.');
+        }
+
         if (useColor) buffer.write(reset);
-        if (x < grid.width - 1) buffer.write(' ');
+        if (x < puzzle.width - 1) buffer.write(' ');
       }
-      if (y < grid.height - 1) buffer.writeln();
+      if (y < puzzle.height - 1) buffer.writeln();
     }
     return buffer.toString();
   }
