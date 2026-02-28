@@ -26,25 +26,29 @@ class FlowerValidator extends RuleValidator {
         // Check the 4 orthogonal neighbors
         if (y > 0) {
           final neighbor = puzzle.pointAt(x, y - 1);
-          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.getCell(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (y < puzzle.height - 1) {
           final neighbor = puzzle.pointAt(x, y + 1);
-          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.getCell(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x > 0) {
           final neighbor = puzzle.pointAt(x - 1, y);
-          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.getCell(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }
         if (x < puzzle.width - 1) {
           final neighbor = puzzle.pointAt(x + 1, y);
-          if (puzzle.isValid(neighbor) && puzzle.isLit(neighbor) == isLit) {
+          if (puzzle.getCell(neighbor) is! VoidCell &&
+              puzzle.isLit(neighbor) == isLit) {
             matchingNeighbors++;
           }
         }

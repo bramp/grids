@@ -125,5 +125,67 @@ void main() {
       expect(result.isValid, isFalse);
       expect(result.errors.length, 3);
     });
+
+    test('Colors without diamonds are ignored by DiamondValidator', () {
+      final grid = GridFormat.parse(
+        '''
+        B- B- B-
+        .  .  .
+        .  .  .
+      ''',
+      );
+
+      // 3 blue dashes.
+      final area = [const GridPoint(0), const GridPoint(1), const GridPoint(2)];
+
+      // DiamondValidator should return success because there are NO diamonds
+      // of color 'blue' to trigger the grouping rule for 'blue'.
+      final result = diamondValidator.validate(grid, area);
+      expect(result.isValid, isTrue);
+    });
+
+    test('Flowers pair with diamonds of their emitted colors', () {
+      final grid = GridFormat.parse(
+        '''
+        Oo F4 .
+        .  .  .
+        .  .  .
+      ''',
+      );
+      // F4 has 4 orange petals = CellColor.orange.
+      // 1 orange diamond + 1 orange flower = 2 orange mechanics.
+      final area1 = [const GridPoint(0), const GridPoint(1)];
+      expect(diamondValidator.validate(grid, area1).isValid, isTrue);
+
+      final grid2 = GridFormat.parse(
+        '''
+        Po F0 .
+        .  .  .
+        .  .  .
+      ''',
+      );
+      // F0 has 0 orange petals, 4 purple petals = CellColor.purple.
+      // 1 purple diamond + 1 purple flower = 2 purple mechanics.
+      final area2 = [const GridPoint(0), const GridPoint(1)];
+      expect(diamondValidator.validate(grid2, area2).isValid, isTrue);
+
+      final grid3 = GridFormat.parse(
+        '''
+        Oo Po .
+        F2 .  .
+        .  .  .
+      ''',
+      );
+      // F2 has 2 orange petals, 2 purple petals =
+      // BOTH CellColor.orange and purple.
+      // 1 orange diamond + orange from flower = 2 orange mechanics.
+      // 1 purple diamond + purple from flower = 2 purple mechanics.
+      final area3 = [
+        const GridPoint(0),
+        const GridPoint(1),
+        const GridPoint(3),
+      ];
+      expect(diamondValidator.validate(grid3, area3).isValid, isTrue);
+    });
   });
 }

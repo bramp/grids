@@ -13,36 +13,37 @@ class DiamondValidator extends RuleValidator {
 
   @override
   ValidationResult validate(Puzzle puzzle, List<GridPoint> area) {
-    final colorMap = <CellColor, List<GridPoint>>{};
-    var hasDiamond = false;
+    final elementsByColor = <CellColor, List<GridPoint>>{};
+    final colorsWithDiamonds = <CellColor>{};
 
     for (final pt in area) {
       final cell = puzzle.getCell(pt);
-      if (cell is DiamondCell) {
-        hasDiamond = true;
-      }
+
       for (final color in cell.colors) {
-        colorMap.putIfAbsent(color, () => []).add(pt);
+        elementsByColor.putIfAbsent(color, () => []).add(pt);
+        if (cell is DiamondCell) {
+          colorsWithDiamonds.add(color);
+        }
       }
     }
 
-    // This rule only triggers for areas that contain at least one diamond.
-    if (!hasDiamond) {
+    if (colorsWithDiamonds.isEmpty) {
       return ValidationResult.success();
     }
 
     final errors = <ValidationError>[];
 
-    // Every color present in a diamond area must have exactly two members.
-    for (final entry in colorMap.entries) {
-      if (entry.value.length != 2) {
-        final colorName = entry.key.name;
-        for (final pt in entry.value) {
+    // Every color that HAS a diamond must have EXACTLY two members in the area.
+    for (final color in colorsWithDiamonds) {
+      final elements = elementsByColor[color]!;
+      if (elements.length != 2) {
+        final colorName = color.name;
+        for (final pt in elements) {
           errors.add(
             ValidationError(
               pt,
               'Area with diamonds must have exactly 2 mechanics of color '
-              '$colorName, but found ${entry.value.length}.',
+              '$colorName, but found ${elements.length}.',
             ),
           );
         }
