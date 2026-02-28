@@ -1,5 +1,6 @@
 import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
+import 'package:grids/engine/grid_shape.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/rule_validator.dart';
 
@@ -21,7 +22,10 @@ class DashValidator extends RuleValidator {
     }
 
     final errors = <ValidationError>[];
-    final allAreas = puzzle.extractContiguousAreas();
+    final allGridAreas = puzzle
+        .extractContiguousAreas()
+        .map<GridArea>(GridArea.new)
+        .toList();
 
     // Find all unique dash colors in THIS area to test
     final colorsToCheck = <CellColor>{};
@@ -33,37 +37,6 @@ class DashValidator extends RuleValidator {
       }
     }
 
-    // Helper functions for shape comparison
-    // TODO(bramp): Should this be a Set<GridPoint> ?
-    Set<(int, int)> getShape(GridPoint dashPt) {
-      final dashArea = allAreas.firstWhere((a) => a.contains(dashPt));
-      final (dashX, dashY) = puzzle.xy(dashPt);
-      return dashArea.map((pt) {
-        final (x, y) = puzzle.xy(pt);
-        return (x - dashX, y - dashY);
-      }).toSet();
-    }
-
-    String canonicalize(Set<(int, int)> shape) {
-      final list = shape.toList()
-        ..sort((a, b) {
-          if (a.$1 != b.$1) return a.$1.compareTo(b.$1);
-          return a.$2.compareTo(b.$2);
-        });
-      return list.map((p) => '${p.$1},${p.$2}').join(';');
-    }
-
-    List<Set<(int, int)>> getRotations(Set<(int, int)> shape) {
-      final result = <Set<(int, int)>>[];
-      var current = shape;
-      for (var i = 0; i < 4; i++) {
-        result.add(current);
-        // Rotate 90 degrees clockwise: (x, y) -> (-y, x)
-        current = current.map((p) => (-p.$2, p.$1)).toSet();
-      }
-      return result;
-    }
-
     // Check for different color dash matches
     final allColorsOnBoard = <CellColor>{};
     for (var i = 0; i < puzzle.mechanics.length; i++) {
@@ -72,6 +45,11 @@ class DashValidator extends RuleValidator {
           mechanic.color != null) {
         allColorsOnBoard.add(mechanic.color!);
       }
+    }
+
+    GridShape getShape(GridPoint pt) {
+      final area = allGridAreas.firstWhere((a) => a.contains(pt));
+      return area.toShape(pt, puzzle);
     }
 
     // Pre-calculate signatures for all colors on the board
@@ -92,11 +70,11 @@ class DashValidator extends RuleValidator {
 
       final shape = getShape(dashesOfColor.first);
       if (isDiagonal) {
-        signaturesByColor[boardColor] = getRotations(
-          shape,
-        ).map(canonicalize).toSet();
+        signaturesByColor[boardColor] = shape.rotations
+            .map((s) => s.signature)
+            .toSet();
       } else {
-        signaturesByColor[boardColor] = {canonicalize(shape)};
+        signaturesByColor[boardColor] = {shape.signature};
       }
     }
 
@@ -115,17 +93,13 @@ class DashValidator extends RuleValidator {
 
       // Check if all dashes of THIS color match each other
       final allowedSigs = signaturesByColor[color]!;
-      // Note: If color has both, the first type found by getShape in pre-calc
-      // wins as the reference. But existing code already enforces consistency.
 
       var internalMatch = true;
       for (final pt in globalDashes) {
-        final sig = canonicalize(getShape(pt));
+        final sig = getShape(pt).signature;
         final mechanic = puzzle.getCell(pt);
         if (mechanic is DashCell) {
-          // Strict dashes MUST match the specific orientation of the reference
-          // (which for simplicity we take as the first one of its color)
-          final refSig = canonicalize(getShape(globalDashes.first));
+          final refSig = getShape(globalDashes.first).signature;
           if (sig != refSig) {
             internalMatch = false;
             break;
