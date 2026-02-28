@@ -147,13 +147,13 @@ void main() {
     test('Flowers pair with diamonds of their emitted colors', () {
       final grid = GridFormat.parse(
         '''
-        Oo F4 .
+        Yo F4 .
         .  .  .
         .  .  .
       ''',
       );
-      // F4 has 4 orange petals = CellColor.orange.
-      // 1 orange diamond + 1 orange flower = 2 orange mechanics.
+      // F4 has 4 yellow petals = CellColor.yellow.
+      // 1 yellow diamond + 1 yellow flower = 2 yellow mechanics.
       final area1 = [const GridPoint(0), const GridPoint(1)];
       expect(diamondValidator.validate(grid, area1).isValid, isTrue);
 
@@ -164,21 +164,21 @@ void main() {
         .  .  .
       ''',
       );
-      // F0 has 0 orange petals, 4 purple petals = CellColor.purple.
+      // F0 has 0 yellow petals, 4 purple petals = CellColor.purple.
       // 1 purple diamond + 1 purple flower = 2 purple mechanics.
       final area2 = [const GridPoint(0), const GridPoint(1)];
       expect(diamondValidator.validate(grid2, area2).isValid, isTrue);
 
       final grid3 = GridFormat.parse(
         '''
-        Oo Po .
+        Yo Po .
         F2 .  .
         .  .  .
       ''',
       );
-      // F2 has 2 orange petals, 2 purple petals =
-      // BOTH CellColor.orange and purple.
-      // 1 orange diamond + orange from flower = 2 orange mechanics.
+      // F2 has 2 yellow petals, 2 purple petals =
+      // BOTH CellColor.yellow and purple.
+      // 1 yellow diamond + yellow from flower = 2 yellow mechanics.
       // 1 purple diamond + purple from flower = 2 purple mechanics.
       final area3 = [
         const GridPoint(0),

@@ -314,9 +314,9 @@ final millLevels = [
   Level(
     id: 'mill_bonus_1',
     puzzle: GridFormat.parse('''
-        O-   .    O-   .    .    .
+        Y-   .    Y-   .    .    .
         -    .    .    -    .    .
-        O-   .    O-   .    .    .
+        Y-   .    Y-   .    .    .
       '''),
   ),
 
@@ -324,15 +324,15 @@ final millLevels = [
     id: 'mill_bonus_2',
     puzzle: GridFormat.parse('''
         (/)  ()   .    .    .
-        .    ()   .    .    O/
-        ()   /    .    O/   ()
+        .    ()   .    .    Y/
+        ()   /    .    Y/   ()
       '''),
   ),
 
   Level(
     id: 'mill_bonus_3',
     puzzle: GridFormat.parse('''
-        C/   O/   .    ()   .    C/   /
+        C/   Y/   .    ()   .    C/   /
       '''),
   ),
 
@@ -340,7 +340,7 @@ final millLevels = [
     id: 'mill_bonus_4',
     puzzle: GridFormat.parse('''
         .    .    .    .    ()   .    .    .    .    .
-        .    /    O/   .    W/   /    .    B/   W/   ()
+        .    /    Y/   .    W/   /    .    B/   W/   ()
         .    .    .    .    ()   .    .    .    .    .
       '''),
   ),
@@ -349,7 +349,7 @@ final millLevels = [
     id: 'mill_bonus_5',
     puzzle: GridFormat.parse('''
         (*)  .    .    .    .    .    .    .    .    ()
-        O/   .    C/   O/   /    .    C/   .    .    /
+        Y/   .    C/   Y/   /    .    C/   .    .    /
         (*)  .    .    .    .    .    .    .    .    ()
       '''),
   ),
@@ -427,9 +427,9 @@ final millLevels = [
   Level(
     id: 'mill_bonus_14',
     puzzle: GridFormat.parse('''
-        O-   ()   .    .    .    O-   .    .    O-
+        Y-   ()   .    .    .    Y-   .    .    Y-
         .    -    .    -    ()   .    .    -    .
-        .    .    .    /    /    .    .    .    O-
+        .    .    .    /    /    .    .    .    Y-
       '''),
   ),
 
@@ -454,11 +454,11 @@ final millLevels = [
   Level(
     id: 'mill_bonus_17',
     puzzle: GridFormat.parse('''
-        .    .    .    .    O/   .
-        C/   O/   .    C/   .    .
+        .    .    .    .    Y/   .
+        C/   Y/   .    C/   .    .
         .    .    ()   ()   .    .
-        O/   .    /    .    .    O/
-        .    .    .    .    O/   .
+        Y/   .    /    .    .    Y/
+        .    .    .    .    Y/   .
       '''),
   ),
 
@@ -467,9 +467,9 @@ final millLevels = [
     puzzle: GridFormat.parse('''
         .    .    .    .    .    .
         .    .    .    .    ()   .
-        .    O-   ()   /    O-   .
+        .    Y-   ()   /    Y-   .
         .    .    ()   /    .    .
-        .    ()   .    .    O-   .
+        .    ()   .    .    Y-   .
         .    .    .    .    .    .
       '''),
   ),
@@ -479,9 +479,9 @@ final millLevels = [
     puzzle: GridFormat.parse('''
         .    .    .    .    .    .
         .    Po   .    Po   ()   Po
-        .    O-   /    /    O-   .
+        .    Y-   /    /    Y-   .
         .    .    /    /    .    .
-        .    ()   O-   Po   O-   Po
+        .    ()   Y-   Po   Y-   Po
         .    .    .    .    .    .
       '''),
   ),
@@ -489,11 +489,11 @@ final millLevels = [
   Level(
     id: 'mill_bonus_20',
     puzzle: GridFormat.parse('''
-        .    /    .    .    O/   .
-        .    .    O/   .    O/   O/
+        .    /    .    .    Y/   .
+        .    .    Y/   .    Y/   Y/
         .    .    .    .    .    .
-        O/   .    .    .    O/   .
-        .    O/   .    .    .    /
+        Y/   .    .    .    Y/   .
+        .    Y/   .    .    .    /
       '''),
   ),
 
@@ -501,48 +501,48 @@ final millLevels = [
     id: 'mill_bonus_21',
     puzzle: GridFormat.parse('''
         .    .    .
-        O/   .    .
-        .    .    O/
-        .    O/   .
-        O/   .    .
-        .    .    O/
+        Y/   .    .
+        .    .    Y/
+        .    Y/   .
+        Y/   .    .
+        .    .    Y/
       '''),
   ),
 
   Level(
     id: 'mill_bonus_22',
     puzzle: GridFormat.parse('''
-        ()   ()   O/   Po   O/   .    .    O/   O/   .
-        O/   .    O/   O/   .    .    .    .    .    .
-        .    .    .    Po   O/   /    .    O/   .    O/
-        O/   Po   .    .    .    .    .    .    .    .
-        .    .    .    .    .    O/   O/   .    .    .
-        O/   .    .    .    .    .    .    .    .    O/
-        O/   .    O/   O/   .    O/   .    O/   .    .
-        .    .    .    .    O/   O/   .    .    .    .
-        .    .    O/   Po   .    .    .    .    ()   /
+        ()   ()   Y/   Po   Y/   .    .    Y/   Y/   .
+        Y/   .    Y/   Y/   .    .    .    .    .    .
+        .    .    .    Po   Y/   /    .    Y/   .    Y/
+        Y/   Po   .    .    .    .    .    .    .    .
+        .    .    .    .    .    Y/   Y/   .    .    .
+        Y/   .    .    .    .    .    .    .    .    Y/
+        Y/   .    Y/   Y/   .    Y/   .    Y/   .    .
+        .    .    .    .    Y/   Y/   .    .    .    .
+        .    .    Y/   Po   .    .    .    .    ()   /
       '''),
   ),
 
   Level(
     id: 'mill_bonus_23',
     puzzle: GridFormat.parse('''
-        .    .    .    -    O/   .    .
+        .    .    .    -    Y/   .    .
         .    .    .    .    .    .    .
-        .    .    .    O-   .    .    -
+        .    .    .    Y-   .    .    -
         .    .    .    .    .    .    .
-        O-   .    .    .    .    .    .
+        Y-   .    .    .    .    .    .
       '''),
   ),
 
   Level(
     id: 'mill_bonus_24',
     puzzle: GridFormat.parse('''
-        O5   .    R2   .    R2   .
+        Y5   .    R2   .    R2   .
         .    .    .    .    .    .
         .    .    .    .    .    R2
         .    R1   .    .    .    .
-        .    .    .    .    .    O5
+        .    .    .    .    .    Y5
       '''),
   ),
 
@@ -550,7 +550,7 @@ final millLevels = [
     id: 'mill_bonus_25',
     puzzle: GridFormat.parse('''
         .    .    .    .    .
-        .    O-   .    O-   .
+        .    Y-   .    Y-   .
         .    .    .    .    .
       '''),
   ),
@@ -558,8 +558,8 @@ final millLevels = [
   Level(
     id: 'mill_bonus_26',
     puzzle: GridFormat.parse('''
-        .    O2   .    O2   .
-        .    O-   O2   O-   .
+        .    Y2   .    Y2   .
+        .    Y-   Y2   Y-   .
         .    .    .    .    .
       '''),
   ),
@@ -567,8 +567,8 @@ final millLevels = [
   Level(
     id: 'mill_bonus_27',
     puzzle: GridFormat.parse('''
-        .    .    .    .    O-   .
-        .    O-   .    .    O4   .
+        .    .    .    .    Y-   .
+        .    Y-   .    .    Y4   .
         .    .    .    .    .    .
       '''),
   ),
@@ -595,7 +595,7 @@ final millLevels = [
     id: 'mill_bonus_30',
     puzzle: GridFormat.parse('''
         ()   /    .    .    .    ()
-        O6   .    .    .    .    O6
+        Y6   .    .    .    .    Y6
         ()   .    .    .    /    ()
       '''),
   ),
@@ -603,23 +603,23 @@ final millLevels = [
   Level(
     id: 'mill_bonus_31',
     puzzle: GridFormat.parse('''
-        /    /    O2   .    .    .    .    .    .
-        .    .    ()   O2   .    .    .    .    C6
+        /    /    Y2   .    .    .    .    .    .
+        .    .    ()   Y2   .    .    .    .    C6
         .    .    .    .    .    .    .    .    .
         .    .    .    .    .    .    .    .    .
-        .    O1   .    .    .    /    C1   .    O4
+        .    Y1   .    .    .    /    C1   .    Y4
         .    .    .    .    .    .    .    .    .
         .    .    .    .    .    .    .    .    .
-        O3   .    .    .    .    ()   .    .    C6
+        Y3   .    .    .    .    ()   .    .    C6
       '''),
   ),
 
   Level(
     id: 'mill_bonus_32',
     puzzle: GridFormat.parse('''
-        .    O-   .
-        .    O4   .
-        .    O-   .
+        .    Y-   .
+        .    Y4   .
+        .    Y-   .
       '''),
   ),
 
@@ -627,17 +627,17 @@ final millLevels = [
     id: 'mill_bonus_33',
     puzzle: GridFormat.parse('''
         .    .    .    .    P-   .
-        O4   O-   .    .    .    .
-        .    O-   .    .    /    .
+        Y4   Y-   .    .    .    .
+        .    Y-   .    .    /    .
       '''),
   ),
 
   Level(
     id: 'mill_bonus_34',
     puzzle: GridFormat.parse('''
-        .    O-   .    .    .
+        .    Y-   .    .    .
         W4   P-   .    P-   .
-        O-   .    .    /    .
+        Y-   .    .    /    .
         .    .    .    .    .
       '''),
   ),

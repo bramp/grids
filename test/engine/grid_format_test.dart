@@ -76,7 +76,7 @@ void main() {
     ''');
 
     testRoundTrip('Multiple colors', '''
-      Ro Go Oo Co Po
+      Ro Go Yo Co Po
       Wo K- B/ R1 G2
     ''');
 

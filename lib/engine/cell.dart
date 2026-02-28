@@ -63,7 +63,7 @@ class BlankCell extends Cell {
 }
 
 /// Represents a specific color for cells like diamonds or numbers.
-enum CellColor { red, black, blue, yellow, purple, white, cyan, orange, green }
+enum CellColor { red, black, blue, yellow, purple, white, cyan, green }
 
 /// The Diamond cell.
 class DiamondCell extends Cell {
@@ -131,25 +131,25 @@ class NumberCell extends Cell {
 
 /// The Flower cell.
 class FlowerCell extends Cell {
-  const FlowerCell(this.orangePetals, {super.lockType = LockType.unlocked})
+  const FlowerCell(this.yellowPetals, {super.lockType = LockType.unlocked})
     : assert(
-        orangePetals >= 0 && orangePetals <= 4,
-        'FlowerCell orangePetals must be between 0 and 4',
+        yellowPetals >= 0 && yellowPetals <= 4,
+        'FlowerCell yellowPetals must be between 0 and 4',
       );
-  final int orangePetals;
+  final int yellowPetals;
 
   // The remaining petals out of 4 are implicitly purple.
-  int get purplePetals => 4 - orangePetals;
+  int get purplePetals => 4 - yellowPetals;
 
   @override
   Iterable<CellColor> get colors => [
-    if (orangePetals > 0) CellColor.orange,
+    if (yellowPetals > 0) CellColor.yellow,
     if (purplePetals > 0) CellColor.purple,
   ];
 
   @override
   Cell lock({required bool isLit}) => FlowerCell(
-    orangePetals,
+    yellowPetals,
     lockType: isLit ? LockType.lockedLit : LockType.lockedUnlit,
   );
 
@@ -158,14 +158,14 @@ class FlowerCell extends Cell {
       identical(this, other) ||
       other is FlowerCell &&
           runtimeType == other.runtimeType &&
-          orangePetals == other.orangePetals &&
+          yellowPetals == other.yellowPetals &&
           lockType == other.lockType;
 
   @override
-  int get hashCode => Object.hash(orangePetals, lockType);
+  int get hashCode => Object.hash(yellowPetals, lockType);
 
   @override
-  String toString() => 'Flower($orangePetals orange, lock: $lockType)';
+  String toString() => 'Flower($yellowPetals yellow, lock: $lockType)';
 }
 
 /// The Dash cell.

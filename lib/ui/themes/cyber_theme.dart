@@ -149,11 +149,11 @@ class CyberTheme extends PuzzleTheme {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       child: CustomPaint(
-        key: ValueKey('flower_${cell.orangePetals}'),
+        key: ValueKey('flower_${cell.yellowPetals}'),
         painter: _CyberFlowerPainter(
-          orangePetals: cell.orangePetals,
+          yellowPetals: cell.yellowPetals,
           purplePetals: cell.purplePetals,
-          orangeColor: _getColor(CellColor.orange),
+          yellowColor: _getColor(CellColor.yellow),
           purpleColor: _getColor(CellColor.purple),
         ),
         child: const SizedBox.expand(),
@@ -208,8 +208,6 @@ class CyberTheme extends PuzzleTheme {
         return const Color(0xFFFFFFFF); // Pure White
       case CellColor.cyan:
         return const Color(0xFF00FFCC); // Neon Cyan
-      case CellColor.orange:
-        return const Color(0xFFFF8800); // Neon Orange
       case CellColor.green:
         return const Color(0xFF39FF14); // Neon Green
     }
@@ -257,15 +255,15 @@ class _CyberLightningPainter extends CustomPainter {
 
 class _CyberFlowerPainter extends CustomPainter {
   const _CyberFlowerPainter({
-    required this.orangePetals,
+    required this.yellowPetals,
     required this.purplePetals,
-    required this.orangeColor,
+    required this.yellowColor,
     required this.purpleColor,
   });
 
-  final int orangePetals;
+  final int yellowPetals;
   final int purplePetals;
-  final Color orangeColor;
+  final Color yellowColor;
   final Color purpleColor;
 
   @override
@@ -289,15 +287,15 @@ class _CyberFlowerPainter extends CustomPainter {
       ..drawCircle(center, radius * 0.5, coreShadowPaint)
       ..drawCircle(center, radius * 0.5, corePaint);
 
-    final totalPetals = orangePetals + purplePetals;
+    final totalPetals = yellowPetals + purplePetals;
     if (totalPetals == 0) return;
 
     for (var i = 0; i < totalPetals; i++) {
       // Rotate by -90 degrees (pi/2) to start pointing UP
       final angle = (i * 2 * 3.14159 / totalPetals) - 1.5708;
 
-      final isOrange = i < orangePetals;
-      final color = isOrange ? orangeColor : purpleColor;
+      final isYellow = i < yellowPetals;
+      final color = isYellow ? yellowColor : purpleColor;
 
       final paint = Paint()
         ..color = color
@@ -330,9 +328,9 @@ class _CyberFlowerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CyberFlowerPainter oldDelegate) {
-    return oldDelegate.orangePetals != orangePetals ||
+    return oldDelegate.yellowPetals != yellowPetals ||
         oldDelegate.purplePetals != purplePetals ||
-        oldDelegate.orangeColor != orangeColor ||
+        oldDelegate.yellowColor != yellowColor ||
         oldDelegate.purpleColor != purpleColor;
   }
 }

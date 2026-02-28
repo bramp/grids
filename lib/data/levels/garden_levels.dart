@@ -397,7 +397,7 @@ final gardenLevels = [
     id: 'garden_bonus_1',
     puzzle: GridFormat.parse('''
         P9 . . .
-        . O3 . .
+        . Y3 . .
         . . W1 .
         . . . W1
       '''),
@@ -498,40 +498,40 @@ final gardenLevels = [
         '''),
     ],
   ),
-  /*
+
   Level(
     id: 'garden_bonus_7',
     puzzle: GridFormat.parse('''
         P4 .  .  F3 .
         .  .  P4 .  .
         .  .  F4 .  .
-        F1 .  .  .  .
-        .  F1 O6 .  .
+        F2 .  .  .  .
+        .  F1 Y6 .  .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * * . * .
+          * * . . .
           . * * . *
-          * * * * .
-          * . . . .
-          * * * . .
+          . * * * .
+          . . * . .
+          * * . . .
         '''),
     ],
   ),
   Level(
     id: 'garden_bonus_8',
     puzzle: GridFormat.parse('''
-        Oo . Wo . (Oo)
-        Oo . (Wo) . Oo
-        Oo . Wo . Oo
-        (Oo) . (Wo) . Oo
+         Y  .  W   . (Y)
+         Y  . (*W) .  Y
+         Y  .  W   .  Y
+        (Y) . (*W) .  Y
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * . * . *
-          * . * . *
-          * . * . *
-          * . * . *
+          * . . . .
+          * * * . .
+          . * . . *
+          . * * . *
         '''),
     ],
   ),
@@ -539,33 +539,33 @@ final gardenLevels = [
     id: 'garden_bonus_9',
     puzzle: GridFormat.parse('''
         F1 .  .  F1
-        Wo Wo Wo Wo
-        Wo Wo Wo Wo
+        W  W  W  W
+        W  W  W  W
         F1 .  .  F1
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * * . *
-          * * . .
+          . * . *
           . . * *
-          * . * *
+          * * . .
+          . . * .
         '''),
     ],
   ),
   Level(
     id: 'garden_bonus_10',
     puzzle: GridFormat.parse('''
-        F3 .  .  .
-        .  F3 .  .
-        .  .  F3 .
-        .  .  .  F3
+        .  .  .  B
+        .  F1 W  .
+        .  B  F1 .
+        W  .  .  .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * * . .
-          * * * .
+          . . . *
+          . * . *
+          . * . *
           . * * *
-          . . * *
         '''),
     ],
   ),
@@ -573,29 +573,30 @@ final gardenLevels = [
   Level(
     id: 'garden_bonus_11',
     puzzle: GridFormat.parse('''
-        .  W  Oo W  .
-        W  F0 Oo F0 W
-        W  Oo .  Oo W
-        W  Co F0 Co W
-        Oo .  .  .  Oo
+        .  .  Y . .
+        .  F0 Y F0 .
+        .  Y .  Y  .
+        .  C F0 C  .
+        Y .  .  .  Y
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
           . * * * .
-          * * * * *
+          * . * . *
           * * . * *
-          * * * * *
+          * . * . *
           * . . . *
         '''),
     ],
   ),
+  /*
   Level(
     id: 'garden_bonus_12',
     puzzle: GridFormat.parse('''
-        Oo Oo Oo Oo
-        Oo .  .  Oo
-        Oo .  .  Oo
-        Oo Oo Oo Oo
+        Yo Yo Yo Yo
+        Yo .  .  Yo
+        Yo .  .  Yo
+        Yo Yo Yo Yo
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -655,12 +656,12 @@ final gardenLevels = [
   Level(
     id: 'garden_bonus_16',
     puzzle: GridFormat.parse('''
-        Oo .  .  .  Oo F1
+        Yo .  .  .  Yo F1
         .  .  .  .  F1 .
         .  .  .  F1 .  .
         .  .  F1 .  .  .
         .  F1 .  .  .  .
-        F1 Oo .  .  .  Oo
+        F1 Yo .  .  .  Yo
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
@@ -678,7 +679,7 @@ final gardenLevels = [
     puzzle: GridFormat.parse('''
         .  .  .  .  .  .
         .  .  .  Po .  .
-        Oo .  .  F0 .  .
+        Yo .  .  F0 .  .
         .  .  F4 .  .  .
         .  F4 .  .  .  .
         .  .  .  F1 .  .
@@ -698,10 +699,10 @@ final gardenLevels = [
     id: 'garden_bonus_18',
     puzzle: GridFormat.parse('''
         Wo .  .  .  .  Ko
-        .  (Po) .  .  (Oo) .
+        .  (Po) .  .  (Yo) .
         .  .  .  F1 .  .
         .  .  F1 .  .  .
-        .  (Po) .  .  (Oo) .
+        .  (Po) .  .  (Yo) .
         Ko .  .  .  .  Wo
       '''),
     knownSolutions: [
@@ -718,9 +719,9 @@ final gardenLevels = [
   Level(
     id: 'garden_bonus_20',
     puzzle: GridFormat.parse('''
-        (P-) .  O- .  .
+        (P-) .  Y- .  .
         .    .  .  .  .
-        O-   .  .  .  (P-)
+        Y-   .  .  .  (P-)
       '''),
     knownSolutions: [
       GridFormat.parseMask('''

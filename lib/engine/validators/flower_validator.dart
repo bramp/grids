@@ -6,7 +6,7 @@ import 'package:grids/engine/rule_validator.dart';
 /// Validates that each flower cell has the correct number of adjacent cells
 /// (up/down/left/right) matching its color.
 ///
-/// A flower cell with `orangePetals` N must have exactly N adjacent cells
+/// A flower cell with `yellowPetals` N must have exactly N adjacent cells
 /// that share its current lit/unlit state. Cells that are off the edge of
 /// the grid are ignored.
 class FlowerValidator extends RuleValidator {
@@ -53,11 +53,11 @@ class FlowerValidator extends RuleValidator {
           }
         }
 
-        if (matchingNeighbors != cell.orangePetals) {
+        if (matchingNeighbors != cell.yellowPetals) {
           errors.add(
             ValidationError(
               pt,
-              'Flower cell at $pt requires exactly ${cell.orangePetals} '
+              'Flower cell at $pt requires exactly ${cell.yellowPetals} '
               'neighbors matching its ${isLit ? 'lit' : 'unlit'} state, but '
               'found $matchingNeighbors.',
             ),

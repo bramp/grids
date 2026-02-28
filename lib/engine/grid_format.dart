@@ -86,7 +86,6 @@ class GridFormat {
               'P': CellColor.purple,
               'W': CellColor.white,
               'C': CellColor.cyan,
-              'O': CellColor.orange,
               'G': CellColor.green,
             };
 
@@ -211,7 +210,7 @@ class GridFormat {
         var token = switch (cell) {
           NumberCell() => '${_getSymbolColor(cell.color) ?? ''}${cell.number}',
           DiamondCell() => '${_getSymbolColor(cell.color) ?? ''}o',
-          FlowerCell() => 'F${cell.orangePetals}',
+          FlowerCell() => 'F${cell.yellowPetals}',
           DashCell() => '${_getSymbolColor(cell.color) ?? ''}-',
           DiagonalDashCell() => '${_getSymbolColor(cell.color) ?? ''}/',
           VoidCell() => 'x',
@@ -282,7 +281,6 @@ class GridFormat {
       CellColor.purple => 'P',
       CellColor.white => 'W',
       CellColor.cyan => 'C',
-      CellColor.orange => 'O',
       CellColor.green => 'G',
     };
   }
@@ -312,7 +310,6 @@ class GridFormat {
         CellColor.purple => '\x1B[38;5;129m',
         CellColor.white => '\x1B[38;5;255m',
         CellColor.cyan => '\x1B[38;5;51m',
-        CellColor.orange => '\x1B[38;5;214m',
         CellColor.green => '\x1B[38;5;46m',
       };
     }
