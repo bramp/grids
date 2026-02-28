@@ -28,7 +28,11 @@ jobs:
 
       - name: Build Web
         run: |
-          flutter build web --release
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          flutter build web --release \
+            --dart-define=COMMIT_HASH=$COMMIT_HASH \
+            --dart-define=BUILD_DATE="$BUILD_DATE"
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4

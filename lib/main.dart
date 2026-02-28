@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grids/build_info.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/rule_validator.dart';
 import 'package:grids/firebase_options.dart';
@@ -130,6 +131,20 @@ class _GameScreenState extends State<GameScreen> {
         actions: [
           // Debug-only: level selector for quickly jumping to any puzzle.
           if (kDebugMode) const _DebugLevelPicker(),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              showAboutDialog(
+                context: context,
+                applicationName: 'Grids',
+                applicationVersion: BuildInfo.version,
+                applicationIcon: const Icon(Icons.grid_on, size: 48),
+                children: [
+                  const Text('A logic puzzle game built with Flutter.'),
+                ],
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: DropdownButton<PuzzleTheme>(
@@ -204,6 +219,19 @@ class _GameScreenState extends State<GameScreen> {
                   icon: const Icon(Icons.arrow_forward),
                 ),
               ],
+            ),
+          ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                BuildInfo.shortVersion,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.3),
+                  fontSize: 10,
+                ),
+              ),
             ),
           ),
         ],

@@ -589,54 +589,66 @@ final gardenLevels = [
         '''),
     ],
   ),
-  /*
   Level(
     id: 'garden_bonus_12',
+    note:
+        'The first puzzle where we learn a yellow diamond can connect '
+        'to a yellow flower',
     puzzle: GridFormat.parse('''
-        Yo Yo Yo Yo
-        Yo .  .  Yo
-        Yo .  .  Yo
-        Yo Yo Yo Yo
+        Y  .  Y  .
+        .  F4 .  Y
+        Y  .  .  Y
+        .  Y  Y  .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          . * * .
-          * . . *
-          * . . *
-          . * * .
+          * * . .
+          * * * .
+          . * . *
+          . . * *
         '''),
     ],
   ),
   Level(
     id: 'garden_bonus_13',
     puzzle: GridFormat.parse('''
-        F1 .  F1
-        .  F4 .
-        F1 .  F1
+        .  .  .  P
+        . F0  P  .
+        . P  F0  P
+        P .   P  .
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          . * .
-          * * *
-          . * .
+          * . . .
+          . * . *
+          . . * .
+          . * . .
         '''),
     ],
   ),
+
   Level(
     id: 'garden_bonus_14',
     puzzle: GridFormat.parse('''
-        F1 F1 F1
-        F1 F0 F1
-        F1 F1 F1
+        Y  .   F0 . . (*Y)
+        . (*Y) . . . F0
+        F0 .   Y . . .
+        .  .   . Y . .
+        .  .   . . (F4) .
+        (Y)  .   F0 . . Y
       '''),
     knownSolutions: [
       GridFormat.parseMask('''
-          * . *
-          . * .
-          * . *
+          * * . * * *
+          * * * . * .
+          . * . * * *
+          * . . * . *
+          . . * . . .
+          . * . * . .
         '''),
     ],
   ),
+  /*
   Level(
     id: 'garden_bonus_15',
     puzzle: GridFormat.parse('''
