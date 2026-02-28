@@ -133,8 +133,62 @@ void main() {
       );
       // Top is 2x1 horizontal. Right is 1x2 vertical.
       final area1 = [const GridPoint(0), const GridPoint(1)];
-      final result = dashValidator.validate(grid, area1);
-      expect(result.isValid, isTrue);
+      final result = dashValidator.validate(grid, area1).isValid;
+      expect(result, isTrue);
+    });
+
+    test('Different colored dashes must NOT have matching areas', () {
+      final grid = GridFormat.parse(
+        '''
+        R-  .  .*
+        .* .* .*
+        B-  .  .*
+        .* .* .*
+      ''',
+      );
+      // Top row is 2-cell Red dash area
+      // Bottom row is 2-cell Blue dash area (Identical shape/relative position)
+      final areaRed = [const GridPoint(0), const GridPoint(1)];
+      final areaBlue = [const GridPoint(6), const GridPoint(7)];
+
+      final resultRed = dashValidator.validate(grid, areaRed);
+      final resultBlue = dashValidator.validate(grid, areaBlue);
+
+      // This currently passes! It should fail.
+      expect(
+        resultRed.isValid,
+        isFalse,
+        reason: 'Red dash area matches Blue dash area',
+      );
+      expect(
+        resultBlue.isValid,
+        isFalse,
+        reason: 'Blue dash area matches Red dash area',
+      );
+    });
+
+    test('Diagonal dash area matching another color rotated (Invalid)', () {
+      final grid = GridFormat.parse(
+        '''
+        R/  .  .*
+        .* .* .*
+        B-  .* .*
+        B.  .* .*
+      ''',
+      );
+      // Top row is 2-cell Red Diagonal dash area (horizontal)
+      // Bottom left is 2-cell Blue Strict dash area (vertical)
+      // Red has 4 signatures (including vertical one).
+      // Blue has 1 signature (vertical).
+      // They match!
+      final areaRed = [const GridPoint(0), const GridPoint(1)];
+      final areaBlue = [const GridPoint(6), const GridPoint(9)];
+
+      final resultRed = dashValidator.validate(grid, areaRed);
+      final resultBlue = dashValidator.validate(grid, areaBlue);
+
+      expect(resultRed.isValid, isFalse);
+      expect(resultBlue.isValid, isFalse);
     });
   });
 }

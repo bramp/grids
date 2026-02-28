@@ -64,8 +64,44 @@ class DashValidator extends RuleValidator {
       return result;
     }
 
+    // Check for different color dash matches
+    final allColorsOnBoard = <CellColor>{};
+    for (var i = 0; i < puzzle.mechanics.length; i++) {
+      final mechanic = puzzle.mechanics[i];
+      if ((mechanic is DashCell || mechanic is DiagonalDashCell) &&
+          mechanic.color != null) {
+        allColorsOnBoard.add(mechanic.color!);
+      }
+    }
+
+    // Pre-calculate signatures for all colors on the board
+    final signaturesByColor = <CellColor, Set<String>>{};
+    for (final boardColor in allColorsOnBoard) {
+      final dashesOfColor = <GridPoint>[];
+      var isDiagonal = false;
+      for (var i = 0; i < puzzle.mechanics.length; i++) {
+        final mechanic = puzzle.mechanics[i];
+        if ((mechanic is DashCell || mechanic is DiagonalDashCell) &&
+            mechanic.color == boardColor) {
+          dashesOfColor.add(GridPoint(i));
+          if (mechanic is DiagonalDashCell) isDiagonal = true;
+        }
+      }
+
+      if (dashesOfColor.isEmpty) continue;
+
+      final shape = getShape(dashesOfColor.first);
+      if (isDiagonal) {
+        signaturesByColor[boardColor] = getRotations(
+          shape,
+        ).map(canonicalize).toSet();
+      } else {
+        signaturesByColor[boardColor] = {canonicalize(shape)};
+      }
+    }
+
     for (final color in colorsToCheck) {
-      // Find all dashes of this color on the ENTIRE board
+      // 1. Existing rule: Same-colored dashes must match
       final globalDashes = <GridPoint>[];
       for (var i = 0; i < puzzle.mechanics.length; i++) {
         final mechanic = puzzle.mechanics[i];
@@ -75,54 +111,34 @@ class DashValidator extends RuleValidator {
         }
       }
 
-      // If this is the only dash of its color, it trivially satisfies the rule
-      if (globalDashes.length <= 1) continue;
+      if (globalDashes.isEmpty) continue;
 
-      // Find the reference shape.
-      // If there are strict dashes (-), the first one becomes the absolute
-      // reference. Its rotations are allowed ONLY for DiagonalDashCells.
-      // If there are only DiagonalDashCells, any can be the reference,
-      // and all must match one of its rotations.
-      GridPoint? strictRefPt;
-      GridPoint? diagRefPt;
+      // Check if all dashes of THIS color match each other
+      final allowedSigs = signaturesByColor[color]!;
+      // Note: If color has both, the first type found by getShape in pre-calc
+      // wins as the reference. But existing code already enforces consistency.
+
+      var internalMatch = true;
       for (final pt in globalDashes) {
-        if (puzzle.getCell(pt) is DashCell) {
-          strictRefPt ??= pt;
-        } else {
-          diagRefPt ??= pt;
-        }
-      }
-
-      final refPt = strictRefPt ?? diagRefPt!;
-      final refShape = getShape(refPt);
-      final strictSig = canonicalize(refShape);
-
-      final allowedDiagSigs = getRotations(
-        refShape,
-      ).map(canonicalize).toSet();
-
-      var allMatch = true;
-      for (final pt in globalDashes) {
-        final shape = getShape(pt);
-        final sig = canonicalize(shape);
+        final sig = canonicalize(getShape(pt));
         final mechanic = puzzle.getCell(pt);
         if (mechanic is DashCell) {
-          if (sig != strictSig) {
-            allMatch = false;
+          // Strict dashes MUST match the specific orientation of the reference
+          // (which for simplicity we take as the first one of its color)
+          final refSig = canonicalize(getShape(globalDashes.first));
+          if (sig != refSig) {
+            internalMatch = false;
             break;
           }
         } else if (mechanic is DiagonalDashCell) {
-          if (!allowedDiagSigs.contains(sig)) {
-            allMatch = false;
+          if (!allowedSigs.contains(sig)) {
+            internalMatch = false;
             break;
           }
         }
       }
 
-      // If any dashes of this color don't match exactly, all dashes of this
-      // color in the CURRENT area are marked as errors. (Other areas will
-      // catch theirs)
-      if (!allMatch) {
+      if (!internalMatch) {
         final invalidDashes = area.where((pt) {
           final mechanic = puzzle.getCell(pt);
           return (mechanic is DashCell || mechanic is DiagonalDashCell) &&
@@ -136,6 +152,35 @@ class DashValidator extends RuleValidator {
               'other dashes of color ${color.name}.',
             ),
           );
+        }
+        continue;
+      }
+
+      // 2. New rule: Different colored dashes must NOT match
+      final mySigs = signaturesByColor[color]!;
+      for (final otherColor in allColorsOnBoard) {
+        if (otherColor == color) continue;
+
+        final otherSigs = signaturesByColor[otherColor]!;
+        final intersection = mySigs.intersection(otherSigs);
+
+        if (intersection.isNotEmpty) {
+          final invalidDashes = area.where((pt) {
+            final mechanic = puzzle.getCell(pt);
+            return (mechanic is DashCell || mechanic is DiagonalDashCell) &&
+                mechanic.color == color;
+          });
+          for (final pt in invalidDashes) {
+            errors.add(
+              ValidationError(
+                pt,
+                'Dash area for color ${color.name} matches '
+                'dash area for color ${otherColor.name}. '
+                'Areas of different colored dashes must not match.',
+              ),
+            );
+          }
+          break; // Found one matching color, that's enough for an error
         }
       }
     }

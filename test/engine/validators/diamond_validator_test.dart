@@ -187,5 +187,35 @@ void main() {
       ];
       expect(diamondValidator.validate(grid3, area3).isValid, isTrue);
     });
+
+    test('Yellow Diamond vs Yellow Numbers', () {
+      final grid = GridFormat.parse(
+        '''
+        Yo Y1 .
+        .  .  .
+      ''',
+      );
+
+      // Yellow Diamond + One Yellow Number = 2 yellow mechanics (Valid)
+      final areaValid = [const GridPoint(0), const GridPoint(1)];
+      expect(diamondValidator.validate(grid, areaValid).isValid, isTrue);
+
+      final gridInvalid = GridFormat.parse(
+        '''
+        Yo Y1 Y2
+        .  .  .
+      ''',
+      );
+
+      // Yellow Diamond + Two Yellow Numbers = 3 yellow mechanics (Invalid)
+      final areaInvalid = [
+        const GridPoint(0),
+        const GridPoint(1),
+        const GridPoint(2),
+      ];
+      final result = diamondValidator.validate(gridInvalid, areaInvalid);
+      expect(result.isValid, isFalse);
+      expect(result.errors.length, 3);
+    });
   });
 }
