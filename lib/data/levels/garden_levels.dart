@@ -1,7 +1,7 @@
 import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/level.dart';
 
-final gardenLevels = [
+final garden = [
   Level(
     id: 'garden_1',
     puzzle: GridFormat.parse('''
@@ -324,8 +324,10 @@ final gardenLevels = [
         '''),
     ],
   ),
+];
 
-  // TODODo Garden 24 - 29 walking puzzles
+// TODO(bramp): Support Garden 24 - 29 walking puzzles
+final gardenShortcut = [
   Level(
     id: 'garden_shortcut_1',
     puzzle: GridFormat.parse('''
@@ -392,7 +394,9 @@ final gardenLevels = [
         '''),
     ],
   ),
+];
 
+final gardenBonus = [
   Level(
     id: 'garden_bonus_1',
     puzzle: GridFormat.parse('''
@@ -851,4 +855,10 @@ final gardenLevels = [
         '''),
     ],
   ),
+];
+
+final List<Level> gardenLevels = [
+  ...garden,
+  ...gardenShortcut,
+  ...gardenBonus,
 ];
