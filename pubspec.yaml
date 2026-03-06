@@ -39,7 +39,7 @@ dependencies:
   collection: any
   meta: ^1.11.0
   firebase_core: ^4.4.0
-  firebase_analytics: ^12.1.2
+  firebase_analytics: ^12.1.3
   clock: ^1.1.2
   go_router: ^17.1.0
 
