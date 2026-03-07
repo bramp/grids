@@ -22,9 +22,12 @@ class CyberTheme extends PuzzleTheme {
     required bool isLocked,
     required bool isLit,
     required bool hasError,
+    required bool isHovered,
+    required bool isFocused,
+    required bool isPressed,
     required Widget child,
   }) {
-    // Determine the base color
+    // Determine the neon tube color
     Color glowColor;
     if (hasError) {
       glowColor = Colors.redAccent;
@@ -36,67 +39,114 @@ class CyberTheme extends PuzzleTheme {
       glowColor = const Color(0xFF00FFCC); // Default Neon Cyan
     }
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutExpo,
-      decoration: BoxDecoration(
-        color: isLit
-            ? glowColor.withValues(alpha: 0.15)
-            : Colors.white.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isLocked
-              ? glowColor.withValues(alpha: 1)
-              : (isLit
-                    ? glowColor.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.1)),
-          width: isLocked ? 4 : (isLit ? 2 : 1),
+    final isInteractable = !isLocked;
+
+    // Scale: pressed cells depress into the board
+    final moveScale = isPressed ? 0.93 : 1.0;
+
+    // --- Fill color ---
+    // Lit: pastel version of the glow color
+    // Unlit: dark slab
+    const cellDarkColor = Color(0xFF161822);
+    final cellColor = isLit
+        ? Color.lerp(cellDarkColor, glowColor, 0.2)!
+        : cellDarkColor;
+
+    // --- Outer border (thin cell frame) ---
+    final outerBorderColor = ((isHovered || isFocused) && isInteractable)
+        ? Colors.white.withValues(alpha: 0.3) // Subtle white edge highlight
+        : glowColor.withValues(alpha: isLit ? 0.4 : 0.12);
+
+    // --- Shadows ---
+    final shadows = <BoxShadow>[
+      // Neon bloom when lit (external glow around the cell)
+      if (isLit) ...[
+        BoxShadow(
+          color: glowColor.withValues(alpha: 0.4),
+          blurRadius: 20,
+          spreadRadius: 2,
         ),
-        boxShadow: isLit
-            ? [
-                BoxShadow(
-                  color: glowColor.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-                BoxShadow(
-                  color: glowColor.withValues(alpha: 0.2),
-                  blurRadius: 40,
-                  spreadRadius: 8,
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: glowColor.withValues(alpha: 0),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
-                BoxShadow(
-                  color: glowColor.withValues(alpha: 0),
-                  blurRadius: 40,
-                  spreadRadius: 8,
-                ),
-              ],
+        BoxShadow(
+          color: glowColor.withValues(alpha: 0.15),
+          blurRadius: 40,
+          spreadRadius: 6,
+        ),
+      ],
+    ];
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOutCubic,
+      transformAlignment: Alignment.center,
+      transform: Matrix4.diagonal3Values(moveScale, moveScale, 1),
+      decoration: BoxDecoration(
+        color: cellColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: outerBorderColor),
+        boxShadow: shadows,
       ),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Glassmorphism subtle white gradient overlay
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.05),
-                  Colors.white.withValues(alpha: 0),
-                ],
+          // Sunken inner shadow for locked cells
+          if (isLocked) ...[
+            // Top-left dark edge (shadow falls into recess)
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.center,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.5),
+                    Colors.transparent,
+                  ],
+                ),
               ),
+            ),
+            // Bottom-right highlight (far lip of recess)
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: LinearGradient(
+                  begin: Alignment.bottomRight,
+                  end: Alignment.center,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.04),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ],
+
+          // Neon tube (inset glowing border)
+          CustomPaint(
+            painter: _NeonTubePainter(
+              color: glowColor,
+              isLit: isLit,
             ),
           ),
 
           child,
+
+          // Small padlock icon for locked cells (1/4 height)
+          if (isLocked)
+            Positioned.fill(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final iconSize = constraints.maxHeight * 0.25;
+                  return Align(
+                    alignment: const Alignment(0.8, 0.8),
+                    child: Icon(
+                      Icons.lock_outline_rounded,
+                      size: iconSize,
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -212,6 +262,94 @@ class CyberTheme extends PuzzleTheme {
         return const Color(0xFF39FF14); // Neon Green
     }
   }
+}
+
+/// Paints a glowing "neon tube" rounded rectangle inset from the cell edges.
+///
+/// When [isLit], the tube is bright with multiple glow layers for a bloom
+/// effect plus a white hot-core highlight. When unlit, a dim outline is drawn.
+class _NeonTubePainter extends CustomPainter {
+  const _NeonTubePainter({
+    required this.color,
+    required this.isLit,
+  });
+
+  final Color color;
+  final bool isLit;
+
+  static const double _inset = 13;
+  static const double _tubeWidth = 9;
+  static const double _cornerRadius = 9;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Rect.fromLTWH(
+      _inset,
+      _inset,
+      size.width - _inset * 2,
+      size.height - _inset * 2,
+    );
+    final rrect = RRect.fromRectAndRadius(
+      rect,
+      const Radius.circular(_cornerRadius),
+    );
+
+    if (isLit) {
+      // Wide outer glow
+      canvas
+        ..drawRRect(
+          rrect,
+          Paint()
+            ..color = color.withValues(alpha: 0.3)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = _tubeWidth + 10
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+        )
+        // Medium glow
+        ..drawRRect(
+          rrect,
+          Paint()
+            ..color = color.withValues(alpha: 0.5)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = _tubeWidth + 4
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+        );
+    }
+
+    // Dark physical tube edge
+    canvas
+      ..drawRRect(
+        rrect,
+        Paint()
+          ..color = Colors.black.withValues(alpha: isLit ? 0.8 : 0.4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _tubeWidth + 4,
+      )
+      // Core colored tube body
+      ..drawRRect(
+        rrect,
+        Paint()
+          ..color = isLit ? color : color.withValues(alpha: 0.15)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _tubeWidth,
+      );
+
+    if (isLit) {
+      // White-hot center highlight (neon tube glass reflection)
+      canvas.drawRRect(
+        rrect,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.45)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = _tubeWidth * 0.35
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NeonTubePainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.isLit != isLit;
 }
 
 class _CyberLightningPainter extends CustomPainter {

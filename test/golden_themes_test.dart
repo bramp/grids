@@ -10,9 +10,9 @@ void main() {
   testWidgets('Generate Golden theme screenshots', tags: ['golden', 'mac'], (
     tester,
   ) async {
-    // Set a consistent large window size for taking screenshots
-    tester.view.physicalSize = const Size(1200, 1600);
-    tester.view.devicePixelRatio = 2.0;
+    // Set a standard Android 1080p landscape resolution (1920x1080)
+    tester.view.physicalSize = const Size(1920, 1080);
+    tester.view.devicePixelRatio = 3.0; // Standard 3.0 density for 1080p
 
     final themeProvider = ThemeProvider();
 
@@ -20,12 +20,12 @@ void main() {
       themeProvider.setTheme(theme);
 
       final demoGrid = GridFormat.parse('''
-        1   R2  B3  Y4  P5   W1   C2
-        o   Ro  Bo  Yo  Po   Wo   Co
-        F0  F1  F2  F3  F4   F1*  F4*
-        -   R-  B-  Y-  P-   W-   C-
-        /   R/  B/  Y/  P/   W/   C/
-       (.) (1)  1* (R-) R-* (F2)  F2*
+        1   R2  B3  Y4  P5   W1   C2   G-1
+        o   Ro  Bo  Yo  Po   Wo   Co   B-2
+        F0  F1  F2  F3  F4   F1*  F4*  Y-3
+        -   R-  B-  Y-  P-   W-   C-   P-4
+        /   R/  B/  Y/  P/   W/   C/   C-5
+       (.) (1)  1* (R-) R-* (F2)  F2*  W-1
       ''');
 
       final puzzleProvider = LevelProvider()
@@ -44,9 +44,8 @@ void main() {
             home: Scaffold(
               backgroundColor: theme.backgroundColor,
               body: const Center(
-                child: SizedBox(
-                  width: 500,
-                  height: 500,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
                   child: GridWidget(),
                 ),
               ),
