@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grids/build_info.dart';
 import 'package:grids/data/level_repository.dart';
-import 'package:grids/engine/rule_validator.dart';
+
 import 'package:grids/firebase_options.dart';
 import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
@@ -109,9 +109,7 @@ class _GameScreenState extends State<GameScreen> {
     final puzzleName = context.select<LevelProvider, String>(
       (p) => p.currentLevel.id,
     );
-    final validation = context.select<LevelProvider, ValidationResult?>(
-      (p) => p.validation,
-    );
+
     final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
     final nextLevelId = context.select<LevelProvider, String?>(
       (p) => p.nextLevelId,
@@ -170,10 +168,6 @@ class _GameScreenState extends State<GameScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: _buildStatusText(context, validation),
-          ),
           const Expanded(
             child: Padding(padding: EdgeInsets.all(24), child: GridWidget()),
           ),
@@ -237,35 +231,6 @@ class _GameScreenState extends State<GameScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildStatusText(BuildContext context, ValidationResult? validation) {
-    if (validation == null) {
-      return const Text(
-        'In Progress',
-        style: TextStyle(color: Colors.grey, fontSize: 18),
-      );
-    }
-
-    if (validation.isValid) {
-      return const Text(
-        'SOLVED!',
-        style: TextStyle(
-          color: Colors.green,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    } else {
-      return const Text(
-        'Incorrect! Try again.',
-        style: TextStyle(
-          color: Colors.redAccent,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    }
   }
 }
 

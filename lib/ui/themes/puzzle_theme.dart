@@ -17,17 +17,31 @@ abstract class PuzzleTheme {
   /// Spacing between individual cells.
   double get cellPadding;
 
-  /// Optional grid background decoration
-  /// (if the theme wants a mat under cells).
-  BoxDecoration? get gridBackgroundDecoration => null;
+  /// Provides the background mat/border for the entire grid.
+  Widget buildGridBackground(
+    BuildContext context, {
+    required bool isSolved,
+    required Widget child,
+  }) {
+    return Container(
+      padding: gridPadding,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white, width: 4),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: child,
+    );
+  }
 
-  /// Builds the background container (with borders/colors) for a single cell.
   Widget buildCellBackground(
     BuildContext context, {
     required Cell mechanic,
     required bool isLocked,
     required bool isLit,
     required bool hasError,
+    required bool isHovered,
+    required bool isFocused,
+    required bool isPressed,
     required Widget child,
   });
 

@@ -16,6 +16,33 @@ class CyberTheme extends PuzzleTheme {
   double get cellPadding => 4;
 
   @override
+  Widget buildGridBackground(
+    BuildContext context, {
+    required bool isSolved,
+    required Widget child,
+  }) {
+    return Container(
+      padding: gridPadding,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Surround the entire grid in a cyan neon tube
+          CustomPaint(
+            painter: _NeonTubePainter(
+              color: const Color(0xFF00FFCC), // Default Cyan
+              isLit: isSolved,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: child,
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget buildCellBackground(
     BuildContext context, {
     required Cell mechanic,

@@ -18,6 +18,7 @@ class GridWidget extends StatelessWidget {
     final puzzleId = context.select<LevelProvider, String>(
       (p) => p.currentLevel.id,
     );
+    final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
 
     // We use a LayoutBuilder to ensure the grid cells remain perfectly square
     return LayoutBuilder(
@@ -66,25 +67,22 @@ class GridWidget extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Container(
                 key: ValueKey(puzzleId),
-                padding: theme.gridPadding,
-                decoration:
-                    theme.gridBackgroundDecoration ??
-                    BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 4),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Column(
-                    children: List.generate(
-                      height,
-                      (y) => Expanded(
-                        child: Row(
-                          children: List.generate(
-                            width,
-                            (x) => Expanded(
-                              child: GridCellWidget(
-                                point: GridPoint(y * width + x),
+                child: theme.buildGridBackground(
+                  context,
+                  isSolved: isSolved,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Column(
+                      children: List.generate(
+                        height,
+                        (y) => Expanded(
+                          child: Row(
+                            children: List.generate(
+                              width,
+                              (x) => Expanded(
+                                child: GridCellWidget(
+                                  point: GridPoint(y * width + x),
+                                ),
                               ),
                             ),
                           ),
@@ -120,7 +118,11 @@ class GridWidget extends StatelessWidget {
     final provider = context.read<LevelProvider>();
 
     if (provider.puzzle.isValid(point)) {
-      provider.dragToggleCell(point);
+      provider
+        ..setHoveredDragPoint(point)
+        ..dragToggleCell(point);
+    } else {
+      provider.setHoveredDragPoint(null);
     }
   }
 }
