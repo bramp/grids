@@ -5,25 +5,36 @@ import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
-class GridCellWidget extends StatelessWidget {
+class GridCellWidget extends StatefulWidget {
   const GridCellWidget({required this.point, super.key});
   final GridPoint point;
+
+  @override
+  State<GridCellWidget> createState() => _GridCellWidgetState();
+}
+
+class _GridCellWidgetState extends State<GridCellWidget> {
+  bool _isHovered = false;
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
     // Only rebuild this specific widget if its own lit state or error state
     // changes
     final isLit = context.select<LevelProvider, bool>(
-      (p) => p.puzzle.isLit(point),
+      (p) => p.puzzle.isLit(widget.point),
     );
     final hasError = context.select<LevelProvider, bool>(
-      (p) => p.validation?.errors.any((e) => e.point == point) ?? false,
+      (p) => p.validation?.errors.any((e) => e.point == widget.point) ?? false,
     );
     final mechanic = context.select<LevelProvider, Cell>(
-      (p) => p.puzzle.getCell(point),
+      (p) => p.puzzle.getCell(widget.point),
     );
     final isLocked = context.select<LevelProvider, bool>(
-      (p) => p.puzzle.isLocked(point),
+      (p) => p.puzzle.isLocked(widget.point),
+    );
+    final isPressed = context.select<LevelProvider, bool>(
+      (p) => p.activeDragPoint == widget.point,
     );
 
     final theme = context.watch<ThemeProvider>().activeTheme;
@@ -44,13 +55,20 @@ class GridCellWidget extends StatelessWidget {
 
     final paddedCell = Padding(
       padding: EdgeInsets.all(theme.cellPadding),
-      child: theme.buildCellBackground(
-        context,
-        mechanic: mechanic,
-        isLocked: isLocked,
-        isLit: isLit,
-        hasError: hasError,
-        child: Center(child: mechanicWidget),
+      child: FocusableActionDetector(
+        onShowHoverHighlight: (v) => setState(() => _isHovered = v),
+        onShowFocusHighlight: (v) => setState(() => _isFocused = v),
+        child: theme.buildCellBackground(
+          context,
+          mechanic: mechanic,
+          isLocked: isLocked,
+          isLit: isLit,
+          hasError: hasError,
+          isHovered: _isHovered,
+          isFocused: _isFocused,
+          isPressed: isPressed,
+          child: Center(child: mechanicWidget),
+        ),
       ),
     );
 

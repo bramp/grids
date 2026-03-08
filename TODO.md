@@ -19,6 +19,7 @@
 ## App Setup
 
 - [x] Setup state management (e.g., Provider/Riverpod).
+- [ ] Implement local persistence for user progress (unlocked levels, solutions, last played level).
 - [x] Verify web builds
 - [ ] Verify mobile builds
 

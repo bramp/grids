@@ -5,6 +5,7 @@ import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:provider/provider.dart';
+import 'mocks/mock_progress_service.dart';
 
 void main() {
   testWidgets('Generate Golden theme screenshots', tags: ['golden', 'mac'], (
@@ -14,6 +15,7 @@ void main() {
     tester.view.physicalSize = const Size(1920, 1080);
     tester.view.devicePixelRatio = 3.0; // Standard 3.0 density for 1080p
 
+    final progressService = await MockProgressService.init();
     final themeProvider = ThemeProvider();
 
     for (final theme in themeProvider.availableThemes) {
@@ -28,7 +30,7 @@ void main() {
        (.) (1)  1* (R-) R-* (F2)  F2*  W-1
       ''');
 
-      final puzzleProvider = LevelProvider()
+      final puzzleProvider = LevelProvider(progressService)
         ..loadCustomPuzzle(demoGrid)
         // Force validation to show error highlights or solved states
         ..checkAnswer();

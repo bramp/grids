@@ -11,12 +11,46 @@ import 'package:grids/engine/level.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 import 'package:grids/engine/rule_validator.dart';
+import 'package:grids/services/progress_service.dart';
 
 /// The active puzzle grid that the user is interacting with.
 class LevelProvider extends ChangeNotifier {
-  LevelProvider() {
+  LevelProvider(this._progressService) {
+    _maxUnlockedLevelIndex = 0; // Default
+
+    // Seed progress from stored values
+    final lastPlayed = _progressService.getLastLevelPlayed();
+    if (lastPlayed != null) {
+      final index = LevelRepository.levels.indexWhere(
+        (l) => l.id == lastPlayed,
+      );
+      if (index != -1) {
+        _currentLevelIndex = index;
+      }
+    }
+
+    // Determine max unlocked block
+    // TODO(bramp): This concept may need tweaking,
+    // if we implement a branch of levels.
+    for (var i = 0; i < LevelRepository.levels.length; i++) {
+      if (_progressService.isLevelUnlocked(LevelRepository.levels[i].id)) {
+        if (i > _maxUnlockedLevelIndex) {
+          _maxUnlockedLevelIndex = i;
+        }
+      }
+    }
+
+    // Guarantee the first level is always unlocked
+    if (!_progressService.isLevelUnlocked(LevelRepository.levels[0].id)) {
+      unawaited(
+        _progressService.saveLevelUnlocked(LevelRepository.levels[0].id),
+      );
+    }
+
     _loadLevel(_currentLevelIndex);
   }
+
+  final ProgressService _progressService;
   final PuzzleValidator _validator = PuzzleValidator();
 
   int _currentLevelIndex = 0;
@@ -26,6 +60,9 @@ class LevelProvider extends ChangeNotifier {
 
   // Track cells that have been flipped during the current drag event.
   final Set<GridPoint> _currentlyDraggedCells = {};
+
+  // Track the cell currently being hovered/pressed by the drag pointer.
+  GridPoint? _activeDragPoint;
 
   // The state (lit or unlit) that the current drag operation is applying.
   bool? _dragActionLit;
@@ -39,6 +76,7 @@ class LevelProvider extends ChangeNotifier {
   Level get currentLevel => _currentLevel;
   Puzzle get puzzle => _puzzle;
   ValidationResult? get validation => _lastValidation;
+  GridPoint? get activeDragPoint => _activeDragPoint;
 
   bool get isSolved => _lastValidation?.isValid ?? false;
 
@@ -51,10 +89,29 @@ class LevelProvider extends ChangeNotifier {
 
     _currentLevelIndex = loadIndex;
     _currentLevel = LevelRepository.levels[loadIndex];
-    _puzzle = _currentLevel.puzzle;
+
+    // Check if we have a saved solution state for this level
+    final savedState = _progressService.getSolution(
+      _currentLevel.id,
+      _currentLevel.puzzle.width,
+      _currentLevel.puzzle.height,
+    );
+
+    if (savedState != null) {
+      _puzzle = _currentLevel.puzzle.copyWith(state: savedState);
+    } else {
+      _puzzle = _currentLevel.puzzle;
+    }
+
     _lastValidation = null;
     _levelStartTime = clock.now();
     _solveAttempts = 0;
+  }
+
+  /// Refreshes the active state dynamically after async init.
+  void refresh() {
+    _loadLevel(_currentLevelIndex);
+    notifyListeners();
   }
 
   bool get hasPreviousLevel => _currentLevelIndex > 0;
@@ -96,10 +153,20 @@ class LevelProvider extends ChangeNotifier {
     _currentlyDraggedCells.add(pt);
   }
 
+  /// Updates the currently highlighted drag point.
+  void setHoveredDragPoint(GridPoint? pt) {
+    if (_activeDragPoint != pt) {
+      _activeDragPoint = pt;
+      notifyListeners();
+    }
+  }
+
   /// Clears the dragging sweep tracking when the user releases their finger.
   void endDrag() {
     _currentlyDraggedCells.clear();
     _dragActionLit = null;
+    _activeDragPoint = null;
+    notifyListeners();
   }
 
   /// Explicitly runs the validation rules against the current board state.
@@ -149,7 +216,17 @@ class LevelProvider extends ChangeNotifier {
     if (isValid) {
       if (_currentLevelIndex >= _maxUnlockedLevelIndex) {
         _maxUnlockedLevelIndex = _currentLevelIndex + 1;
+
+        // Save advancement progress
+        if (_maxUnlockedLevelIndex < LevelRepository.levels.length) {
+          final unlockedLevelId =
+              LevelRepository.levels[_maxUnlockedLevelIndex].id;
+          unawaited(_progressService.saveLevelUnlocked(unlockedLevelId));
+        }
       }
+
+      // Save their solution for this level
+      unawaited(_progressService.saveSolution(_currentLevel.id, _puzzle.state));
     }
     notifyListeners();
   }
@@ -161,6 +238,7 @@ class LevelProvider extends ChangeNotifier {
   void nextLevel() {
     if (hasNextLevel) {
       _loadLevel(_currentLevelIndex + 1);
+      unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
       notifyListeners();
     }
   }
@@ -173,6 +251,7 @@ class LevelProvider extends ChangeNotifier {
   void previousLevel() {
     if (hasPreviousLevel) {
       _loadLevel(_currentLevelIndex - 1);
+      unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
       notifyListeners();
     }
   }
@@ -185,6 +264,7 @@ class LevelProvider extends ChangeNotifier {
       'Level index $index out of range',
     );
     _loadLevel(index);
+    unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
     notifyListeners();
   }
 
@@ -198,8 +278,10 @@ class LevelProvider extends ChangeNotifier {
     if (index != -1) {
       if (index > _maxUnlockedLevelIndex) {
         _maxUnlockedLevelIndex = index;
+        unawaited(_progressService.saveLevelUnlocked(id));
       }
       _loadLevel(index);
+      unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
       notifyListeners();
     }
   }

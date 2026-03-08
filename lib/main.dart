@@ -8,6 +8,7 @@ import 'package:grids/data/level_repository.dart';
 import 'package:grids/firebase_options.dart';
 import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
+import 'package:grids/services/progress_service.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:provider/provider.dart';
@@ -22,10 +23,13 @@ void main() async {
     debugPrint('Firebase initialization failed (not configured?): $e');
   }
 
+  // Initialize synchronous access to shared_preferences
+  final progressService = await ProgressService.init();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LevelProvider()),
+        ChangeNotifierProvider(create: (_) => LevelProvider(progressService)),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const GridsApp(),
