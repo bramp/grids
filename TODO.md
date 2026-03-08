@@ -2,34 +2,36 @@
 
 ## Puzzle Engine
 
-- [ ] Define immutable `GridState`.
-- [ ] Implement contiguous area extraction (flood-fill algorithm).
-- [ ] Implement `RuleValidator` interface.
-- [ ] Implement validation for Colored Diamonds Constraint.
-- [ ] Implement validation for Strict Number Areas Constraint.
-- [ ] Add comprehensive unit tests around the validation logic.
+- [x] Define immutable `GridState`.
+- [x] Implement contiguous area extraction (flood-fill algorithm).
+- [x] Implement `RuleValidator` interface.
+- [x] Implement validation for Colored Diamonds Constraint.
+- [x] Implement validation for Strict Number Areas Constraint.
+- [x] Add comprehensive unit tests around the validation logic.
 - [ ] Puzzle types
-  - [ ] Numbers, Flowers, Diamonds, Dashes, Diagonal Dashes
+  - [x] Numbers, Flowers, Diamonds, Dashes, Diagonal Dashes
   - [ ] Start - end logic
 - [ ] Implement different interaction styles
-  - [ ] Tapping toggles the state
+  - [x] Tapping toggles the state
   - [ ] Walking puzzles
   - [ ] Cluster toggling (e.g press and all the squares around change state)
 
 ## App Setup
 
-- [ ] Setup state management (e.g., Provider/Riverpod).
-- [ ] Verify web/mobile builds.
+- [x] Setup state management (e.g., Provider/Riverpod).
+- [x] Verify web builds
+- [ ] Verify mobile builds
 
 ## UI / Presentation
 
-- [ ] Implement `GridWidget` for rendering interactive tiles.
-- [ ] Implement `CellSymbolRenderer` for numbers.
-- [ ] Implement `CellSymbolRenderer` for colored diamonds.
-- [ ] Create basic placeholder artwork/assets for the game.
+- [x] Implement `GridWidget` for rendering interactive tiles.
+- [x] Implement `CellSymbolRenderer` for numbers.
+- [x] Implement `CellSymbolRenderer` for colored diamonds.
+- [x] Create basic placeholder artwork/assets for the game.
 - [ ] Acquire or design finalized high-quality artwork.
-- [ ] Build the main Game loop/screen UI.
+- [x] Build the main Game loop/screen UI.
 - [ ] When a unlit cell is wrong, it does not light up red.
+- [ ] Fix accessiability / keyboard use - space to toggle, enter to solve, left-right to switch puzzles, etc.
 
 ## Future / Polish
 
