@@ -4,6 +4,50 @@ import 'package:grids/engine/grid_state.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 
+/// The result of running a [PuzzleSolver].
+class SolveResult {
+  const SolveResult(this.solutions, {this.errorHistogram = const {}});
+
+  final List<Puzzle> solutions;
+  final Map<int, int> errorHistogram;
+
+  /// Returns the total number of states evaluated.
+  int get totalStatesEvaluated =>
+      errorHistogram.values.fold(0, (a, b) => a + b);
+
+  /// Returns the average number of erroneous cells across all evaluated states.
+  double get averageErrors {
+    final total = totalStatesEvaluated;
+    if (total == 0) return 0;
+    var sum = 0;
+    for (final e in errorHistogram.entries) {
+      sum += e.key * e.value;
+    }
+    return sum / total;
+  }
+
+  /// Returns the median (50th percentile) number of erroneous cells.
+  double get medianErrors => percentileErrors(0.5);
+
+  /// Returns the given percentile (0.0 to 1.0) for the number of erroneous
+  /// cells.
+  double percentileErrors(double percentile) {
+    if (errorHistogram.isEmpty) return 0;
+    final sortedCounts = <int>[];
+    for (final e in errorHistogram.entries) {
+      for (var i = 0; i < e.value; i++) {
+        sortedCounts.add(e.key);
+      }
+    }
+    sortedCounts.sort();
+    final index = (sortedCounts.length * percentile).floor().clamp(
+      0,
+      sortedCounts.length - 1,
+    );
+    return sortedCounts[index].toDouble();
+  }
+}
+
 /// A simple brute-force backtracking solver for Grids puzzles.
 class PuzzleSolver {
   PuzzleSolver({PuzzleValidator? validator})
@@ -12,15 +56,23 @@ class PuzzleSolver {
   // TODO(bramp): Based on the puzzle, we can enable/disable validators.
   final PuzzleValidator _validator;
 
-  /// Returns all valid solutions for a given [puzzle].
+  /// Returns all valid solutions and an analysis histogram for a given
+  /// [puzzle].
   ///
   /// If [deduplicate] is true, solutions that differ only in areas containing
   /// no mechanic (e.g., isolated checkerboard islands of blanks) are considered
   /// identical and omitted.
   ///
+  /// If [analyze] is true, it evaluates all possible states and constructs a
+  /// histogram of how many unique cells are explicitly erroneous.
+  ///
   /// Note: This is a brute-force solver. Puzzles with many playable cells (>25)
   /// will take significant time to solve.
-  List<Puzzle> solve(Puzzle puzzle, {bool deduplicate = true}) {
+  SolveResult solve(
+    Puzzle puzzle, {
+    bool deduplicate = true,
+    bool analyze = false,
+  }) {
     // Optimize validation by only using rules relevant to this specific puzzle.
     final optimizedValidator = _validator.filter(puzzle);
 
@@ -35,6 +87,7 @@ class PuzzleSolver {
 
     final solutions = <Puzzle>[];
     final seenSignatures = <String>{};
+    final errorHistogram = <int, int>{};
 
     final bitMasks = playableIndices.map((pt) => BigInt.one << pt).toList();
 
@@ -46,10 +99,12 @@ class PuzzleSolver {
       solutions,
       seenSignatures,
       deduplicate,
+      analyze,
       optimizedValidator,
+      errorHistogram,
     );
 
-    return solutions;
+    return SolveResult(solutions, errorHistogram: errorHistogram);
   }
 
   void _backtrack(
@@ -60,7 +115,9 @@ class PuzzleSolver {
     List<Puzzle> solutions,
     Set<String> seenSignatures,
     bool deduplicate,
+    bool analyze,
     PuzzleValidator validator,
+    Map<int, int> errorHistogram,
   ) {
     if (index == bitMasks.length) {
       final current = basePuzzle.copyWith(
@@ -70,7 +127,16 @@ class PuzzleSolver {
           bits: currentBits,
         ),
       );
-      if (validator.validate(current).isValid) {
+      final result = validator.validate(current);
+      if (analyze) {
+        final uniqueErrorCells = result.errors
+            .map((e) => e.point)
+            .toSet()
+            .length;
+        errorHistogram[uniqueErrorCells] =
+            (errorHistogram[uniqueErrorCells] ?? 0) + 1;
+      }
+      if (result.isValid) {
         if (!deduplicate) {
           solutions.add(current);
           return;
@@ -95,7 +161,9 @@ class PuzzleSolver {
       solutions,
       seenSignatures,
       deduplicate,
+      analyze,
       validator,
+      errorHistogram,
     );
 
     // Try bit on
@@ -107,7 +175,9 @@ class PuzzleSolver {
       solutions,
       seenSignatures,
       deduplicate,
+      analyze,
       validator,
+      errorHistogram,
     );
   }
 

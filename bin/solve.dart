@@ -71,7 +71,8 @@ void main(List<String> args) {
     );
 
     final stopwatch = Stopwatch()..start();
-    final solutions = solver.solve(puzzle);
+    final result = solver.solve(puzzle, analyze: true);
+    final solutions = result.solutions;
     stopwatch.stop();
 
     final density = searchSpace > 0
@@ -85,6 +86,11 @@ void main(List<String> args) {
     );
     print('Solution density: ${solutions.length}/$searchSpace ($density%)');
     print('Difficulty: $difficulty');
+    print('Average Error Cells: ${result.averageErrors.toStringAsFixed(2)}');
+    print('Median Error Cells: ${result.medianErrors.toStringAsFixed(2)}');
+    print(
+      'P90 Error Cells: ${result.percentileErrors(0.9).toStringAsFixed(2)}',
+    );
 
     for (var i = 0; i < solutions.length; i++) {
       print('\n--- Solution #${i + 1} ---');
@@ -115,6 +121,7 @@ void main(List<String> args) {
       '${'Solns'.padRight(7)}'
       '${'Density'.padRight(10)}'
       '${'Difficulty'.padRight(14)}'
+      '${'Avg Err'.padRight(9)}'
       'Time';
   print(header);
   print('─' * header.length);
@@ -125,7 +132,8 @@ void main(List<String> args) {
     final searchSpace = pow(2, playable);
 
     final stopwatch = Stopwatch()..start();
-    final solutions = solver.solve(puzzle);
+    final result = solver.solve(puzzle, analyze: true);
+    final solutions = result.solutions;
     stopwatch.stop();
 
     final density = searchSpace > 0
@@ -135,6 +143,8 @@ void main(List<String> args) {
     final size = '${puzzle.width}x${puzzle.height}';
     final time = '${stopwatch.elapsedMilliseconds}ms';
 
+    final avgErrStr = result.averageErrors.toStringAsFixed(2);
+
     print(
       '${level.id.padRight(15)}'
       '${size.padRight(6)}'
@@ -143,6 +153,7 @@ void main(List<String> args) {
       '${solutions.length.toString().padRight(7)}'
       '${density.padRight(10)}'
       '${difficulty.padRight(14)}'
+      '${avgErrStr.padRight(9)}'
       '$time',
     );
   }
