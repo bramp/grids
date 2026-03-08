@@ -56,14 +56,20 @@ void main() {
         ),
       );
 
-      // Allow animations to settle
-      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      // Allow initial animations to settle
+      // while the error flashing is STILL active.
+      // We pump a small amount of time so the first red flash is visible.
+      await tester.pump(const Duration(milliseconds: 100));
 
       final themeFilename = theme.name.toLowerCase().replaceAll(' ', '_');
       await expectLater(
         find.byType(GridWidget),
         matchesGoldenFile('goldens/theme_$themeFilename.png'),
       );
+
+      // Now fast forward the test clock so the 2-second error flashing timer
+      // terminates properly
+      await tester.pumpAndSettle(const Duration(seconds: 3));
     }
   });
 }

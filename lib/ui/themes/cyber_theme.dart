@@ -82,12 +82,12 @@ class CyberTheme extends PuzzleTheme {
     // --- Outer border (thin cell frame) ---
     final outerBorderColor = ((isHovered || isFocused) && isInteractable)
         ? Colors.white.withValues(alpha: 0.3) // Subtle white edge highlight
-        : glowColor.withValues(alpha: isLit ? 0.4 : 0.12);
+        : glowColor.withValues(alpha: hasError ? 0.8 : (isLit ? 0.4 : 0.12));
 
     // --- Shadows ---
     final shadows = <BoxShadow>[
       // Neon bloom when lit (external glow around the cell)
-      if (isLit) ...[
+      if (isLit || hasError) ...[
         BoxShadow(
           color: glowColor.withValues(alpha: 0.4),
           blurRadius: 20,

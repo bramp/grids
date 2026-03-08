@@ -70,12 +70,22 @@ class LevelProvider extends ChangeNotifier {
   // Validation is only populated when the user explicitly taps "Check Answer"
   ValidationResult? _lastValidation;
 
+  Timer? _errorPulseTimer;
+  bool _showErrors = true;
+  int _errorPulseCount = 0;
+
   DateTime? _levelStartTime;
   int _solveAttempts = 0;
 
   Level get currentLevel => _currentLevel;
   Puzzle get puzzle => _puzzle;
-  ValidationResult? get validation => _lastValidation;
+  ValidationResult? get validation {
+    if (_lastValidation?.isValid == true) {
+      return _lastValidation;
+    }
+    return _showErrors ? _lastValidation : null;
+  }
+
   GridPoint? get activeDragPoint => _activeDragPoint;
 
   bool get isSolved => _lastValidation?.isValid ?? false;
@@ -104,6 +114,10 @@ class LevelProvider extends ChangeNotifier {
     }
 
     _lastValidation = null;
+    _errorPulseTimer?.cancel();
+    _showErrors = true;
+    _errorPulseCount = 0;
+
     if (savedState != null) {
       // If the loaded state is perfectly solved, restore the 'Solved' UI state
       final validation = _validator.validate(_puzzle);
@@ -131,6 +145,8 @@ class LevelProvider extends ChangeNotifier {
   void toggleCell(GridPoint pt) {
     _puzzle = _puzzle.toggle(pt);
     _lastValidation = null; // Clear previous validation attempt
+    _errorPulseTimer?.cancel();
+    _showErrors = true;
     unawaited(_progressService.saveSolution(_currentLevel.id, _puzzle.state));
     notifyListeners();
   }
@@ -147,6 +163,8 @@ class LevelProvider extends ChangeNotifier {
       _dragActionLit = _puzzle.isLit(pt);
       _currentlyDraggedCells.add(pt);
       _lastValidation = null;
+      _errorPulseTimer?.cancel();
+      _showErrors = true;
       notifyListeners();
       return;
     }
@@ -156,6 +174,8 @@ class LevelProvider extends ChangeNotifier {
     if (isCurrentlyLit != _dragActionLit) {
       _puzzle = _puzzle.toggle(pt);
       _lastValidation = null;
+      _errorPulseTimer?.cancel();
+      _showErrors = true;
       notifyListeners();
     }
 
@@ -186,6 +206,27 @@ class LevelProvider extends ChangeNotifier {
     _solveAttempts++;
     _lastValidation = _validator.validate(_puzzle);
     final isValid = _lastValidation?.isValid == true;
+
+    _errorPulseTimer?.cancel();
+    _showErrors = true;
+    _errorPulseCount = 0;
+
+    if (!isValid) {
+      // Flash errors on and off for 2 seconds (8 toggles at 250ms each)
+      _errorPulseTimer = Timer.periodic(const Duration(milliseconds: 250), (
+        timer,
+      ) {
+        _showErrors = !_showErrors;
+        _errorPulseCount++;
+        notifyListeners();
+
+        if (_errorPulseCount >= 8) {
+          timer.cancel();
+          _showErrors = false;
+          notifyListeners();
+        }
+      });
+    }
 
     try {
       if (Firebase.apps.isNotEmpty) {
@@ -296,6 +337,12 @@ class LevelProvider extends ChangeNotifier {
       unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _errorPulseTimer?.cancel();
+    super.dispose();
   }
 
   /// Loads a custom puzzle directly. Primarily for testing or debug.
