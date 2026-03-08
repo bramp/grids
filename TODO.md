@@ -32,7 +32,7 @@
 - [ ] Acquire or design finalized high-quality artwork.
 - [x] Build the main Game loop/screen UI.
 - [x] When a unlit cell is wrong, it does not light up red.
-- [ ] Fix accessiability / keyboard use - space to toggle, enter to solve, left-right to switch puzzles, etc.
+- [x] Fix accessibility / keyboard use - space to toggle, enter to solve, left-right to switch puzzles, etc.
 
 ## Sounds
 

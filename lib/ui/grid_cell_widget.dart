@@ -56,8 +56,19 @@ class _GridCellWidgetState extends State<GridCellWidget> {
     final paddedCell = Padding(
       padding: EdgeInsets.all(theme.cellPadding),
       child: FocusableActionDetector(
+        autofocus: widget.point == const GridPoint(0),
         onShowHoverHighlight: (v) => setState(() => _isHovered = v),
         onShowFocusHighlight: (v) => setState(() => _isFocused = v),
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (intent) {
+              if (!isLocked) {
+                context.read<LevelProvider>().toggleCell(widget.point);
+              }
+              return null;
+            },
+          ),
+        },
         child: theme.buildCellBackground(
           context,
           mechanic: mechanic,

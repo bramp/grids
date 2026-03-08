@@ -10,6 +10,7 @@ import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/services/progress_service.dart';
 import 'package:grids/ui/grid_widget.dart';
+import 'package:grids/ui/intents.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -125,114 +126,146 @@ class _GameScreenState extends State<GameScreen> {
     final themeProvider = context.watch<ThemeProvider>();
     final activeTheme = themeProvider.activeTheme;
 
-    return Scaffold(
-      backgroundColor: activeTheme.backgroundColor,
-      appBar: AppBar(
-        title: Text(puzzleName),
-        centerTitle: true,
-        actions: [
-          // Debug-only: level selector for quickly jumping to any puzzle.
-          if (kDebugMode) const _DebugLevelPicker(),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'Grids',
-                applicationVersion: BuildInfo.version,
-                applicationIcon: const Icon(Icons.grid_on, size: 48),
-                children: [
-                  const Text('A logic puzzle game built with Flutter.'),
-                ],
-              );
+    return Shortcuts(
+      shortcuts: GameShortcuts.bindings,
+      child: Actions(
+        actions: {
+          CheckAnswerIntent: CallbackAction<CheckAnswerIntent>(
+            onInvoke: (intent) {
+              context.read<LevelProvider>().checkAnswer();
+              return null;
             },
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: DropdownButton<PuzzleTheme>(
-              value: activeTheme,
-              underline: const SizedBox.shrink(),
-              icon: const Icon(Icons.palette),
-              onChanged: (theme) {
-                if (theme != null) {
-                  themeProvider.setTheme(theme);
-                }
-              },
-              items: themeProvider.availableThemes
-                  .map(
-                    (t) => DropdownMenuItem(
-                      value: t,
-                      child: Text(t.name),
-                    ),
-                  )
-                  .toList(),
-            ),
+          NextLevelIntent: CallbackAction<NextLevelIntent>(
+            onInvoke: (intent) {
+              if (nextLevelId != null) {
+                context.go('/level/$nextLevelId');
+              }
+              return null;
+            },
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          const Expanded(
-            child: Padding(padding: EdgeInsets.all(24), child: GridWidget()),
+          PrevLevelIntent: CallbackAction<PrevLevelIntent>(
+            onInvoke: (intent) {
+              if (prevLevelId != null) {
+                context.go('/level/$prevLevelId');
+              }
+              return null;
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              children: [
-                IconButton(
-                  iconSize: 32,
-                  onPressed: prevLevelId != null
-                      ? () => context.go('/level/$prevLevelId')
-                      : null,
-                  icon: const Icon(Icons.arrow_back),
+        },
+        child: Scaffold(
+          backgroundColor: activeTheme.backgroundColor,
+          appBar: AppBar(
+            title: Text(puzzleName),
+            centerTitle: true,
+            actions: [
+              // Debug-only: level selector for quickly jumping to any puzzle.
+              if (kDebugMode) const _DebugLevelPicker(),
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: () {
+                  showAboutDialog(
+                    context: context,
+                    applicationName: 'Grids',
+                    applicationVersion: BuildInfo.version,
+                    applicationIcon: const Icon(Icons.grid_on, size: 48),
+                    children: [
+                      const Text('A logic puzzle game built with Flutter.'),
+                    ],
+                  );
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: DropdownButton<PuzzleTheme>(
+                  value: activeTheme,
+                  underline: const SizedBox.shrink(),
+                  icon: const Icon(Icons.palette),
+                  onChanged: (theme) {
+                    if (theme != null) {
+                      themeProvider.setTheme(theme);
+                    }
+                  },
+                  items: themeProvider.availableThemes
+                      .map(
+                        (t) => DropdownMenuItem(
+                          value: t,
+                          child: Text(t.name),
+                        ),
+                      )
+                      .toList(),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: SizedBox(
-                    height: 56,
-                    child: FilledButton.tonal(
-                      onPressed: () =>
-                          context.read<LevelProvider>().checkAnswer(),
-                      style: isSolved
-                          ? FilledButton.styleFrom(
-                              backgroundColor: Colors.green,
-                            )
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: GridWidget(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    IconButton(
+                      iconSize: 32,
+                      onPressed: prevLevelId != null
+                          ? () => context.go('/level/$prevLevelId')
                           : null,
-                      child: const Text(
-                        'Check Answer',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: SizedBox(
+                        height: 56,
+                        child: FilledButton.tonal(
+                          onPressed: () =>
+                              context.read<LevelProvider>().checkAnswer(),
+                          style: isSolved
+                              ? FilledButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                )
+                              : null,
+                          child: const Text(
+                            'Check Answer',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  iconSize: 32,
-                  onPressed: nextLevelId != null
-                      ? () => context.go('/level/$nextLevelId')
-                      : null,
-                  icon: const Icon(Icons.arrow_forward),
-                ),
-              ],
-            ),
-          ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                BuildInfo.shortVersion,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).hintColor.withValues(alpha: 0.3),
-                  fontSize: 10,
+                    const SizedBox(width: 16),
+                    IconButton(
+                      iconSize: 32,
+                      onPressed: nextLevelId != null
+                          ? () => context.go('/level/$nextLevelId')
+                          : null,
+                      icon: const Icon(Icons.arrow_forward),
+                    ),
+                  ],
                 ),
               ),
-            ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    BuildInfo.shortVersion,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).hintColor.withValues(alpha: 0.3),
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
