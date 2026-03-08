@@ -104,6 +104,14 @@ class LevelProvider extends ChangeNotifier {
     }
 
     _lastValidation = null;
+    if (savedState != null) {
+      // If the loaded state is perfectly solved, restore the 'Solved' UI state
+      final validation = _validator.validate(_puzzle);
+      if (validation.isValid) {
+        _lastValidation = validation;
+      }
+    }
+
     _levelStartTime = clock.now();
     _solveAttempts = 0;
   }
