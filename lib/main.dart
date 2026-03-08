@@ -1,9 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grids/build_info.dart';
-import 'package:grids/data/level_repository.dart';
 
 import 'package:grids/firebase_options.dart';
 import 'package:grids/providers/level_provider.dart';
@@ -11,7 +9,8 @@ import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/services/progress_service.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/intents.dart';
-import 'package:grids/ui/themes/puzzle_theme.dart';
+import 'package:grids/ui/widgets/game_app_bar.dart';
+import 'package:grids/ui/widgets/game_bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -111,11 +110,6 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     // Watch relevant provider state
-    final puzzleName = context.select<LevelProvider, String>(
-      (p) => p.currentLevel.id,
-    );
-
-    final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
     final nextLevelId = context.select<LevelProvider, String?>(
       (p) => p.nextLevelId,
     );
@@ -155,49 +149,7 @@ class _GameScreenState extends State<GameScreen> {
         },
         child: Scaffold(
           backgroundColor: activeTheme.backgroundColor,
-          appBar: AppBar(
-            title: Text(puzzleName),
-            centerTitle: true,
-            actions: [
-              // Debug-only: level selector for quickly jumping to any puzzle.
-              if (kDebugMode) const _DebugLevelPicker(),
-              IconButton(
-                icon: const Icon(Icons.info_outline),
-                onPressed: () {
-                  showAboutDialog(
-                    context: context,
-                    applicationName: 'Grids',
-                    applicationVersion: BuildInfo.version,
-                    applicationIcon: const Icon(Icons.grid_on, size: 48),
-                    children: [
-                      const Text('A logic puzzle game built with Flutter.'),
-                    ],
-                  );
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: DropdownButton<PuzzleTheme>(
-                  value: activeTheme,
-                  underline: const SizedBox.shrink(),
-                  icon: const Icon(Icons.palette),
-                  onChanged: (theme) {
-                    if (theme != null) {
-                      themeProvider.setTheme(theme);
-                    }
-                  },
-                  items: themeProvider.availableThemes
-                      .map(
-                        (t) => DropdownMenuItem(
-                          value: t,
-                          child: Text(t.name),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-            ],
-          ),
+          appBar: const GameAppBar(),
           body: Column(
             children: [
               const Expanded(
@@ -206,50 +158,7 @@ class _GameScreenState extends State<GameScreen> {
                   child: GridWidget(),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Row(
-                  children: [
-                    IconButton(
-                      iconSize: 32,
-                      onPressed: prevLevelId != null
-                          ? () => context.go('/level/$prevLevelId')
-                          : null,
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: FilledButton.tonal(
-                          onPressed: () =>
-                              context.read<LevelProvider>().checkAnswer(),
-                          style: isSolved
-                              ? FilledButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                )
-                              : null,
-                          child: const Text(
-                            'Check Answer',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    IconButton(
-                      iconSize: 32,
-                      onPressed: nextLevelId != null
-                          ? () => context.go('/level/$nextLevelId')
-                          : null,
-                      icon: const Icon(Icons.arrow_forward),
-                    ),
-                  ],
-                ),
-              ),
+              const GameBottomBar(),
               SafeArea(
                 top: false,
                 child: Padding(
@@ -264,43 +173,6 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Debug-only widget: a dropdown in the AppBar for jumping directly to any
-/// puzzle by ID. Only compiled in when [kDebugMode] is true.
-class _DebugLevelPicker extends StatelessWidget {
-  const _DebugLevelPicker();
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<LevelProvider>();
-    final levels = LevelRepository.levels;
-    final currentIndex = provider.currentLevelIndex;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: DropdownButton<int>(
-        value: currentIndex,
-        underline: const SizedBox.shrink(),
-        icon: const Icon(Icons.bug_report, size: 20),
-        onChanged: (index) {
-          if (index != null) {
-            context.go('/level/${levels[index].id}');
-          }
-        },
-        items: List.generate(
-          levels.length,
-          (i) => DropdownMenuItem(
-            value: i,
-            child: Text(
-              levels[i].id,
-              style: const TextStyle(fontSize: 13),
-            ),
           ),
         ),
       ),

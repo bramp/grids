@@ -1,0 +1,108 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:grids/build_info.dart';
+import 'package:grids/data/level_repository.dart';
+import 'package:grids/providers/level_provider.dart';
+import 'package:grids/providers/theme_provider.dart';
+import 'package:grids/ui/themes/puzzle_theme.dart';
+import 'package:provider/provider.dart';
+
+/// The AppBar for the main game screen, containing the puzzle name,
+/// theme selector, and a debug level picker.
+class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const GameAppBar({super.key});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch relevant provider state
+    final puzzleName = context.select<LevelProvider, String>(
+      (p) => p.currentLevel.id,
+    );
+    final themeProvider = context.watch<ThemeProvider>();
+    final activeTheme = themeProvider.activeTheme;
+
+    return AppBar(
+      title: Text(puzzleName),
+      centerTitle: true,
+      actions: [
+        // Debug-only: level selector for quickly jumping to any puzzle.
+        if (kDebugMode) const _DebugLevelPicker(),
+        IconButton(
+          icon: const Icon(Icons.info_outline),
+          onPressed: () {
+            showAboutDialog(
+              context: context,
+              applicationName: 'Grids',
+              applicationVersion: BuildInfo.version,
+              applicationIcon: const Icon(Icons.grid_on, size: 48),
+              children: [
+                const Text('A logic puzzle game built with Flutter.'),
+              ],
+            );
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: DropdownButton<PuzzleTheme>(
+            value: activeTheme,
+            underline: const SizedBox.shrink(),
+            icon: const Icon(Icons.palette),
+            onChanged: (theme) {
+              if (theme != null) {
+                themeProvider.setTheme(theme);
+              }
+            },
+            items: themeProvider.availableThemes
+                .map(
+                  (t) => DropdownMenuItem(
+                    value: t,
+                    child: Text(t.name),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Debug-only widget: a dropdown in the AppBar for jumping directly to any
+/// puzzle by ID. Only compiled in when [kDebugMode] is true.
+class _DebugLevelPicker extends StatelessWidget {
+  const _DebugLevelPicker();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<LevelProvider>();
+    final levels = LevelRepository.levels;
+    final currentIndex = provider.currentLevelIndex;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DropdownButton<int>(
+        value: currentIndex,
+        underline: const SizedBox.shrink(),
+        icon: const Icon(Icons.bug_report),
+        onChanged: (index) {
+          if (index != null) {
+            provider.jumpToLevel(index);
+          }
+        },
+        items: List.generate(
+          levels.length,
+          (i) => DropdownMenuItem(
+            value: i,
+            child: Text(
+              '${levels[i].id} (${i + 1}/${levels.length})',
+              style: const TextStyle(fontFamily: 'monospace'),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
