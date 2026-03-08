@@ -19,7 +19,7 @@
 ## App Setup
 
 - [x] Setup state management (e.g., Provider/Riverpod).
-- [ ] Implement local persistence for user progress (unlocked levels, solutions, last played level).
+- [X] Implement local persistence for user progress (unlocked levels, solutions, last played level).
 - [x] Verify web builds
 - [ ] Verify mobile builds
 
@@ -33,6 +33,10 @@
 - [x] Build the main Game loop/screen UI.
 - [ ] When a unlit cell is wrong, it does not light up red.
 - [ ] Fix accessiability / keyboard use - space to toggle, enter to solve, left-right to switch puzzles, etc.
+
+## Sounds
+
+- [ ] Add sound effects for solving puzzles.
 
 ## Future / Polish
 
