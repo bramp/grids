@@ -31,7 +31,7 @@
 - [x] Create basic placeholder artwork/assets for the game.
 - [ ] Acquire or design finalized high-quality artwork.
 - [x] Build the main Game loop/screen UI.
-- [ ] When a unlit cell is wrong, it does not light up red.
+- [x] When a unlit cell is wrong, it does not light up red.
 - [ ] Fix accessiability / keyboard use - space to toggle, enter to solve, left-right to switch puzzles, etc.
 
 ## Sounds
