@@ -123,6 +123,7 @@ class LevelProvider extends ChangeNotifier {
   void toggleCell(GridPoint pt) {
     _puzzle = _puzzle.toggle(pt);
     _lastValidation = null; // Clear previous validation attempt
+    unawaited(_progressService.saveSolution(_currentLevel.id, _puzzle.state));
     notifyListeners();
   }
 
@@ -163,6 +164,9 @@ class LevelProvider extends ChangeNotifier {
 
   /// Clears the dragging sweep tracking when the user releases their finger.
   void endDrag() {
+    if (_currentlyDraggedCells.isNotEmpty) {
+      unawaited(_progressService.saveSolution(_currentLevel.id, _puzzle.state));
+    }
     _currentlyDraggedCells.clear();
     _dragActionLit = null;
     _activeDragPoint = null;
