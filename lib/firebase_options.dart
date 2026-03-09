@@ -50,6 +50,7 @@ class DefaultFirebaseOptions {
     projectId: 'grids-bramp-net',
     authDomain: 'grids-bramp-net.firebaseapp.com',
     storageBucket: 'grids-bramp-net.firebasestorage.app',
+    measurementId: 'G-1VLM4RFSV6',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
