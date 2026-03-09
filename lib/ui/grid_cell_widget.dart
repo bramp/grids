@@ -53,6 +53,13 @@ class _GridCellWidgetState extends State<GridCellWidget> {
       return mechanicWidget;
     }
 
+    final selectionColor = context.select<LevelProvider, Color?>(
+      (p) {
+        final hex = p.currentLevel.selectionColor;
+        return hex != null ? Color(hex) : null;
+      },
+    );
+
     final paddedCell = Padding(
       padding: EdgeInsets.all(theme.cellPadding),
       child: FocusableActionDetector(
@@ -78,6 +85,7 @@ class _GridCellWidgetState extends State<GridCellWidget> {
           isHovered: _isHovered,
           isFocused: _isFocused,
           isPressed: isPressed,
+          selectionColor: selectionColor,
           child: Center(child: mechanicWidget),
         ),
       ),

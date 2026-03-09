@@ -11,6 +11,7 @@ class Level {
     required this.puzzle,
     this.knownSolutions = const [],
     this.note,
+    this.selectionColor,
   }) {
     _validateSolutions(puzzle, knownSolutions, id);
   }
@@ -23,6 +24,11 @@ class Level {
 
   /// A list of known valid solutions.
   final List<GridState> knownSolutions;
+
+  /// The color used for the selection highlight (lit cells).
+  /// Represented as a 32-bit ARGB integer.
+  /// Defaults to neon green if null.
+  final int? selectionColor;
 
   static void _validateSolutions(
     Puzzle puzzle,

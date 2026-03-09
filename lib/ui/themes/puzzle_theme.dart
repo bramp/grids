@@ -43,6 +43,7 @@ abstract class PuzzleTheme {
     required bool isFocused,
     required bool isPressed,
     required Widget child,
+    Color? selectionColor,
   });
 
   /// Builds the visual representation of a Number mechanic.

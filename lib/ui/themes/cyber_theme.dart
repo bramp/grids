@@ -53,17 +53,15 @@ class CyberTheme extends PuzzleTheme {
     required bool isFocused,
     required bool isPressed,
     required Widget child,
+    Color? selectionColor,
   }) {
     // Determine the neon tube color
     Color glowColor;
     if (hasError) {
       glowColor = Colors.redAccent;
-    } else if (mechanic is DiamondCell) {
-      glowColor = _getColor(mechanic.color);
-    } else if (mechanic is NumberCell) {
-      glowColor = _getColor(mechanic.color);
     } else {
-      glowColor = const Color(0xFF00FFCC); // Default Neon Cyan
+      // All cells use the same selection color (defaults to neon green)
+      glowColor = selectionColor ?? _getColor(CellColor.green);
     }
 
     final isInteractable = !isLocked;
