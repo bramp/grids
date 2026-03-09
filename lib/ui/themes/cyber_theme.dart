@@ -91,16 +91,17 @@ class CyberTheme extends PuzzleTheme {
         // --- Shadows ---
         final shadows = <BoxShadow>[
           // Neon bloom when lit (external glow around the cell)
+          // To reduce the overlap problem across grid cells,
+          // spread and blur are minimized.
           if (isLit || hasError) ...[
             BoxShadow(
-              color: glowColor.withValues(alpha: 0.4),
-              blurRadius: s * 0.25,
-              spreadRadius: s * 0.02,
+              color: glowColor.withValues(alpha: 0.3),
+              blurRadius: s * 0.15,
             ),
             BoxShadow(
-              color: glowColor.withValues(alpha: 0.15),
-              blurRadius: s * 0.5,
-              spreadRadius: s * 0.07,
+              color: glowColor.withValues(alpha: 0.1),
+              blurRadius: s * 0.3,
+              spreadRadius: s * 0.02,
             ),
           ],
         ];
@@ -156,14 +157,14 @@ class CyberTheme extends PuzzleTheme {
                 painter: _NeonTubePainter(
                   color: glowColor,
                   isLit: isLit,
-                  inset: s * 0.15,
-                  tubeWidth: s * 0.1,
-                  cornerRadius: s * 0.1,
-                  glow1Blur: s * 0.12,
-                  glow1Spread: s * 0.12,
-                  glow2Blur: s * 0.05,
-                  glow2Spread: s * 0.05,
-                  edgeSpread: s * 0.05,
+                  inset: s * 0.05,
+                  tubeWidth: s * 0.04,
+                  cornerRadius: cellBorderRadius * 0.8,
+                  glow1Blur: s * 0.08,
+                  glow1Spread: s * 0.04,
+                  glow2Blur: s * 0.03,
+                  glow2Spread: s * 0.02,
+                  edgeSpread: s * 0.02,
                   coreBlur: s * 0.01,
                 ),
               ),
