@@ -119,8 +119,8 @@ class DiceDotsWidget extends StatelessWidget {
             // Otherwise the entire inside of the dot is glow effect.
             BoxShadow(
               color: backgroundColor,
-              spreadRadius: -2,
-              blurRadius: 16,
+              spreadRadius: -size * 0.05,
+              blurRadius: size * 0.4,
             ),
           ],
         ),

@@ -31,6 +31,7 @@ class CyberTheme extends PuzzleTheme {
               painter: _NeonTubePainter(
                 color: const Color(0xFF00FFCC), // Default Cyan
                 isLit: isSolved,
+                isGrid: true,
               ),
             ),
           ),
@@ -83,98 +84,100 @@ class CyberTheme extends PuzzleTheme {
         ? Colors.white.withValues(alpha: 0.3) // Subtle white edge highlight
         : glowColor.withValues(alpha: hasError ? 0.8 : (isLit ? 0.4 : 0.12));
 
-    // --- Shadows ---
-    final shadows = <BoxShadow>[
-      // Neon bloom when lit (external glow around the cell)
-      if (isLit || hasError) ...[
-        BoxShadow(
-          color: glowColor.withValues(alpha: 0.4),
-          blurRadius: 20,
-          spreadRadius: 2,
-        ),
-        BoxShadow(
-          color: glowColor.withValues(alpha: 0.15),
-          blurRadius: 40,
-          spreadRadius: 6,
-        ),
-      ],
-    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final s = constraints.maxHeight;
+        final cellBorderRadius = s * 0.15;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeOutCubic,
-      transformAlignment: Alignment.center,
-      transform: Matrix4.diagonal3Values(moveScale, moveScale, 1),
-      decoration: BoxDecoration(
-        color: cellColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: outerBorderColor),
-        boxShadow: shadows,
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Sunken inner shadow for locked cells
-          if (isLocked) ...[
-            // Top-left dark edge (shadow falls into recess)
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.center,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.5),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+        // --- Shadows ---
+        final shadows = <BoxShadow>[
+          // Neon bloom when lit (external glow around the cell)
+          if (isLit || hasError) ...[
+            BoxShadow(
+              color: glowColor.withValues(alpha: 0.4),
+              blurRadius: s * 0.25,
+              spreadRadius: s * 0.02,
             ),
-            // Bottom-right highlight (far lip of recess)
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                gradient: LinearGradient(
-                  begin: Alignment.bottomRight,
-                  end: Alignment.center,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.04),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+            BoxShadow(
+              color: glowColor.withValues(alpha: 0.15),
+              blurRadius: s * 0.5,
+              spreadRadius: s * 0.07,
             ),
           ],
+        ];
 
-          // Neon tube (inset glowing border)
-          CustomPaint(
-            painter: _NeonTubePainter(
-              color: glowColor,
-              isLit: isLit,
-            ),
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          transformAlignment: Alignment.center,
+          transform: Matrix4.diagonal3Values(moveScale, moveScale, 1),
+          decoration: BoxDecoration(
+            color: cellColor,
+            borderRadius: BorderRadius.circular(cellBorderRadius),
+            border: Border.all(color: outerBorderColor),
+            boxShadow: shadows,
           ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Sunken inner shadow for locked cells
+              if (isLocked) ...[
+                // Top-left dark edge (shadow falls into recess)
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(cellBorderRadius),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.center,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.5),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+                // Bottom-right highlight (far lip of recess)
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(cellBorderRadius),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomRight,
+                      end: Alignment.center,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.04),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ],
 
-          child,
+              // Neon tube (inset glowing border)
+              CustomPaint(
+                painter: _NeonTubePainter(
+                  color: glowColor,
+                  isLit: isLit,
+                ),
+              ),
 
-          // Small padlock icon for locked cells (1/4 height)
-          if (isLocked)
-            Positioned.fill(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final iconSize = constraints.maxHeight * 0.25;
-                  return Align(
+              child,
+
+              // Small padlock icon for locked cells (1/4 height)
+              if (isLocked)
+                Positioned.fill(
+                  child: Align(
                     alignment: const Alignment(0.8, 0.8),
                     child: Icon(
                       Icons.lock_outline_rounded,
-                      size: iconSize,
+                      size: s * 0.25,
                       color: Colors.white.withValues(alpha: 0.2),
                     ),
-                  );
-                },
-              ),
-            ),
-        ],
-      ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -182,26 +185,31 @@ class CyberTheme extends PuzzleTheme {
   Widget buildNumberMechanic(BuildContext context, NumberCell cell) {
     final color = _getColor(cell.color);
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      child: DiceDotsWidget(
-        key: ValueKey('${cell.number}_${cell.color}'),
-        number: cell.number,
-        dotColor: color,
-        backgroundColor: backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.8),
-            blurRadius: 8,
-            spreadRadius: 1,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final s = constraints.maxHeight;
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: DiceDotsWidget(
+            key: ValueKey('${cell.number}_${cell.color}'),
+            number: cell.number,
+            dotColor: color,
+            backgroundColor: backgroundColor,
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.8),
+                blurRadius: s * 0.1,
+                spreadRadius: s * 0.01,
+              ),
+              BoxShadow(
+                color: color.withValues(alpha: 0.4),
+                blurRadius: s * 0.2,
+                spreadRadius: s * 0.02,
+              ),
+            ],
           ),
-          BoxShadow(
-            color: color.withValues(alpha: 0.4),
-            blurRadius: 16,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -298,26 +306,32 @@ class _NeonTubePainter extends CustomPainter {
   const _NeonTubePainter({
     required this.color,
     required this.isLit,
+    this.isGrid = false,
   });
 
   final Color color;
   final bool isLit;
-
-  static const double _inset = 13;
-  static const double _tubeWidth = 9;
-  static const double _cornerRadius = 9;
+  final bool isGrid;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final s = size.shortestSide;
+    final inset = isGrid ? 13.0 : s * 0.15;
+    final tubeWidth = isGrid ? 9.0 : s * 0.1;
+    final cornerRadius = isGrid ? 9.0 : s * 0.1;
+    final blur1 = isGrid ? 10.0 : s * 0.12;
+    final blur2 = isGrid ? 4.0 : s * 0.05;
+    final blurCore = isGrid ? 1.0 : s * 0.01;
+
     final rect = Rect.fromLTWH(
-      _inset,
-      _inset,
-      size.width - _inset * 2,
-      size.height - _inset * 2,
+      inset,
+      inset,
+      size.width - inset * 2,
+      size.height - inset * 2,
     );
     final rrect = RRect.fromRectAndRadius(
       rect,
-      const Radius.circular(_cornerRadius),
+      Radius.circular(cornerRadius),
     );
 
     if (isLit) {
@@ -328,8 +342,8 @@ class _NeonTubePainter extends CustomPainter {
           Paint()
             ..color = color.withValues(alpha: 0.3)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = _tubeWidth + 10
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+            ..strokeWidth = tubeWidth + (isGrid ? 10.0 : s * 0.12)
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur1),
         )
         // Medium glow
         ..drawRRect(
@@ -337,8 +351,8 @@ class _NeonTubePainter extends CustomPainter {
           Paint()
             ..color = color.withValues(alpha: 0.5)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = _tubeWidth + 4
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+            ..strokeWidth = tubeWidth + (isGrid ? 4.0 : s * 0.05)
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur2),
         );
     }
 
@@ -349,7 +363,7 @@ class _NeonTubePainter extends CustomPainter {
         Paint()
           ..color = Colors.black.withValues(alpha: isLit ? 0.8 : 0.4)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = _tubeWidth + 4,
+          ..strokeWidth = tubeWidth + (isGrid ? 4.0 : s * 0.05),
       )
       // Core colored tube body
       ..drawRRect(
@@ -357,7 +371,7 @@ class _NeonTubePainter extends CustomPainter {
         Paint()
           ..color = isLit ? color : color.withValues(alpha: 0.15)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = _tubeWidth,
+          ..strokeWidth = tubeWidth,
       );
 
     if (isLit) {
@@ -367,15 +381,17 @@ class _NeonTubePainter extends CustomPainter {
         Paint()
           ..color = Colors.white.withValues(alpha: 0.45)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = _tubeWidth * 0.35
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1),
+          ..strokeWidth = tubeWidth * 0.35
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurCore),
       );
     }
   }
 
   @override
   bool shouldRepaint(covariant _NeonTubePainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.isLit != isLit;
+      oldDelegate.color != color ||
+      oldDelegate.isLit != isLit ||
+      oldDelegate.isGrid != isGrid;
 }
 
 class _CyberLightningPainter extends CustomPainter {
@@ -391,7 +407,7 @@ class _CyberLightningPainter extends CustomPainter {
     final shadowPaint = Paint()
       ..color = color.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, size.shortestSide * 0.1);
 
     final w = size.width;
     final h = size.height;
@@ -445,7 +461,10 @@ class _CyberFlowerPainter extends CustomPainter {
     final coreShadowPaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.normal,
+        size.shortestSide * 0.05,
+      );
 
     canvas
       ..drawCircle(center, radius * 0.5, coreShadowPaint)
@@ -468,7 +487,10 @@ class _CyberFlowerPainter extends CustomPainter {
       final shadowPaint = Paint()
         ..color = color.withValues(alpha: 0.6)
         ..style = PaintingStyle.fill
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.1,
+        );
 
       canvas
         ..save()
@@ -515,7 +537,7 @@ class _CyberDashPainter extends CustomPainter {
     final shadowPaint = Paint()
       ..color = color.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, size.shortestSide * 0.1);
 
     // A horizontal dash
     final rect = RRect.fromRectAndRadius(
@@ -554,7 +576,7 @@ class _CyberDiagonalDashPainter extends CustomPainter {
     final shadowPaint = Paint()
       ..color = color.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, size.shortestSide * 0.1);
 
     // A horizontal dash, rotated by 45 degrees
     canvas
