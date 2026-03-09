@@ -33,6 +33,8 @@
 - [x] Build the main Game loop/screen UI.
 - [x] When a unlit cell is wrong, it does not light up red.
 - [x] Fix accessibility / keyboard use - space to toggle, enter to solve, left-right to switch puzzles, etc.
+- [ ] When a lit square is tab focus - you can't tell
+- [ ] The lit color now seems a little consistent.
 
 ## Sounds
 
@@ -42,3 +44,5 @@
 
 - [ ] Level Selection screen.
 - [ ] Setup Daily Challenges + Leaderboards.
+- [ ] The won color is a different shade to the check answer button - fix that.
+- [ ] Ensure puzzles are always displayed in the best orentation for the device.
