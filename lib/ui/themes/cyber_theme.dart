@@ -156,7 +156,7 @@ class CyberTheme extends PuzzleTheme {
               CustomPaint(
                 painter: _NeonTubePainter(
                   color: glowColor,
-                  isLit: isLit,
+                  isLit: isLit || hasError,
                   inset: s * 0.05,
                   tubeWidth: s * 0.04,
                   cornerRadius: cellBorderRadius * 0.8,
