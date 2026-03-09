@@ -24,13 +24,14 @@ class CyberTheme extends PuzzleTheme {
     return Container(
       padding: gridPadding,
       child: Stack(
-        fit: StackFit.expand,
         children: [
           // Surround the entire grid in a cyan neon tube
-          CustomPaint(
-            painter: _NeonTubePainter(
-              color: const Color(0xFF00FFCC), // Default Cyan
-              isLit: isSolved,
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _NeonTubePainter(
+                color: const Color(0xFF00FFCC), // Default Cyan
+                isLit: isSolved,
+              ),
             ),
           ),
           Padding(

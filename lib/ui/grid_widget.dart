@@ -20,56 +20,36 @@ class GridWidget extends StatelessWidget {
     );
     final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
 
-    // We use a LayoutBuilder to ensure the grid cells remain perfectly square
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxWidth = constraints.maxWidth;
-        final maxHeight = constraints.maxHeight;
-
-        final gridAspectRatio = width / height;
-        final containerAspectRatio = maxWidth / maxHeight;
-
-        var finalWidth = maxWidth;
-        var finalHeight = maxHeight;
-
-        if (containerAspectRatio > gridAspectRatio) {
-          // Constrained by height
-          finalWidth = maxHeight * gridAspectRatio;
-        } else {
-          // Constrained by width
-          finalHeight = maxWidth / gridAspectRatio;
-        }
-
-        return Center(
-          child: SizedBox(
-            width: finalWidth,
-            height: finalHeight,
-            // Container adds the outer stroke of the entire game grid
-            child: Listener(
-              onPointerDown: (details) => _handleDrag(
-                context,
-                details.localPosition,
-                finalWidth,
-                finalHeight,
-                width,
-                height,
-              ),
-              onPointerMove: (details) => _handleDrag(
-                context,
-                details.localPosition,
-                finalWidth,
-                finalHeight,
-                width,
-                height,
-              ),
-              onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
-              onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                key: ValueKey(puzzleId),
-                child: theme.buildGridBackground(
+    return Center(
+      child: theme.buildGridBackground(
+        context,
+        isSolved: isSolved,
+        child: AspectRatio(
+          aspectRatio: width / height,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Listener(
+                onPointerDown: (details) => _handleDrag(
                   context,
-                  isSolved: isSolved,
+                  details.localPosition,
+                  constraints.maxWidth,
+                  constraints.maxHeight,
+                  width,
+                  height,
+                ),
+                onPointerMove: (details) => _handleDrag(
+                  context,
+                  details.localPosition,
+                  constraints.maxWidth,
+                  constraints.maxHeight,
+                  width,
+                  height,
+                ),
+                onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
+                onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  key: ValueKey(puzzleId),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: Column(
@@ -91,11 +71,11 @@ class GridWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
