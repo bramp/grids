@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/level.dart';
+import 'package:grids/engine/level_group.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 import 'package:grids/engine/rule_validator.dart';
@@ -16,45 +17,40 @@ import 'package:grids/services/progress_service.dart';
 /// The active puzzle grid that the user is interacting with.
 class LevelProvider extends ChangeNotifier {
   LevelProvider(this._progressService) {
-    _maxUnlockedLevelIndex = 0; // Default
+    // Determine unlocked groups initially
+    _refreshUnlockedGroups();
+
+    // Default to the first level of the first available group
+    _currentGroupId = LevelRepository.worldMap.keys.first;
+    _currentLevelIndexInGroup = 0;
 
     // Seed progress from stored values
     final lastPlayed = _progressService.getLastLevelPlayed();
     if (lastPlayed != null) {
-      final index = LevelRepository.levels.indexWhere(
-        (l) => l.id == lastPlayed,
-      );
-      if (index != -1) {
-        _currentLevelIndex = index;
-      }
-    }
-
-    // Determine max unlocked block
-    // TODO(bramp): This concept may need tweaking,
-    // if we implement a branch of levels.
-    for (var i = 0; i < LevelRepository.levels.length; i++) {
-      if (_progressService.isLevelUnlocked(LevelRepository.levels[i].id)) {
-        if (i > _maxUnlockedLevelIndex) {
-          _maxUnlockedLevelIndex = i;
+      // Find which group and index this level belongs to
+      for (final group in LevelRepository.worldMap.values) {
+        final index = group.levels.indexWhere((l) => l.id == lastPlayed);
+        if (index != -1) {
+          _currentGroupId = group.id;
+          _currentLevelIndexInGroup = index;
+          break;
         }
       }
     }
 
-    // Guarantee the first level is always unlocked
-    if (!_progressService.isLevelUnlocked(LevelRepository.levels[0].id)) {
-      unawaited(
-        _progressService.saveLevelUnlocked(LevelRepository.levels[0].id),
-      );
-    }
-
-    _loadLevel(_currentLevelIndex);
+    _loadLevel(_currentGroupId, _currentLevelIndexInGroup);
   }
 
   final ProgressService _progressService;
   final PuzzleValidator _validator = PuzzleValidator();
 
-  int _currentLevelIndex = 0;
-  int _maxUnlockedLevelIndex = 0;
+  String _currentGroupId = '';
+  int _currentLevelIndexInGroup = 0;
+
+  // Set of unlocked group IDs
+  final Set<String> _unlockedGroups = {};
+
+  late LevelGroup _currentGroup;
   late Level _currentLevel;
   late Puzzle _puzzle;
 
@@ -77,6 +73,7 @@ class LevelProvider extends ChangeNotifier {
   DateTime? _levelStartTime;
   int _solveAttempts = 0;
 
+  LevelGroup get currentGroup => _currentGroup;
   Level get currentLevel => _currentLevel;
   Puzzle get puzzle => _puzzle;
   ValidationResult? get validation {
@@ -90,15 +87,62 @@ class LevelProvider extends ChangeNotifier {
 
   bool get isSolved => _lastValidation?.isValid ?? false;
 
-  void _loadLevel(int index) {
-    var loadIndex = index;
-    if (loadIndex >= LevelRepository.levels.length) {
-      // Loop back to start or handle "game complete" state
+  Set<String> get unlockedGroups => _unlockedGroups;
+
+  void _refreshUnlockedGroups() {
+    _unlockedGroups.clear();
+    for (final group in LevelRepository.worldMap.values) {
+      var canUnlock = true;
+      for (final req in group.requiredGroups) {
+        final reqGroup = LevelRepository.worldMap[req];
+        if (reqGroup == null) continue;
+
+        // A group is complete if all of its levels are solved
+        final groupLevelIds = reqGroup.levels.map((l) => l.id).toList();
+        if (!_progressService.areAllLevelsSolved(groupLevelIds)) {
+          canUnlock = false;
+          break;
+        }
+      }
+
+      // Also check if the user has explicitly manually unlocked the first level
+      // of this group as a legacy fallback, or if it's the very first root.
+      final isRoot = group.requiredGroups.isEmpty;
+      final hasProgress =
+          group.levels.isNotEmpty &&
+          _progressService.isLevelUnlocked(group.levels.first.id);
+
+      if (canUnlock || isRoot || hasProgress) {
+        _unlockedGroups.add(group.id);
+        if (group.levels.isNotEmpty) {
+          // Ensure at least the first level is marked unlocked for UI
+          unawaited(
+            _progressService.saveLevelUnlocked(group.levels.first.id),
+          );
+        }
+      }
+    }
+  }
+
+  void _loadLevel(String groupId, int indexInGroup) {
+    var activeGroupId = groupId;
+    var activeIndexInGroup = indexInGroup;
+
+    if (!LevelRepository.worldMap.containsKey(activeGroupId)) {
+      activeGroupId = LevelRepository.worldMap.keys.first;
+      activeIndexInGroup = 0;
+    }
+
+    _currentGroup = LevelRepository.worldMap[activeGroupId]!;
+
+    var loadIndex = activeIndexInGroup;
+    if (loadIndex >= _currentGroup.levels.length || loadIndex < 0) {
       loadIndex = 0;
     }
 
-    _currentLevelIndex = loadIndex;
-    _currentLevel = LevelRepository.levels[loadIndex];
+    _currentGroupId = activeGroupId;
+    _currentLevelIndexInGroup = loadIndex;
+    _currentLevel = _currentGroup.levels[loadIndex];
 
     // Check if we have a saved solution state for this level
     final savedState = _progressService.getSolution(
@@ -132,14 +176,20 @@ class LevelProvider extends ChangeNotifier {
 
   /// Refreshes the active state dynamically after async init.
   void refresh() {
-    _loadLevel(_currentLevelIndex);
+    _refreshUnlockedGroups();
+    _loadLevel(_currentGroupId, _currentLevelIndexInGroup);
     notifyListeners();
   }
 
-  bool get hasPreviousLevel => _currentLevelIndex > 0;
-  bool get hasNextLevel =>
-      _currentLevelIndex < LevelRepository.levels.length - 1 &&
-      _currentLevelIndex < _maxUnlockedLevelIndex;
+  bool get hasPreviousLevel => _currentLevelIndexInGroup > 0;
+
+  bool get hasNextLevel {
+    // We can go to the next level if it's within the same group
+    // AND if that level is unlocked (or if the current one is solved,
+    // meaning they virtually unlocked it).
+    // In our new graph, you can only 'nextLevel' within a group.
+    return _currentLevelIndexInGroup < _currentGroup.levels.length - 1;
+  }
 
   /// Toggles the specified cell, updating validation and notifying listeners.
   void toggleCell(GridPoint pt) {
@@ -267,75 +317,105 @@ class LevelProvider extends ChangeNotifier {
     }
 
     if (isValid) {
-      if (_currentLevelIndex >= _maxUnlockedLevelIndex) {
-        _maxUnlockedLevelIndex = _currentLevelIndex + 1;
-
-        // Save advancement progress
-        if (_maxUnlockedLevelIndex < LevelRepository.levels.length) {
-          final unlockedLevelId =
-              LevelRepository.levels[_maxUnlockedLevelIndex].id;
-          unawaited(_progressService.saveLevelUnlocked(unlockedLevelId));
-        }
+      // Mark this specific level as unlocked, and the NEXT level in the group
+      unawaited(_progressService.saveLevelUnlocked(_currentLevel.id));
+      if (_currentLevelIndexInGroup + 1 < _currentGroup.levels.length) {
+        unawaited(
+          _progressService.saveLevelUnlocked(
+            _currentGroup.levels[_currentLevelIndexInGroup + 1].id,
+          ),
+        );
       }
 
       // Save their solution for this level
       unawaited(_progressService.saveSolution(_currentLevel.id, _puzzle.state));
+
+      // Since they solved a level, it might have completed a group
+      // and unlocked new groups
+      _refreshUnlockedGroups();
     }
     notifyListeners();
   }
 
-  String? get nextLevelId =>
-      hasNextLevel ? LevelRepository.levels[_currentLevelIndex + 1].id : null;
+  String? get nextLevelId => hasNextLevel
+      ? _currentGroup.levels[_currentLevelIndexInGroup + 1].id
+      : null;
 
-  /// Advances the game to the next available level puzzle.
+  /// Advances the game to the next available level puzzle
+  /// within the current group.
   void nextLevel() {
     if (hasNextLevel) {
-      _loadLevel(_currentLevelIndex + 1);
+      _loadLevel(_currentGroupId, _currentLevelIndexInGroup + 1);
       unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
       notifyListeners();
     }
   }
 
   String? get previousLevelId => hasPreviousLevel
-      ? LevelRepository.levels[_currentLevelIndex - 1].id
+      ? _currentGroup.levels[_currentLevelIndexInGroup - 1].id
       : null;
 
-  /// Goes back to the previous level.
+  /// Goes back to the previous level within the current group.
   void previousLevel() {
     if (hasPreviousLevel) {
-      _loadLevel(_currentLevelIndex - 1);
+      _loadLevel(_currentGroupId, _currentLevelIndexInGroup - 1);
       unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
       notifyListeners();
     }
   }
 
-  /// Jumps directly to a level by index, bypassing the unlock gate.
-  /// Intended for debug/development use only.
-  void jumpToLevel(int index) {
-    assert(
-      index >= 0 && index < LevelRepository.levels.length,
-      'Level index $index out of range',
-    );
-    _loadLevel(index);
+  /// Jumps directly to a specific level group,
+  /// to its first unsolved level or 0.
+  void jumpToGroup(String groupId) {
+    if (!LevelRepository.worldMap.containsKey(groupId)) return;
+
+    final group = LevelRepository.worldMap[groupId]!;
+
+    // Find first unsolved puzzle in this group
+    var firstUnsolved = 0;
+    for (var i = 0; i < group.levels.length; i++) {
+      if (!_progressService.isLevelSolved(group.levels[i].id)) {
+        firstUnsolved = i;
+        break;
+      }
+    }
+    // If all solved, it defaults to the first puzzle or 0.
+
+    _loadLevel(groupId, firstUnsolved);
     unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
     notifyListeners();
   }
 
-  /// The index of the currently active level.
-  int get currentLevelIndex => _currentLevelIndex;
+  /// Jumps directly to a level by index within the CURRENT group.
+  /// Intended for debug/development use only.
+  void jumpToLevel(int index) {
+    if (index >= 0 && index < _currentGroup.levels.length) {
+      _loadLevel(_currentGroupId, index);
+      unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
+      notifyListeners();
+    }
+  }
+
+  /// The index of the currently active level in the group.
+  int get currentLevelIndex => _currentLevelIndexInGroup;
 
   /// Loads a level by its ID.
   void loadLevelById(String id) {
     if (_currentLevel.id == id) return;
-    final index = LevelRepository.levels.indexWhere((l) => l.id == id);
-    if (index != -1) {
-      if (index > _maxUnlockedLevelIndex) {
-        _maxUnlockedLevelIndex = index;
+
+    // Search all groups for this ID
+    for (final groupId in LevelRepository.worldMap.keys) {
+      final group = LevelRepository.worldMap[groupId]!;
+      final index = group.levels.indexWhere((l) => l.id == id);
+
+      if (index != -1) {
+        // Found it.
         unawaited(_progressService.saveLevelUnlocked(id));
+        _loadLevel(groupId, index);
+        unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
+        notifyListeners();
+        return;
       }
-      _loadLevel(index);
-      unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
-      notifyListeners();
     }
   }
 

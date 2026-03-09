@@ -9,6 +9,7 @@ import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/services/progress_service.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/intents.dart';
+import 'package:grids/ui/screens/world_map_screen.dart';
 import 'package:grids/ui/widgets/game_app_bar.dart';
 import 'package:grids/ui/widgets/game_bottom_bar.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<ProgressService>.value(value: progressService),
         ChangeNotifierProvider(create: (_) => LevelProvider(progressService)),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
@@ -42,17 +44,41 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      redirect: (context, state) {
-        final provider = context.read<LevelProvider>();
-        return '/level/${provider.currentLevel.id}';
-      },
-    ),
-    GoRoute(
-      path: '/level/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return GameScreen(levelId: id);
-      },
+      builder: (context, state) => const WorldMapScreen(),
+      routes: [
+        GoRoute(
+          path: 'level/:id',
+          pageBuilder: (context, state) {
+            final id = state.pathParameters['id']!;
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: GameScreen(levelId: id),
+              transitionsBuilder:
+                  (
+                    context,
+                    animation,
+                    secondaryAnimation,
+                    child,
+                  ) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1, 0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                              reverseCurve: Curves.easeInCubic,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+            );
+          },
+        ),
+      ],
     ),
   ],
 );

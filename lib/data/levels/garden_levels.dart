@@ -856,9 +856,3 @@ final gardenBonus = [
     ],
   ),
 ];
-
-final List<Level> gardenLevels = [
-  ...garden,
-  ...gardenShortcut,
-  ...gardenBonus,
-];

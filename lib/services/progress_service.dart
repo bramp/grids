@@ -57,4 +57,30 @@ class ProgressService {
 
     return GridState(width: width, height: height, bits: bits);
   }
+
+  /// Checks if a specific level has been solved.
+  bool isLevelSolved(String levelId) {
+    return _prefs.getString('$_keySolutionPrefix$levelId') != null;
+  }
+
+  /// Checks if all levels in a given list of IDs have been solved.
+  bool areAllLevelsSolved(List<String> levelIds) {
+    for (final id in levelIds) {
+      if (!isLevelSolved(id)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Returns the number of levels in a given list of IDs that have been solved.
+  int getSolvedCount(List<String> levelIds) {
+    var count = 0;
+    for (final id in levelIds) {
+      if (isLevelSolved(id)) {
+        count++;
+      }
+    }
+    return count;
+  }
 }

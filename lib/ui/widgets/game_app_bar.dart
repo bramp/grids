@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:grids/build_info.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/providers/level_provider.dart';
@@ -25,6 +26,13 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
     final activeTheme = themeProvider.activeTheme;
 
     return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.map),
+        tooltip: 'World Map',
+        onPressed: () {
+          context.go('/');
+        },
+      ),
       title: Text(puzzleName),
       centerTitle: true,
       actions: [
@@ -79,7 +87,9 @@ class _DebugLevelPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<LevelProvider>();
     final levels = LevelRepository.levels;
-    final currentIndex = provider.currentLevelIndex;
+    final currentIndex = levels.indexWhere(
+      (l) => l.id == provider.currentLevel.id,
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -88,8 +98,8 @@ class _DebugLevelPicker extends StatelessWidget {
         underline: const SizedBox.shrink(),
         icon: const Icon(Icons.bug_report),
         onChanged: (index) {
-          if (index != null) {
-            provider.jumpToLevel(index);
+          if (index != null && index >= 0 && index < levels.length) {
+            context.go('/level/${levels[index].id}');
           }
         },
         items: List.generate(
