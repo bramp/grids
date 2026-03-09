@@ -31,7 +31,6 @@ class CyberTheme extends PuzzleTheme {
               painter: _NeonTubePainter(
                 color: const Color(0xFF00FFCC), // Default Cyan
                 isLit: isSolved,
-                isGrid: true,
               ),
             ),
           ),
@@ -157,6 +156,15 @@ class CyberTheme extends PuzzleTheme {
                 painter: _NeonTubePainter(
                   color: glowColor,
                   isLit: isLit,
+                  inset: s * 0.15,
+                  tubeWidth: s * 0.1,
+                  cornerRadius: s * 0.1,
+                  glow1Blur: s * 0.12,
+                  glow1Spread: s * 0.12,
+                  glow2Blur: s * 0.05,
+                  glow2Spread: s * 0.05,
+                  edgeSpread: s * 0.05,
+                  coreBlur: s * 0.01,
                 ),
               ),
 
@@ -306,23 +314,31 @@ class _NeonTubePainter extends CustomPainter {
   const _NeonTubePainter({
     required this.color,
     required this.isLit,
-    this.isGrid = false,
+    this.inset = 13.0,
+    this.tubeWidth = 9.0,
+    this.cornerRadius = 9.0,
+    this.glow1Blur = 10.0,
+    this.glow1Spread = 10.0,
+    this.glow2Blur = 4.0,
+    this.glow2Spread = 4.0,
+    this.edgeSpread = 4.0,
+    this.coreBlur = 1.0,
   });
 
   final Color color;
   final bool isLit;
-  final bool isGrid;
+  final double inset;
+  final double tubeWidth;
+  final double cornerRadius;
+  final double glow1Blur;
+  final double glow1Spread;
+  final double glow2Blur;
+  final double glow2Spread;
+  final double edgeSpread;
+  final double coreBlur;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final s = size.shortestSide;
-    final inset = isGrid ? 13.0 : s * 0.15;
-    final tubeWidth = isGrid ? 9.0 : s * 0.1;
-    final cornerRadius = isGrid ? 9.0 : s * 0.1;
-    final blur1 = isGrid ? 10.0 : s * 0.12;
-    final blur2 = isGrid ? 4.0 : s * 0.05;
-    final blurCore = isGrid ? 1.0 : s * 0.01;
-
     final rect = Rect.fromLTWH(
       inset,
       inset,
@@ -342,8 +358,8 @@ class _NeonTubePainter extends CustomPainter {
           Paint()
             ..color = color.withValues(alpha: 0.3)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = tubeWidth + (isGrid ? 10.0 : s * 0.12)
-            ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur1),
+            ..strokeWidth = tubeWidth + glow1Spread
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow1Blur),
         )
         // Medium glow
         ..drawRRect(
@@ -351,8 +367,8 @@ class _NeonTubePainter extends CustomPainter {
           Paint()
             ..color = color.withValues(alpha: 0.5)
             ..style = PaintingStyle.stroke
-            ..strokeWidth = tubeWidth + (isGrid ? 4.0 : s * 0.05)
-            ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur2),
+            ..strokeWidth = tubeWidth + glow2Spread
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow2Blur),
         );
     }
 
@@ -363,7 +379,7 @@ class _NeonTubePainter extends CustomPainter {
         Paint()
           ..color = Colors.black.withValues(alpha: isLit ? 0.8 : 0.4)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = tubeWidth + (isGrid ? 4.0 : s * 0.05),
+          ..strokeWidth = tubeWidth + edgeSpread,
       )
       // Core colored tube body
       ..drawRRect(
@@ -382,16 +398,25 @@ class _NeonTubePainter extends CustomPainter {
           ..color = Colors.white.withValues(alpha: 0.45)
           ..style = PaintingStyle.stroke
           ..strokeWidth = tubeWidth * 0.35
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurCore),
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, coreBlur),
       );
     }
   }
 
   @override
-  bool shouldRepaint(covariant _NeonTubePainter oldDelegate) =>
-      oldDelegate.color != color ||
-      oldDelegate.isLit != isLit ||
-      oldDelegate.isGrid != isGrid;
+  bool shouldRepaint(covariant _NeonTubePainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.isLit != isLit ||
+        oldDelegate.inset != inset ||
+        oldDelegate.tubeWidth != tubeWidth ||
+        oldDelegate.cornerRadius != cornerRadius ||
+        oldDelegate.glow1Blur != glow1Blur ||
+        oldDelegate.glow1Spread != glow1Spread ||
+        oldDelegate.glow2Blur != glow2Blur ||
+        oldDelegate.glow2Spread != glow2Spread ||
+        oldDelegate.edgeSpread != edgeSpread ||
+        oldDelegate.coreBlur != coreBlur;
+  }
 }
 
 class _CyberLightningPainter extends CustomPainter {
