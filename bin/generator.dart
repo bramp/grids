@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print, prefer_final_locals // CLI tool.
+// NOTE: This generator is a work in progress.
 import 'dart:math';
 
 import 'package:args/args.dart';
