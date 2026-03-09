@@ -346,8 +346,8 @@ class LevelProvider extends ChangeNotifier {
   }
 
   /// Loads a custom puzzle directly. Primarily for testing or debug.
-  void loadCustomPuzzle(Puzzle puzzle) {
-    _currentLevel = Level(id: 'custom', puzzle: puzzle);
+  void loadCustomPuzzle(Puzzle puzzle, {String id = 'custom'}) {
+    _currentLevel = Level(id: id, puzzle: puzzle);
     _puzzle = puzzle;
     _lastValidation = null;
     _levelStartTime = clock.now();

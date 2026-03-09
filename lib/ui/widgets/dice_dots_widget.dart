@@ -48,9 +48,19 @@ class DiceDotsWidget extends StatelessWidget {
 
   List<Widget> _buildDots(double size) {
     // 3x3 positions grid mapping
-    // TL, TC, TR
-    // ML, MC, MR
-    // BL, BC, BR
+    // Define the offset from center for the dots (0.0 to 1.0)
+    // 0.7-0.75 is often considered optimal for dice pips
+    const offset = 0.7;
+
+    const tl = Alignment(-offset, -offset);
+    const tc = Alignment(0, -offset);
+    const tr = Alignment(offset, -offset);
+    const ml = Alignment(-offset, 0);
+    const mc = Alignment.center;
+    const mr = Alignment(offset, 0);
+    const bl = Alignment(-offset, offset);
+    const bc = Alignment(0, offset);
+    const br = Alignment(offset, offset);
 
     final abs = number.abs();
     final positions = <Alignment>[];
@@ -62,30 +72,30 @@ class DiceDotsWidget extends StatelessWidget {
     final hasTopBottomCenter = abs == 8 || abs == 9;
     final hasAllCorners = abs >= 4; // 4, 5, 6, 7, 8, 9
 
-    if (hasCenterCenter) positions.add(Alignment.center);
+    if (hasCenterCenter) positions.add(mc);
 
     if (hasCorners) {
       positions
-        ..add(Alignment.topLeft)
-        ..add(Alignment.bottomRight);
+        ..add(tl)
+        ..add(br);
     }
 
     if (hasAllCorners) {
       positions
-        ..add(Alignment.topRight)
-        ..add(Alignment.bottomLeft);
+        ..add(tr)
+        ..add(bl);
     }
 
     if (hasMidLeftRight) {
       positions
-        ..add(Alignment.centerLeft)
-        ..add(Alignment.centerRight);
+        ..add(ml)
+        ..add(mr);
     }
 
     if (hasTopBottomCenter) {
       positions
-        ..add(Alignment.topCenter)
-        ..add(Alignment.bottomCenter);
+        ..add(tc)
+        ..add(bc);
     }
 
     final filled = number > 0;
