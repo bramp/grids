@@ -188,7 +188,11 @@ class LevelProvider extends ChangeNotifier {
     // AND if that level is unlocked (or if the current one is solved,
     // meaning they virtually unlocked it).
     // In our new graph, you can only 'nextLevel' within a group.
-    return _currentLevelIndexInGroup < _currentGroup.levels.length - 1;
+    if (_currentLevelIndexInGroup >= _currentGroup.levels.length - 1) {
+      return false;
+    }
+    final nextLevelId = _currentGroup.levels[_currentLevelIndexInGroup + 1].id;
+    return _progressService.isLevelUnlocked(nextLevelId) || isSolved;
   }
 
   /// Toggles the specified cell, updating validation and notifying listeners.
