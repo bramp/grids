@@ -6,10 +6,14 @@ import 'package:grids/build_info.dart';
 import 'package:grids/firebase_options.dart';
 import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
+import 'package:grids/services/analytics_service.dart';
+import 'package:grids/services/consent_service.dart';
+import 'package:grids/services/preferences_service.dart';
 import 'package:grids/services/progress_service.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/intents.dart';
 import 'package:grids/ui/screens/world_map_screen.dart';
+import 'package:grids/ui/widgets/consent_banner.dart';
 import 'package:grids/ui/widgets/game_app_bar.dart';
 import 'package:grids/ui/widgets/game_bottom_bar.dart';
 import 'package:provider/provider.dart';
@@ -25,13 +29,19 @@ void main() async {
   }
 
   // Initialize synchronous access to shared_preferences
-  final progressService = await ProgressService.init();
+  final preferencesService = await PreferencesService.init();
+  final progressService = ProgressService(preferencesService);
+  final consentService = ConsentService(preferencesService);
+  final analyticsService = AnalyticsService(consentService);
 
   runApp(
     MultiProvider(
       providers: [
         Provider<ProgressService>.value(value: progressService),
-        ChangeNotifierProvider(create: (_) => LevelProvider(progressService)),
+        ChangeNotifierProvider<ConsentService>.value(value: consentService),
+        ChangeNotifierProvider(
+          create: (_) => LevelProvider(progressService, analyticsService),
+        ),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const GridsApp(),
@@ -98,6 +108,53 @@ class GridsApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
+      builder: (context, child) {
+        return _DeferredFocusOverlay(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (child != null) Positioned.fill(child: child),
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: ConsentBanner(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Defers focus traversal for one frame to work around a web-specific crash
+/// where the browser's focus event fires before Flutter's render tree is fully
+/// laid out, causing `_RenderTheater` to be accessed without a size.
+class _DeferredFocusOverlay extends StatefulWidget {
+  const _DeferredFocusOverlay({required this.child});
+  final Widget child;
+
+  @override
+  State<_DeferredFocusOverlay> createState() => _DeferredFocusOverlayState();
+}
+
+class _DeferredFocusOverlayState extends State<_DeferredFocusOverlay> {
+  bool _traversable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _traversable = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusTraversalGroup(
+      descendantsAreTraversable: _traversable,
+      child: widget.child,
     );
   }
 }

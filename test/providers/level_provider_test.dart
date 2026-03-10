@@ -1,16 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grids/providers/level_provider.dart';
+import 'package:grids/services/analytics_service.dart';
+import 'package:grids/services/consent_service.dart';
+import 'package:grids/services/preferences_service.dart';
 import 'package:grids/services/progress_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   late ProgressService progressService;
+  late AnalyticsService analyticsService;
   late LevelProvider levelProvider;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    progressService = await ProgressService.init();
-    levelProvider = LevelProvider(progressService)..refresh();
+    final prefs = await PreferencesService.init();
+    progressService = ProgressService(prefs);
+    analyticsService = AnalyticsService(ConsentService(prefs));
+    levelProvider = LevelProvider(progressService, analyticsService)..refresh();
   });
 
   test('hasNextLevel should be false initially for the first level', () {

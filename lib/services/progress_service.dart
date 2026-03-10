@@ -1,21 +1,16 @@
 import 'dart:async';
 
 import 'package:grids/engine/grid_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:grids/services/preferences_service.dart';
 
 class ProgressService {
   ProgressService(this._prefs);
 
-  final SharedPreferences _prefs;
+  final PreferencesService _prefs;
 
   static const String _keyLastLevelPlayed = 'last_level_played';
   static const String _keyUnlockedLevelsPrefix = 'unlocked_level_';
   static const String _keySolutionPrefix = 'solution_';
-
-  static Future<ProgressService> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    return ProgressService(prefs);
-  }
 
   /// Saves the ID of the last level the user played.
   Future<void> saveLastLevelPlayed(String levelId) async {
@@ -29,7 +24,7 @@ class ProgressService {
 
   /// Marks a specific level as unlocked.
   Future<void> saveLevelUnlocked(String levelId) async {
-    await _prefs.setBool('$_keyUnlockedLevelsPrefix$levelId', true);
+    await _prefs.setBool('$_keyUnlockedLevelsPrefix$levelId', value: true);
   }
 
   /// Checks if a specific level is unlocked.

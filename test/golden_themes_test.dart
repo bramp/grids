@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:grids/engine/grid_format.dart';
 import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
+import 'package:grids/services/analytics_service.dart';
+import 'package:grids/services/consent_service.dart';
 import 'package:grids/ui/grid_widget.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +19,9 @@ void main() {
     tester.view.devicePixelRatio = 3; // Standard 3.0 density for 1080p
 
     final progressService = await MockProgressService.init();
+    final analyticsService = AnalyticsService(
+      ConsentService(progressService.preferencesService),
+    );
     final themeProvider = ThemeProvider();
 
     for (final theme in themeProvider.availableThemes) {
@@ -32,7 +37,7 @@ void main() {
        (.) (1)  1* (R-) R-* (F2)  F2*  W-1
       ''');
 
-      final levelProvider = LevelProvider(progressService)
+      final levelProvider = LevelProvider(progressService, analyticsService)
         ..loadCustomPuzzle(demoGrid, id: 'demo')
         ..checkAnswer();
 

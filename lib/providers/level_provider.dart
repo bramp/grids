@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:clock/clock.dart';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_point.dart';
@@ -12,11 +10,12 @@ import 'package:grids/engine/level_group.dart';
 import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/puzzle_validator.dart';
 import 'package:grids/engine/rule_validator.dart';
+import 'package:grids/services/analytics_service.dart';
 import 'package:grids/services/progress_service.dart';
 
 /// The active puzzle grid that the user is interacting with.
 class LevelProvider extends ChangeNotifier {
-  LevelProvider(this._progressService) {
+  LevelProvider(this._progressService, this._analytics) {
     // Determine unlocked groups initially
     _refreshUnlockedGroups();
 
@@ -42,6 +41,7 @@ class LevelProvider extends ChangeNotifier {
   }
 
   final ProgressService _progressService;
+  final AnalyticsService _analytics;
   final PuzzleValidator _validator = PuzzleValidator();
 
   String _currentGroupId = '';
@@ -70,7 +70,7 @@ class LevelProvider extends ChangeNotifier {
   bool _showErrors = true;
   int _errorPulseCount = 0;
 
-  DateTime? _levelStartTime;
+  DateTime _levelStartTime = DateTime(0);
   int _solveAttempts = 0;
 
   LevelGroup get currentGroup => _currentGroup;
@@ -294,42 +294,27 @@ class LevelProvider extends ChangeNotifier {
       });
     }
 
-    try {
-      if (Firebase.apps.isNotEmpty) {
-        final analytics = FirebaseAnalytics.instance;
+    final timeMs = clock.now().difference(_levelStartTime).inMilliseconds;
 
-        // Log the check answer attempt
-        unawaited(
-          analytics.logEvent(
-            name: 'level_solve_attempt',
-            parameters: {
-              'level_id': _currentLevel.id,
-              'is_correct': isValid ? 1 : 0,
-              'attempt_number': _solveAttempts,
-            },
-          ),
-        );
+    _analytics.logEvent(
+      name: 'level_solve_attempt',
+      parameters: {
+        'level_id': _currentLevel.id,
+        'is_correct': isValid ? 1 : 0,
+        'attempt_number': _solveAttempts,
+        'time_ms': timeMs,
+      },
+    );
 
-        if (isValid && _levelStartTime != null) {
-          final timeMs = clock
-              .now()
-              .difference(_levelStartTime!)
-              .inMilliseconds;
-          // Log a successful solve with timing details
-          unawaited(
-            analytics.logEvent(
-              name: 'level_complete',
-              parameters: {
-                'level_id': _currentLevel.id,
-                'time_ms': timeMs,
-                'total_attempts': _solveAttempts,
-              },
-            ),
-          );
-        }
-      }
-    } on Object catch (e) {
-      debugPrint('Analytics error: $e');
+    if (isValid) {
+      _analytics.logEvent(
+        name: 'level_complete',
+        parameters: {
+          'level_id': _currentLevel.id,
+          'time_ms': timeMs,
+          'attempt_number': _solveAttempts,
+        },
+      );
     }
 
     if (isValid) {
