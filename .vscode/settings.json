@@ -5,5 +5,8 @@
         "editor.wordWrapColumn": 80,
         "editor.wordWrap": "wordWrapColumn"
     },
-    "dart.lineLength": 80
+    "dart.lineLength": 80,
+    "chat.tools.terminal.autoApprove": {
+        "flutter": true
+    }
 }
