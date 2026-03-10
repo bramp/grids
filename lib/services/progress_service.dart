@@ -47,6 +47,11 @@ class ProgressService {
     );
   }
 
+  /// Clears the user's saved state for a specific puzzle.
+  Future<void> clearSolution(String levelId) async {
+    await _prefs.remove('$_keySolutionPrefix$levelId');
+  }
+
   /// Loads the user's solved state for a specific puzzle, if they have one.
   GridState? getSolution(String levelId, int width, int height) {
     final solutionString = _prefs.getString('$_keySolutionPrefix$levelId');

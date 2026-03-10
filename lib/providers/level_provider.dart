@@ -185,14 +185,26 @@ class LevelProvider extends ChangeNotifier {
 
   bool get hasNextLevel {
     // We can go to the next level if it's within the same group
-    // AND if that level is unlocked (or if the current one is solved,
-    // meaning they virtually unlocked it).
+    // AND if that level is unlocked.
     // In our new graph, you can only 'nextLevel' within a group.
     if (_currentLevelIndexInGroup >= _currentGroup.levels.length - 1) {
       return false;
     }
     final nextLevelId = _currentGroup.levels[_currentLevelIndexInGroup + 1].id;
-    return _progressService.isLevelUnlocked(nextLevelId) || isSolved;
+    return _progressService.isLevelUnlocked(nextLevelId);
+  }
+
+  /// Resets the current puzzle to its original (unsolved) state.
+  void resetPuzzle() {
+    _puzzle = _currentLevel.puzzle;
+    _lastValidation = null;
+    _errorPulseTimer?.cancel();
+    _showErrors = true;
+    _errorPulseCount = 0;
+    _levelStartTime = clock.now();
+    _solveAttempts = 0;
+    unawaited(_progressService.clearSolution(_currentLevel.id));
+    notifyListeners();
   }
 
   /// Toggles the specified cell, updating validation and notifying listeners.
@@ -414,7 +426,6 @@ class LevelProvider extends ChangeNotifier {
 
       if (index != -1) {
         // Found it.
-        unawaited(_progressService.saveLevelUnlocked(id));
         _loadLevel(groupId, index);
         unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
         notifyListeners();

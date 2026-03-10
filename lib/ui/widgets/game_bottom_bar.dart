@@ -30,6 +30,13 @@ class GameBottomBar extends StatelessWidget {
             icon: const Icon(Icons.arrow_back),
           ),
           const SizedBox(width: 16),
+          IconButton(
+            iconSize: 32,
+            onPressed: () => context.read<LevelProvider>().resetPuzzle(),
+            tooltip: 'Reset puzzle',
+            icon: const Icon(Icons.restart_alt),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: SizedBox(
               height: 56,

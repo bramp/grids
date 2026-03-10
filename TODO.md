@@ -46,3 +46,5 @@
 - [ ] Setup Daily Challenges + Leaderboards.
 - [ ] The won color is a different shade to the check answer button - fix that.
 - [ ] Ensure puzzles are always displayed in the best orentation for the device.
+- [ ] On web, I need a cookie warning banner.
+- [ ] I need a privacy policy
