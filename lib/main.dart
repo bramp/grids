@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grids/build_info.dart';
 
@@ -19,7 +20,9 @@ import 'package:grids/ui/widgets/game_bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -33,6 +36,8 @@ void main() async {
   final progressService = ProgressService(preferencesService);
   final consentService = ConsentService(preferencesService);
   final analyticsService = AnalyticsService(consentService);
+
+  FlutterNativeSplash.remove();
 
   runApp(
     MultiProvider(
