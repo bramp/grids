@@ -4,6 +4,7 @@ import 'package:grids/data/level_repository.dart';
 import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/services/progress_service.dart';
+import 'package:grids/ui/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 
 class WorldMapScreen extends StatelessWidget {
@@ -25,6 +26,13 @@ class WorldMapScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () => showSettingsDialog(context),
+          ),
+        ],
       ),
       body: Center(
         child: ConstrainedBox(
