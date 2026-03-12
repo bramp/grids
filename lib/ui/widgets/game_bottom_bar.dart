@@ -19,7 +19,7 @@ class GameBottomBar extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
           IconButton(

@@ -51,5 +51,5 @@
 - [x] I need a setting / about page
 - [x] Move the version number to the setting / about page
 - [ ] Give more screen space to the puzzle
-- [ ] Clicking puzzle -> map -> puzzle - lands you on the next puzzle
+- [X] Clicking mine puzzle -> map -> mine puzzle - lands you on mine_2 instead of mine_1
 - [ ] Add a hint button

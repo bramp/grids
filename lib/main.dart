@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
-import 'package:grids/build_info.dart';
 
 import 'package:grids/firebase_options.dart';
 import 'package:grids/providers/level_provider.dart';
@@ -238,28 +237,15 @@ class _GameScreenState extends State<GameScreen> {
         child: Scaffold(
           backgroundColor: activeTheme.backgroundColor,
           appBar: const GameAppBar(),
-          body: Column(
+          body: const Column(
             children: [
-              const Expanded(
+              Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: EdgeInsets.all(8),
                   child: GridWidget(),
                 ),
               ),
-              const GameBottomBar(),
-              SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    BuildInfo.shortVersion,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).hintColor.withValues(alpha: 0.3),
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
+              GameBottomBar(),
             ],
           ),
         ),

@@ -12,7 +12,7 @@ abstract class PuzzleTheme {
   Color get backgroundColor;
 
   /// External padding around the whole grid.
-  EdgeInsets get gridPadding => const EdgeInsets.all(16);
+  EdgeInsets get gridPadding => const EdgeInsets.all(8);
 
   /// Spacing between individual cells.
   double get cellPadding;

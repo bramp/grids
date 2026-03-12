@@ -3,6 +3,10 @@ import 'package:grids/engine/cell.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:grids/ui/widgets/dice_dots_widget.dart';
 
+/// Inset of the neon tube from the edge of the grid, must match
+/// [_NeonTubePainter.inset].
+const double _neonTubeInset = 13;
+
 class CyberTheme extends PuzzleTheme {
   const CyberTheme();
 
@@ -13,7 +17,7 @@ class CyberTheme extends PuzzleTheme {
   Color get backgroundColor => const Color(0xFF0D0E15); // Deep dark blue-black
 
   @override
-  double get cellPadding => 4;
+  double get cellPadding => 6;
 
   @override
   Widget buildGridBackground(
@@ -35,7 +39,7 @@ class CyberTheme extends PuzzleTheme {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(2 * cellPadding + _neonTubeInset),
             child: child,
           ),
         ],
