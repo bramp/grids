@@ -129,4 +129,46 @@ void main() {
       isNull,
     );
   });
+
+  test('jumpToGroup should not skip to unsolved level when only '
+      'partial progress is saved', () {
+    // We start on shrine_1. Toggle a cell to save a partial solution.
+    final pt = levelProvider.puzzle.pointAt(0, 0);
+    levelProvider.toggleCell(pt);
+
+    // A partial solution is now saved for shrine_1.
+    expect(
+      progressService.getSolution(
+        'shrine_1',
+        levelProvider.currentLevel.puzzle.width,
+        levelProvider.currentLevel.puzzle.height,
+      ),
+      isNotNull,
+    );
+
+    // Jump to the same group again — should land on shrine_1 (the partial
+    // level), NOT skip to shrine_2.
+    levelProvider.jumpToGroup(levelProvider.currentGroup.id);
+    expect(levelProvider.currentLevel.id, 'shrine_1');
+  });
+
+  test('jumpToGroup should advance past truly solved levels', () {
+    // Solve shrine_1 via checkAnswer.
+    final level = levelProvider.currentLevel;
+    final solution = level.knownSolutions.first;
+    for (var y = 0; y < level.puzzle.height; y++) {
+      for (var x = 0; x < level.puzzle.width; x++) {
+        final pt = level.puzzle.pointAt(x, y);
+        if (solution.isLit(pt) != levelProvider.puzzle.state.isLit(pt)) {
+          levelProvider.toggleCell(pt);
+        }
+      }
+    }
+    levelProvider.checkAnswer();
+    expect(levelProvider.isSolved, isTrue);
+
+    // Jump to the same group — should land on shrine_2 (next unsolved).
+    levelProvider.jumpToGroup(levelProvider.currentGroup.id);
+    expect(levelProvider.currentLevel.id, 'shrine_2');
+  });
 }

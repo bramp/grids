@@ -372,17 +372,34 @@ class LevelProvider extends ChangeNotifier {
 
     final group = LevelRepository.worldMap[groupId]!;
 
-    // Find first unsolved puzzle in this group
-    var firstUnsolved = 0;
+    // Find the first level that is unlocked but not yet solved.
+    // This correctly resumes progress without skipping levels that have
+    // only been partially attempted (toggleCell saves partial state which
+    // isLevelSolved would treat as "solved").
+    var targetIndex = 0;
     for (var i = 0; i < group.levels.length; i++) {
-      if (!_progressService.isLevelSolved(group.levels[i].id)) {
-        firstUnsolved = i;
+      final level = group.levels[i];
+      if (_progressService.isLevelUnlocked(level.id)) {
+        targetIndex = i;
+        // Check if this level was correctly solved (valid solution).
+        final savedState = _progressService.getSolution(
+          level.id,
+          level.puzzle.width,
+          level.puzzle.height,
+        );
+        if (savedState == null) break; // Never touched — start here.
+        final validation = _validator.validate(
+          level.puzzle.copyWith(state: savedState),
+        );
+        if (!validation.isValid) break; // Partial / wrong — resume here.
+        // Otherwise this level is truly solved; continue to next.
+      } else {
+        // Not unlocked — can't go beyond here.
         break;
       }
     }
-    // If all solved, it defaults to the first puzzle or 0.
 
-    _loadLevel(groupId, firstUnsolved);
+    _loadLevel(groupId, targetIndex);
     unawaited(_progressService.saveLastLevelPlayed(_currentLevel.id));
     notifyListeners();
   }
