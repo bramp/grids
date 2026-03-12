@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 import 'package:grids/ui/widgets/dice_dots_widget.dart';
+import 'package:grids/ui/widgets/gaussian_orbs.dart';
 
 /// Inset of the neon tube from the edge of the grid, must match
 /// [_NeonTubePainter.inset].
@@ -18,6 +19,11 @@ class CyberTheme extends PuzzleTheme {
 
   @override
   double get cellPadding => 6;
+
+  @override
+  Widget buildScreenBackground(BuildContext context) {
+    return const GaussianOrbs();
+  }
 
   @override
   Widget buildGridBackground(

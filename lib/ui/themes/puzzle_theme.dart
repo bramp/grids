@@ -14,6 +14,14 @@ abstract class PuzzleTheme {
   /// External padding around the whole grid.
   EdgeInsets get gridPadding => const EdgeInsets.all(8);
 
+  /// Animated background layer rendered behind the game UI.
+  ///
+  /// Override in a theme to provide a custom effect (e.g. floating orbs,
+  /// particle fields). Returns an empty box by default.
+  Widget buildScreenBackground(BuildContext context) {
+    return const SizedBox.shrink();
+  }
+
   /// Spacing between individual cells.
   double get cellPadding;
 

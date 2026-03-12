@@ -237,15 +237,24 @@ class _GameScreenState extends State<GameScreen> {
         child: Scaffold(
           backgroundColor: activeTheme.backgroundColor,
           appBar: const GameAppBar(),
-          body: const Column(
+          body: Stack(
             children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: GridWidget(),
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: activeTheme.buildScreenBackground(context),
                 ),
               ),
-              GameBottomBar(),
+              const Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(8),
+                      child: GridWidget(),
+                    ),
+                  ),
+                  GameBottomBar(),
+                ],
+              ),
             ],
           ),
         ),

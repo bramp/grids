@@ -73,6 +73,10 @@ class LevelProvider extends ChangeNotifier {
   DateTime _levelStartTime = DateTime(0);
   int _solveAttempts = 0;
 
+  /// Last cell toggled (for background animation reactions).
+  GridPoint? _lastToggledPoint;
+  int _toggleCount = 0;
+
   LevelGroup get currentGroup => _currentGroup;
   Level get currentLevel => _currentLevel;
   Puzzle get puzzle => _puzzle;
@@ -207,9 +211,16 @@ class LevelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Last cell the player toggled and a monotonic counter so listeners
+  /// can detect repeated taps on the same cell.
+  GridPoint? get lastToggledPoint => _lastToggledPoint;
+  int get toggleCount => _toggleCount;
+
   /// Toggles the specified cell, updating validation and notifying listeners.
   void toggleCell(GridPoint pt) {
     _puzzle = _puzzle.toggle(pt);
+    _lastToggledPoint = pt;
+    _toggleCount++;
     _lastValidation = null; // Clear previous validation attempt
     _errorPulseTimer?.cancel();
     _showErrors = true;
@@ -226,6 +237,8 @@ class LevelProvider extends ChangeNotifier {
     // First cell dictates the painting action for this entire drag operation
     if (_currentlyDraggedCells.isEmpty) {
       _puzzle = _puzzle.toggle(pt);
+      _lastToggledPoint = pt;
+      _toggleCount++;
       _dragActionLit = _puzzle.isLit(pt);
       _currentlyDraggedCells.add(pt);
       _lastValidation = null;
@@ -239,6 +252,8 @@ class LevelProvider extends ChangeNotifier {
     final isCurrentlyLit = _puzzle.isLit(pt);
     if (isCurrentlyLit != _dragActionLit) {
       _puzzle = _puzzle.toggle(pt);
+      _lastToggledPoint = pt;
+      _toggleCount++;
       _lastValidation = null;
       _errorPulseTimer?.cancel();
       _showErrors = true;
