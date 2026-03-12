@@ -10,13 +10,12 @@ class GameBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
-    final nextLevelId = context.select<LevelProvider, String?>(
-      (p) => p.nextLevelId,
-    );
-    final prevLevelId = context.select<LevelProvider, String?>(
-      (p) => p.previousLevelId,
-    );
+    final provider = context.watch<LevelProvider>();
+    final isSolved = provider.isSolved;
+    final hasPrev = provider.hasPreviousLevel;
+    final hasNext = provider.hasNextLevel;
+    final currentIndex = provider.currentLevelIndex;
+    final group = provider.currentGroup;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -24,8 +23,10 @@ class GameBottomBar extends StatelessWidget {
         children: [
           IconButton(
             iconSize: 32,
-            onPressed: prevLevelId != null
-                ? () => context.go('/level/$prevLevelId')
+            onPressed: hasPrev
+                ? () => context.go(
+                    '/level/${group.levels[currentIndex - 1].id}',
+                  )
                 : null,
             icon: const Icon(Icons.arrow_back),
           ),
@@ -60,8 +61,10 @@ class GameBottomBar extends StatelessWidget {
           const SizedBox(width: 16),
           IconButton(
             iconSize: 32,
-            onPressed: nextLevelId != null
-                ? () => context.go('/level/$nextLevelId')
+            onPressed: hasNext
+                ? () => context.go(
+                    '/level/${group.levels[currentIndex + 1].id}',
+                  )
                 : null,
             icon: const Icon(Icons.arrow_forward),
           ),

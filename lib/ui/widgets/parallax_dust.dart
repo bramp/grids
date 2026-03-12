@@ -27,7 +27,7 @@ class ParallaxDust extends StatefulWidget {
   final Random? random;
 
   /// Particles per logical pixel² of screen area.
-  /// Default 0.0002 ≈ 80 particles on a 400×1000 screen.
+  /// Default 0.0005 ≈ 200 particles on a 400×1000 screen.
   final double density;
 
   /// Maximum parallax shift in logical pixels for the nearest depth layer.
@@ -294,7 +294,7 @@ class _DustPainter extends CustomPainter {
       final baseX = (p.x + driftX) % size.width;
       final baseY = (p.y + driftY) % size.height;
 
-      // Depth-scaled parallax offset.
+      // Depth-scaled parallax offset (mouse).
       final shift = parallaxBase * p.depth;
 
       final paint = Paint()
@@ -305,8 +305,9 @@ class _DustPainter extends CustomPainter {
           p.brightness * (0.6 + 0.4 * p.depth),
         );
 
+      final px = (baseX + shift.dx) % size.width;
       canvas.drawCircle(
-        Offset(baseX + shift.dx, baseY + shift.dy),
+        Offset(px, baseY + shift.dy),
         minRadius + p.depth * (maxRadius - minRadius),
         paint,
       );

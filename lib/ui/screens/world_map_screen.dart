@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/providers/level_provider.dart';
-import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/services/progress_service.dart';
 import 'package:grids/ui/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
@@ -14,13 +13,11 @@ class WorldMapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final levelProvider = context.watch<LevelProvider>();
     final progressService = context.watch<ProgressService>();
-    final themeProvider = context.watch<ThemeProvider>();
-    final activeTheme = themeProvider.activeTheme;
 
     // A simple list view for now. A true 2D graph requires a CustomPainter
     // or a complex Stack layout, which we can iterate on later.
     return Scaffold(
-      backgroundColor: activeTheme.backgroundColor,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('World Map'),
         backgroundColor: Colors.transparent,

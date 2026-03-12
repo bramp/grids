@@ -64,31 +64,8 @@ final _router = GoRouter(
           path: 'level/:id',
           pageBuilder: (context, state) {
             final id = state.pathParameters['id']!;
-            return CustomTransitionPage(
-              key: state.pageKey,
+            return NoTransitionPage(
               child: GameScreen(levelId: id),
-              transitionsBuilder:
-                  (
-                    context,
-                    animation,
-                    secondaryAnimation,
-                    child,
-                  ) {
-                    return SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(1, 0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutCubic,
-                              reverseCurve: Curves.easeInCubic,
-                            ),
-                          ),
-                      child: child,
-                    );
-                  },
             );
           },
         ),
@@ -113,10 +90,23 @@ class GridsApp extends StatelessWidget {
         useMaterial3: true,
       ),
       builder: (context, child) {
+        final themeProvider = context.watch<ThemeProvider>();
+        final activeTheme = themeProvider.activeTheme;
+
         return _DeferredFocusOverlay(
           child: Stack(
             fit: StackFit.expand,
             children: [
+              // Persistent background that never participates in page
+              // transitions – visible on every screen.
+              Positioned.fill(
+                child: ColoredBox(color: activeTheme.backgroundColor),
+              ),
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: activeTheme.buildScreenBackground(context),
+                ),
+              ),
               if (child != null) Positioned.fill(child: child),
               const Positioned(
                 left: 0,
@@ -196,16 +186,7 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Watch relevant provider state
-    final nextLevelId = context.select<LevelProvider, String?>(
-      (p) => p.nextLevelId,
-    );
-    final prevLevelId = context.select<LevelProvider, String?>(
-      (p) => p.previousLevelId,
-    );
-
-    final themeProvider = context.watch<ThemeProvider>();
-    final activeTheme = themeProvider.activeTheme;
+    final provider = context.watch<LevelProvider>();
 
     return Shortcuts(
       shortcuts: GameShortcuts.bindings,
@@ -219,42 +200,37 @@ class _GameScreenState extends State<GameScreen> {
           ),
           NextLevelIntent: CallbackAction<NextLevelIntent>(
             onInvoke: (intent) {
-              if (nextLevelId != null) {
-                context.go('/level/$nextLevelId');
+              if (provider.hasNextLevel) {
+                final group = provider.currentGroup;
+                final nextLevel = group.levels[provider.currentLevelIndex + 1];
+                context.go('/level/${nextLevel.id}');
               }
               return null;
             },
           ),
           PrevLevelIntent: CallbackAction<PrevLevelIntent>(
             onInvoke: (intent) {
-              if (prevLevelId != null) {
-                context.go('/level/$prevLevelId');
+              if (provider.hasPreviousLevel) {
+                final group = provider.currentGroup;
+                final prevLevel = group.levels[provider.currentLevelIndex - 1];
+                context.go('/level/${prevLevel.id}');
               }
               return null;
             },
           ),
         },
-        child: Scaffold(
-          backgroundColor: activeTheme.backgroundColor,
-          appBar: const GameAppBar(),
-          body: Stack(
+        child: const Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: GameAppBar(),
+          body: Column(
             children: [
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: activeTheme.buildScreenBackground(context),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: GridWidget(),
                 ),
               ),
-              const Column(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: GridWidget(),
-                    ),
-                  ),
-                  GameBottomBar(),
-                ],
-              ),
+              GameBottomBar(),
             ],
           ),
         ),

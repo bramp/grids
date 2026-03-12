@@ -17,7 +17,8 @@ abstract class PuzzleTheme {
   /// Animated background layer rendered behind the game UI.
   ///
   /// Override in a theme to provide a custom effect (e.g. floating orbs,
-  /// particle fields). Returns an empty box by default.
+  /// particle fields).
+  /// Returns an empty box by default.
   Widget buildScreenBackground(BuildContext context) {
     return const SizedBox.shrink();
   }
