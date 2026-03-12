@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:grids/providers/level_provider.dart';
-import 'package:provider/provider.dart';
 
 /// Animated background of soft, blurred orbs that drift in slow lava-lamp
-/// style paths and pulse toward the quadrant where the player toggles cells.
+/// style paths.
 class GaussianOrbs extends StatefulWidget {
   const GaussianOrbs({super.key});
 
@@ -57,16 +55,9 @@ class _Orb {
 }
 
 class _GaussianOrbsState extends State<GaussianOrbs>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late final AnimationController _driftController;
-  late final AnimationController _pulseController;
   late final List<_Orb> _orbs;
-
-  LevelProvider? _provider;
-  int _prevToggleCount = -1;
-
-  /// Pulse target in normalized coordinates (0–1).
-  Offset _pulseTarget = const Offset(0.5, 0.5);
 
   static final _random = Random(42);
 
@@ -81,15 +72,10 @@ class _GaussianOrbsState extends State<GaussianOrbs>
     );
     unawaited(_driftController.repeat());
 
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
     _orbs = _generateOrbs();
   }
 
-  /// Build orbs with 3 harmonics each so the paths look organic.
+  /// Build orbs with 4 harmonics each so the paths look organic.
   static List<_Orb> _generateOrbs() {
     const colors = [
       Color(0xFF00FFCC), // cyan
@@ -147,40 +133,8 @@ class _GaussianOrbsState extends State<GaussianOrbs>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final provider = context.read<LevelProvider>();
-    if (_provider != provider) {
-      _provider?.removeListener(_onProviderChanged);
-      _provider = provider;
-      _provider!.addListener(_onProviderChanged);
-    }
-  }
-
-  void _onProviderChanged() {
-    final provider = _provider;
-    if (provider == null) return;
-
-    final point = provider.lastToggledPoint;
-    final count = provider.toggleCount;
-    if (point != null && count != _prevToggleCount) {
-      _prevToggleCount = count;
-
-      final w = provider.puzzle.width;
-      final h = provider.puzzle.height;
-      _pulseTarget = Offset(
-        (point.value % w + 0.5) / w,
-        (point.value ~/ w + 0.5) / h,
-      );
-      unawaited(_pulseController.forward(from: 0));
-    }
-  }
-
-  @override
   void dispose() {
-    _provider?.removeListener(_onProviderChanged);
     _driftController.dispose();
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -188,15 +142,12 @@ class _GaussianOrbsState extends State<GaussianOrbs>
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: ListenableBuilder(
-        listenable: Listenable.merge([_driftController, _pulseController]),
+        listenable: _driftController,
         builder: (context, child) {
           return CustomPaint(
             painter: _OrbPainter(
               orbs: _orbs,
-              // Map the 0–1 controller value back to seconds.
               driftSeconds: _driftController.value * 240,
-              pulseT: _pulseController.value,
-              pulseTarget: _pulseTarget,
             ),
             size: Size.infinite,
           );
@@ -210,51 +161,28 @@ class _OrbPainter extends CustomPainter {
   const _OrbPainter({
     required this.orbs,
     required this.driftSeconds,
-    required this.pulseT,
-    required this.pulseTarget,
   });
 
   final List<_Orb> orbs;
   final double driftSeconds;
 
-  /// Pulse progress 0 → 1 (0 = start, 1 = settled).
-  final double pulseT;
-
-  /// Normalized pulse target (0–1).
-  final Offset pulseTarget;
-
   @override
   void paint(Canvas canvas, Size size) {
-    // Quick rise, slow decay.
-    final pulseCurve = Curves.easeOut.transform(1 - pulseT);
-
     for (final orb in orbs) {
       final pos = orb.positionAt(driftSeconds);
 
-      var center = Offset(
+      final center = Offset(
         pos.dx * size.width,
         pos.dy * size.height,
       );
-
-      // Shift toward the toggle target during a pulse.
-      if (pulseT > 0 && pulseT < 1) {
-        final target = Offset(
-          pulseTarget.dx * size.width,
-          pulseTarget.dy * size.height,
-        );
-        center += (target - center) * 0.12 * pulseCurve;
-      }
 
       // Breathing size: ±20% of base radius.
       final breathAngle = driftSeconds * orb.breathFreq + orb.breathPhase;
       final breathScale = 1.0 + 0.2 * sin(breathAngle);
       final radius = orb.radius * breathScale * size.shortestSide;
 
-      // Base ~8 % opacity; pulse adds up to ~5 %.
-      final opacity = 0.08 + (pulseT > 0 ? 0.05 * pulseCurve : 0);
-
       final paint = Paint()
-        ..color = orb.color.withValues(alpha: opacity)
+        ..color = orb.color.withValues(alpha: 0.08)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 0.7);
 
       canvas.drawCircle(center, radius, paint);
@@ -262,6 +190,5 @@ class _OrbPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_OrbPainter old) =>
-      driftSeconds != old.driftSeconds || pulseT != old.pulseT;
+  bool shouldRepaint(_OrbPainter old) => driftSeconds != old.driftSeconds;
 }
