@@ -20,6 +20,12 @@ class CyberTheme extends PuzzleTheme {
   Color get backgroundColor => const Color(0xFF0D0E15); // Deep dark blue-black
 
   @override
+  Color get accentColor => Colors.cyan;
+
+  @override
+  Color get solvedColor => Colors.green;
+
+  @override
   double get cellPadding => 6;
 
   @override

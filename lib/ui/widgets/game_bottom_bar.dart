@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grids/providers/level_provider.dart';
+import 'package:grids/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 /// The bottom controls for the game screen, including Previous,
@@ -11,6 +12,9 @@ class GameBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<LevelProvider>();
+    final solvedColor = context.select<ThemeProvider, Color>(
+      (p) => p.activeTheme.solvedColor,
+    );
     final isSolved = provider.isSolved;
     final hasPrev = provider.hasPreviousLevel;
     final hasNext = provider.hasNextLevel;
@@ -45,7 +49,7 @@ class GameBottomBar extends StatelessWidget {
                 onPressed: () => context.read<LevelProvider>().checkAnswer(),
                 style: isSolved
                     ? FilledButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: solvedColor,
                       )
                     : null,
                 child: const Text(

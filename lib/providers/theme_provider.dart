@@ -1,19 +1,14 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:grids/ui/themes/cyber_theme.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  ThemeProvider() {
-    _themes = [
-      const CyberTheme(),
-    ];
-    _activeTheme = _themes.first;
-  }
+  final List<PuzzleTheme> _themes = [const CyberTheme()];
+  late PuzzleTheme _activeTheme = _themes.first;
 
-  late List<PuzzleTheme> _themes;
-  late PuzzleTheme _activeTheme;
-
-  List<PuzzleTheme> get availableThemes => _themes;
+  List<PuzzleTheme> get availableThemes => UnmodifiableListView(_themes);
   PuzzleTheme get activeTheme => _activeTheme;
 
   void setTheme(PuzzleTheme theme) {

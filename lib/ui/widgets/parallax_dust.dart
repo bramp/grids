@@ -230,21 +230,32 @@ class _ParallaxDustState extends State<ParallaxDust>
       opaque: false,
       onHover: _onHover,
       child: RepaintBoundary(
-        child: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, child) {
-            return CustomPaint(
-              painter: _DustPainter(
-                ensureParticles: _ensureParticles,
-                particles: _particles,
-                pointerNorm: _pointerNorm,
-                maxShift: widget.maxShift,
-                minRadius: widget.minRadius,
-                maxRadius: widget.maxRadius,
-                driftScale: widget.driftScale,
-                time: _controller.value * 180,
-              ),
-              size: Size.infinite,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final layoutSize = Size(
+              constraints.maxWidth,
+              constraints.maxHeight,
+            );
+            // Ensure particles are generated/updated before painting,
+            // not inside the painter's paint() method.
+            _ensureParticles(layoutSize);
+
+            return ListenableBuilder(
+              listenable: _controller,
+              builder: (context, child) {
+                return CustomPaint(
+                  painter: _DustPainter(
+                    particles: _particles,
+                    pointerNorm: _pointerNorm,
+                    maxShift: widget.maxShift,
+                    minRadius: widget.minRadius,
+                    maxRadius: widget.maxRadius,
+                    driftScale: widget.driftScale,
+                    time: _controller.value * 180,
+                  ),
+                  size: Size.infinite,
+                );
+              },
             );
           },
         ),
@@ -255,7 +266,6 @@ class _ParallaxDustState extends State<ParallaxDust>
 
 class _DustPainter extends CustomPainter {
   _DustPainter({
-    required this.ensureParticles,
     required this.particles,
     required this.pointerNorm,
     required this.maxShift,
@@ -265,7 +275,6 @@ class _DustPainter extends CustomPainter {
     required this.time,
   });
 
-  final void Function(Size) ensureParticles;
   final List<_Particle> particles;
   final Offset pointerNorm;
   final double maxShift;
@@ -276,8 +285,6 @@ class _DustPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    ensureParticles(size);
-
     // Parallax offset: pointer deviation from center, inverted.
     final parallaxBase = Offset(
       -(pointerNorm.dx - 0.5) * 2 * maxShift,

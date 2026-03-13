@@ -48,6 +48,27 @@ class SolveResult {
   }
 }
 
+/// Shared mutable state for a single [PuzzleSolver.solve] invocation.
+class _SolveContext {
+  _SolveContext({
+    required this.basePuzzle,
+    required this.bitMasks,
+    required this.deduplicate,
+    required this.analyze,
+    required this.validator,
+  });
+
+  final Puzzle basePuzzle;
+  final List<BigInt> bitMasks;
+  final bool deduplicate;
+  final bool analyze;
+  final PuzzleValidator validator;
+
+  final List<Puzzle> solutions = [];
+  final Set<String> seenSignatures = {};
+  final Map<int, int> errorHistogram = {};
+}
+
 /// A simple brute-force backtracking solver for Grids puzzles.
 class PuzzleSolver {
   PuzzleSolver({PuzzleValidator? validator})
@@ -85,100 +106,58 @@ class PuzzleSolver {
       }
     }
 
-    final solutions = <Puzzle>[];
-    final seenSignatures = <String>{};
-    final errorHistogram = <int, int>{};
-
-    final bitMasks = playableIndices.map((pt) => BigInt.one << pt).toList();
-
-    _backtrack(
-      puzzle,
-      bitMasks,
-      0,
-      puzzle.bits,
-      solutions,
-      seenSignatures,
-      deduplicate,
-      analyze,
-      optimizedValidator,
-      errorHistogram,
+    final ctx = _SolveContext(
+      basePuzzle: puzzle,
+      bitMasks: playableIndices.map((pt) => BigInt.one << pt).toList(),
+      deduplicate: deduplicate,
+      analyze: analyze,
+      validator: optimizedValidator,
     );
 
-    return SolveResult(solutions, errorHistogram: errorHistogram);
+    _backtrack(ctx, 0, puzzle.bits);
+
+    return SolveResult(ctx.solutions, errorHistogram: ctx.errorHistogram);
   }
 
-  void _backtrack(
-    Puzzle basePuzzle,
-    List<BigInt> bitMasks,
-    int index,
-    BigInt currentBits,
-    List<Puzzle> solutions,
-    Set<String> seenSignatures,
-    bool deduplicate,
-    bool analyze,
-    PuzzleValidator validator,
-    Map<int, int> errorHistogram,
-  ) {
-    if (index == bitMasks.length) {
-      final current = basePuzzle.copyWith(
+  void _backtrack(_SolveContext ctx, int index, BigInt currentBits) {
+    if (index == ctx.bitMasks.length) {
+      final current = ctx.basePuzzle.copyWith(
         state: GridState(
-          width: basePuzzle.width,
-          height: basePuzzle.height,
+          width: ctx.basePuzzle.width,
+          height: ctx.basePuzzle.height,
           bits: currentBits,
         ),
       );
-      final result = validator.validate(current);
-      if (analyze) {
+      final result = ctx.validator.validate(current);
+      if (ctx.analyze) {
         final uniqueErrorCells = result.errors
             .map((e) => e.point)
             .toSet()
             .length;
-        errorHistogram[uniqueErrorCells] =
-            (errorHistogram[uniqueErrorCells] ?? 0) + 1;
+        ctx.errorHistogram[uniqueErrorCells] =
+            (ctx.errorHistogram[uniqueErrorCells] ?? 0) + 1;
       }
       if (result.isValid) {
-        if (!deduplicate) {
-          solutions.add(current);
+        if (!ctx.deduplicate) {
+          ctx.solutions.add(current);
           return;
         }
 
         final signature = _getSignature(current);
-        if (seenSignatures.add(signature)) {
-          solutions.add(_normalize(current, validator));
+        if (ctx.seenSignatures.add(signature)) {
+          ctx.solutions.add(_normalize(current, ctx.validator));
         }
       }
       return;
     }
 
-    final bit = bitMasks[index];
+    final bit = ctx.bitMasks[index];
 
     // Try bit off
-    _backtrack(
-      basePuzzle,
-      bitMasks,
-      index + 1,
-      currentBits & ~bit,
-      solutions,
-      seenSignatures,
-      deduplicate,
-      analyze,
-      validator,
-      errorHistogram,
-    );
+    _backtrack(ctx, index + 1, currentBits & ~bit);
 
     // Try bit on
-    _backtrack(
-      basePuzzle,
-      bitMasks,
-      index + 1,
-      currentBits | bit,
-      solutions,
-      seenSignatures,
-      deduplicate,
-      analyze,
-      validator,
-      errorHistogram,
-    );
+    _backtrack(ctx, index + 1, currentBits | bit);
   }
 
   String _getSignature(Puzzle puzzle) {

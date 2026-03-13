@@ -64,23 +64,10 @@ class ProgressService {
   }
 
   /// Checks if all levels in a given list of IDs have been solved.
-  bool areAllLevelsSolved(List<String> levelIds) {
-    for (final id in levelIds) {
-      if (!isLevelSolved(id)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  bool areAllLevelsSolved(List<String> levelIds) =>
+      levelIds.every(isLevelSolved);
 
   /// Returns the number of levels in a given list of IDs that have been solved.
-  int getSolvedCount(List<String> levelIds) {
-    var count = 0;
-    for (final id in levelIds) {
-      if (isLevelSolved(id)) {
-        count++;
-      }
-    }
-    return count;
-  }
+  int getSolvedCount(List<String> levelIds) =>
+      levelIds.where(isLevelSolved).length;
 }

@@ -11,6 +11,12 @@ abstract class PuzzleTheme {
   /// The overarching background color for the screen/board.
   Color get backgroundColor;
 
+  /// Accent color used for highlights, borders, and interactive elements.
+  Color get accentColor;
+
+  /// Color shown on the check-answer button when a puzzle is solved.
+  Color get solvedColor;
+
   /// External padding around the whole grid.
   EdgeInsets get gridPadding => const EdgeInsets.all(8);
 

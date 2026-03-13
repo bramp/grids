@@ -6,33 +6,44 @@ import 'package:meta/meta.dart';
 /// a reference point.
 @immutable
 class GridShape {
-  const GridShape(this.offsets);
+  factory GridShape(Set<(int, int)> offsets) {
+    final signature = _computeSignature(offsets);
+
+    final rotationOffsets = <Set<(int, int)>>[];
+    var current = offsets;
+    for (var i = 0; i < 4; i++) {
+      rotationOffsets.add(current);
+      // Rotate 90 degrees clockwise: (x, y) -> (-y, x)
+      current = current.map((p) => (-p.$2, p.$1)).toSet();
+    }
+
+    final rotations = [
+      for (final o in rotationOffsets) GridShape._(o, _computeSignature(o)),
+    ];
+
+    return GridShape._(offsets, signature, rotations);
+  }
+
+  const GridShape._(this.offsets, this.signature, [this.rotations = const []]);
 
   /// The relative offsets from the reference point that define this shape.
   final Set<(int, int)> offsets;
 
-  /// Returns a canonical string representation of this shape.
+  /// A canonical string representation of this shape.
   /// Identical shapes will have identical signatures regardless of the
   /// order in which offsets were added.
-  String get signature {
+  final String signature;
+
+  /// All four 90-degree rotations of this shape (including itself at index 0).
+  final List<GridShape> rotations;
+
+  static String _computeSignature(Set<(int, int)> offsets) {
     final list = offsets.toList()
       ..sort((a, b) {
         if (a.$1 != b.$1) return a.$1.compareTo(b.$1);
         return a.$2.compareTo(b.$2);
       });
     return list.map((p) => '${p.$1},${p.$2}').join(';');
-  }
-
-  /// Returns all four 90-degree rotations of this shape.
-  List<GridShape> get rotations {
-    final result = <GridShape>[];
-    var current = offsets;
-    for (var i = 0; i < 4; i++) {
-      result.add(GridShape(current));
-      // Rotate 90 degrees clockwise: (x, y) -> (-y, x)
-      current = current.map((p) => (-p.$2, p.$1)).toSet();
-    }
-    return result;
   }
 
   @override

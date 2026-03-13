@@ -53,3 +53,30 @@
 - [ ] Give more screen space to the puzzle
 - [X] Clicking mine puzzle -> map -> mine puzzle - lands you on mine_2 instead of mine_1
 - [ ] Add a hint button
+
+## Code Audit (March 2026)
+
+### HIGH Priority
+
+- [x] Remove unused `rule_validator.dart` import in `lib/providers/level_provider.dart` (line 12).
+- [x] Fix side-effects inside `CustomPainter.paint()` in `lib/ui/widgets/parallax_dust.dart` and `lib/ui/widgets/plasma_lightning.dart`. Both call mutation functions (`ensureParticles()`, `_tick()`) inside `paint()`. Flutter can call `paint()` multiple times per frame during layout. Move state mutations into the `State` class (e.g. animation listener or `build()`), not the painter.
+- [x] Refactor `_backtrack()` in `lib/engine/solver.dart` — it takes 10 parameters. Wrap them in a `_SolveContext` class for readability and to reduce error potential.
+- [x] `AreaExtractor` (`lib/engine/area_extractor.dart`) uses mutable static buffers (`_visitedBuffer`, `_queueBuffer`). Not safe if `extract()` is ever called from an isolate. Document the single-threaded constraint or switch to local allocations.
+
+### MEDIUM Priority
+
+- [x] `ThemeProvider` (`lib/providers/theme_provider.dart`) exposes the mutable `_themes` list directly via `availableThemes`. Return `List.unmodifiable(_themes)` or `UnmodifiableListView` instead.
+- [x] `ThemeProvider` uses unnecessary `late` for `_themes` and `_activeTheme`. Both are assigned in the constructor and could be `final` fields with direct initialization.
+- [x] Add `@immutable` annotation to `Level` class (`lib/engine/level.dart`) — all fields are final but the annotation is missing.
+- [x] Cache `GridShape.signature` and `rotations` (`lib/engine/grid_shape.dart`) — they recompute (sort + join / generate 4 rotations) on every access. Use `late final` to compute once: `late final String signature = _computeSignature();`
+- [x] `LevelRepository` (`lib/data/level_repository.dart`) exposes mutable `worldMap` (Map) and `levels` (List). Callers could accidentally modify the game data. Wrap with `Map.unmodifiable()` and `List.unmodifiable()`.
+- [x] Simplify `ProgressService` (`lib/services/progress_service.dart`) methods to idiomatic Dart: `areAllLevelsSolved` → `ids.every(isLevelSolved)`, `getSolvedCount` → `ids.where(isLevelSolved).length`.
+
+### LOW Priority
+
+- [x] Hard-coded colors in UI: `world_map_screen.dart` uses `Color(0xFF00CC00)`, `game_bottom_bar.dart` uses `Colors.green` for solved state. Move these to the theme.
+- [ ] `DashValidator` (`lib/engine/validators/dash_validator.dart`) is ~150 lines with quadruple nested loops. Extract helper methods like `_findDashesByColor()` and `_getSignaturesForColor()`.
+- [ ] `GridFormat.parse()` (`lib/engine/grid_format.dart`) is 200+ lines. Extract modifier-parsing logic into a separate method.
+- [ ] Missing tests for: `progress_service.dart`, `analytics_service.dart`, `preferences_service.dart`, `grid_cell_widget.dart`, `grid_widget.dart`, `game_bottom_bar.dart`, `dice_dots_widget.dart`, `gaussian_orbs.dart`, `parallax_dust.dart`, `plasma_lightning.dart`.
+- [ ] Move TODO comments in level data files (`garden_levels.dart`, `mine_levels.dart`, `shrine_levels.dart`) into this file or an issue tracker.
+- [ ] `consent_banner.dart` uses a `StatefulWidget` for one boolean (`_analyticsEnabled`). Could derive it directly from `ConsentService` state instead.

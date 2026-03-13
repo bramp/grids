@@ -73,17 +73,27 @@ class _PlasmaLightningState extends State<PlasmaLightning>
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: ListenableBuilder(
-        listenable: _controller,
-        builder: (context, child) {
-          final time = _controller.value * 3600;
-          return CustomPaint(
-            painter: _LightningPainter(
-              bolts: _bolts,
-              time: time,
-              onTick: (size) => _tick(time, size),
-            ),
-            size: Size.infinite,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final layoutSize = Size(
+            constraints.maxWidth,
+            constraints.maxHeight,
+          );
+
+          return ListenableBuilder(
+            listenable: _controller,
+            builder: (context, child) {
+              final time = _controller.value * 3600;
+              // Update bolt state before painting, not inside the painter.
+              _tick(time, layoutSize);
+              return CustomPaint(
+                painter: _LightningPainter(
+                  bolts: _bolts,
+                  time: time,
+                ),
+                size: Size.infinite,
+              );
+            },
           );
         },
       ),
@@ -174,20 +184,13 @@ class _LightningPainter extends CustomPainter {
   const _LightningPainter({
     required this.bolts,
     required this.time,
-    required this.onTick,
   });
 
   final List<_Bolt> bolts;
   final double time;
 
-  /// Called during paint so the state can spawn / cull bolts at the
-  /// right size without an extra build cycle.
-  final void Function(Size size) onTick;
-
   @override
   void paint(Canvas canvas, Size size) {
-    onTick(size);
-
     for (final bolt in bolts) {
       final t = bolt.progress(time);
       if (t >= 1) continue;

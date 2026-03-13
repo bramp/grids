@@ -6,8 +6,8 @@ import 'package:grids/engine/puzzle.dart';
 void main() {
   group('GridShape', () {
     test('signature is canonical and stable', () {
-      const shape1 = GridShape({(0, 0), (1, 0), (0, 1)});
-      const shape2 = GridShape({(0, 1), (0, 0), (1, 0)}); // Reordered
+      final shape1 = GridShape(const {(0, 0), (1, 0), (0, 1)});
+      final shape2 = GridShape(const {(0, 1), (0, 0), (1, 0)}); // Reordered
       expect(shape1.signature, shape2.signature);
       expect(shape1.signature, '0,0;0,1;1,0');
       expect(shape1, shape2);
@@ -15,7 +15,7 @@ void main() {
 
     test('rotations are calculated correctly', () {
       // Horizontal 2-cell: (0,0), (1,0)
-      const shape = GridShape({(0, 0), (1, 0)});
+      final shape = GridShape(const {(0, 0), (1, 0)});
       final rotations = shape.rotations;
 
       expect(rotations.length, 4);
@@ -34,9 +34,9 @@ void main() {
     });
 
     test('hashCode and operator == work via signature', () {
-      const shape1 = GridShape({(0, 0), (1, 0)});
-      const shape2 = GridShape({(1, 0), (0, 0)});
-      const shape3 = GridShape({(0, 0), (0, 1)});
+      final shape1 = GridShape(const {(0, 0), (1, 0)});
+      final shape2 = GridShape(const {(1, 0), (0, 0)});
+      final shape3 = GridShape(const {(0, 0), (0, 1)});
 
       expect(shape1, shape2);
       expect(shape1.hashCode, shape2.hashCode);

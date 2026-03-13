@@ -5,26 +5,14 @@ import 'package:grids/engine/puzzle.dart';
 
 /// Utility class to extract contiguous areas of like-lit cells.
 class AreaExtractor {
-  static Uint8List _visitedBuffer = Uint8List(0);
-  static Int32List _queueBuffer = Int32List(0);
-
   /// Identifies all contiguous areas where cells share the same lit/unlit state.
   static List<List<GridPoint>> extract(Puzzle puzzle) {
     final width = puzzle.width;
     final height = puzzle.height;
     final size = width * height;
 
-    if (_visitedBuffer.length < size) {
-      _visitedBuffer = Uint8List(size);
-      _queueBuffer = Int32List(size);
-    }
-
-    final visited = _visitedBuffer;
-    final queue = _queueBuffer;
-
-    for (var i = 0; i < size; i++) {
-      visited[i] = 0;
-    }
+    final visited = Uint8List(size);
+    final queue = Int32List(size);
 
     final areas = <List<GridPoint>>[];
 

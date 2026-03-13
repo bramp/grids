@@ -2,9 +2,11 @@ import 'package:grids/engine/cell.dart';
 import 'package:grids/engine/grid_point.dart';
 import 'package:grids/engine/grid_state.dart';
 import 'package:grids/engine/puzzle.dart';
+import 'package:meta/meta.dart';
 
 /// Represents a level in the game, consisting of metadata
 /// and the puzzle itself.
+@immutable
 class Level {
   Level({
     required this.id,
