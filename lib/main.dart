@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 
@@ -92,6 +93,14 @@ class GridsApp extends StatelessWidget {
       builder: (context, child) {
         final themeProvider = context.watch<ThemeProvider>();
         final activeTheme = themeProvider.activeTheme;
+
+        // Ensure the system navigation bar matches the theme background
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            systemNavigationBarColor: activeTheme.backgroundColor,
+            systemNavigationBarIconBrightness: Brightness.light,
+          ),
+        );
 
         return _DeferredFocusOverlay(
           child: Stack(

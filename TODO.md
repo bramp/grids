@@ -53,6 +53,12 @@
 - [ ] Give more screen space to the puzzle
 - [X] Clicking mine puzzle -> map -> mine puzzle - lands you on mine_2 instead of mine_1
 - [ ] Add a hint button
+- [ ] Drag to the right highlights the next row
+- [ ] Solve, but don't click solve. Go back and forward and it appears solved
+- [ ] Colour that button correctly
+- [x] Check mine_13
+- [ ] All the radius should match
+- [x] Set android:navigationBarColor
 
 ## Code Audit (March 2026)
 
