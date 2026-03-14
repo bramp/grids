@@ -53,12 +53,14 @@
 - [ ] Give more screen space to the puzzle
 - [X] Clicking mine puzzle -> map -> mine puzzle - lands you on mine_2 instead of mine_1
 - [ ] Add a hint button
-- [ ] Drag to the right highlights the next row
-- [ ] Solve, but don't click solve. Go back and forward and it appears solved
+- [x] Click Drag to the right highlights the next row
+- [x] Solve, but don't click solve. Go back and forward and it appears solved
+- [x] If I return to a puzzle I've never cliecked "solved" on, but the solution was correct, it defaults to being highlgihted as solved.
 - [ ] Colour that button correctly
 - [x] Check mine_13
-- [ ] All the radius should match
+- [x] All the radius should match
 - [x] Set android:navigationBarColor
+- [ ] Make "success" more obvious.
 
 ## Code Audit (March 2026)
 

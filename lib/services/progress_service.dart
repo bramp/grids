@@ -9,7 +9,7 @@ class ProgressService {
   final PreferencesService _prefs;
 
   static const String _keyLastLevelPlayed = 'last_level_played';
-  static const String _keyUnlockedLevelsPrefix = 'unlocked_level_';
+  static const String _keySolvedPrefix = 'solved_';
   static const String _keySolutionPrefix = 'solution_';
 
   /// Saves the ID of the last level the user played.
@@ -22,20 +22,19 @@ class ProgressService {
     return _prefs.getString(_keyLastLevelPlayed);
   }
 
-  /// Marks a specific level as unlocked.
-  Future<void> saveLevelUnlocked(String levelId) async {
-    await _prefs.setBool('$_keyUnlockedLevelsPrefix$levelId', value: true);
+  /// Marks a level as solved after the user explicitly clicks Check Answer
+  /// and the validation passes.
+  Future<void> saveLevelSolved(String levelId) async {
+    await _prefs.setBool('$_keySolvedPrefix$levelId', value: true);
   }
 
-  /// Checks if a specific level is unlocked.
-  bool isLevelUnlocked(String levelId) {
-    return _prefs.getBool('$_keyUnlockedLevelsPrefix$levelId') ?? false;
+  /// Checks if a specific level was explicitly solved via Check Answer.
+  bool isLevelSolved(String levelId) {
+    return _prefs.getBool('$_keySolvedPrefix$levelId') ?? false;
   }
 
-  /// Saves the user's solved state for a specific puzzle.
-  /// Converts the GridState's BigInt to a string for storage.
+  /// Saves the user's grid state for a specific puzzle (partial or complete).
   Future<void> saveSolution(String levelId, GridState state) async {
-    // BigInt.toString(radix: 16) gives us a compact hex string.
     await _prefs.setString(
       '$_keySolutionPrefix$levelId',
       state.bits.toRadixString(16),
@@ -56,11 +55,6 @@ class ProgressService {
     if (bits == null) return null;
 
     return GridState(width: width, height: height, bits: bits);
-  }
-
-  /// Checks if a specific level has been solved.
-  bool isLevelSolved(String levelId) {
-    return _prefs.getString('$_keySolutionPrefix$levelId') != null;
   }
 
   /// Checks if all levels in a given list of IDs have been solved.

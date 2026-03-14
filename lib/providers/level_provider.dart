@@ -109,21 +109,16 @@ class LevelProvider extends ChangeNotifier {
         }
       }
 
-      // Also check if the user has explicitly manually unlocked the first level
-      // of this group as a legacy fallback, or if it's the very first root.
       final isRoot = group.requiredGroups.isEmpty;
-      final hasProgress =
-          group.levels.isNotEmpty &&
-          _progressService.isLevelUnlocked(group.levels.first.id);
+
+      // Legacy fallback: if any level in the group has progress, consider
+      // the group accessible.
+      final hasProgress = group.levels.any(
+        (l) => _progressService.isLevelSolved(l.id),
+      );
 
       if (canUnlock || isRoot || hasProgress) {
         _unlockedGroups.add(group.id);
-        if (group.levels.isNotEmpty) {
-          // Ensure at least the first level is marked unlocked for UI
-          unawaited(
-            _progressService.saveLevelUnlocked(group.levels.first.id),
-          );
-        }
       }
     }
   }
@@ -166,8 +161,14 @@ class LevelProvider extends ChangeNotifier {
     _showErrors = true;
     _errorPulseCount = 0;
 
-    if (savedState != null) {
-      // If the loaded state is perfectly solved, restore the 'Solved' UI state
+    // Restore the solved UI only when BOTH conditions are met:
+    //  1. The user previously clicked "Check Answer" and it passed
+    //     (tracked by saveLevelSolved).
+    //  2. The loaded state still validates as correct (the user may have
+    //     toggled cells after solving, making the saved state wrong).
+    // If either condition is false we just load the state silently and
+    // wait for the player to click "Check Answer".
+    if (_progressService.isLevelSolved(_currentLevel.id)) {
       final validation = _validator.validate(_puzzle);
       if (validation.isValid) {
         _lastValidation = validation;
@@ -188,14 +189,11 @@ class LevelProvider extends ChangeNotifier {
   bool get hasPreviousLevel => _currentLevelIndexInGroup > 0;
 
   bool get hasNextLevel {
-    // We can go to the next level if it's within the same group
-    // AND if that level is unlocked.
-    // In our new graph, you can only 'nextLevel' within a group.
     if (_currentLevelIndexInGroup >= _currentGroup.levels.length - 1) {
       return false;
     }
-    final nextLevelId = _currentGroup.levels[_currentLevelIndexInGroup + 1].id;
-    return _progressService.isLevelUnlocked(nextLevelId);
+    // The next level is playable once the current one has been solved.
+    return _progressService.isLevelSolved(_currentLevel.id);
   }
 
   /// Resets the current puzzle to its original (unsolved) state.
@@ -333,15 +331,8 @@ class LevelProvider extends ChangeNotifier {
     }
 
     if (isValid) {
-      // Mark this specific level as unlocked, and the NEXT level in the group
-      unawaited(_progressService.saveLevelUnlocked(_currentLevel.id));
-      if (_currentLevelIndexInGroup + 1 < _currentGroup.levels.length) {
-        unawaited(
-          _progressService.saveLevelUnlocked(
-            _currentGroup.levels[_currentLevelIndexInGroup + 1].id,
-          ),
-        );
-      }
+      // Mark this level as solved
+      unawaited(_progressService.saveLevelSolved(_currentLevel.id));
 
       // Save their solution for this level
       unawaited(_progressService.saveSolution(_currentLevel.id, _puzzle.state));
@@ -387,31 +378,17 @@ class LevelProvider extends ChangeNotifier {
 
     final group = LevelRepository.worldMap[groupId]!;
 
-    // Find the first level that is unlocked but not yet solved.
-    // This correctly resumes progress without skipping levels that have
-    // only been partially attempted (toggleCell saves partial state which
-    // isLevelSolved would treat as "solved").
+    // Find the first level that is not yet solved.
+    // Level 0 is always playable; level N is playable if level N-1 is solved.
     var targetIndex = 0;
     for (var i = 0; i < group.levels.length; i++) {
       final level = group.levels[i];
-      if (_progressService.isLevelUnlocked(level.id)) {
-        targetIndex = i;
-        // Check if this level was correctly solved (valid solution).
-        final savedState = _progressService.getSolution(
-          level.id,
-          level.puzzle.width,
-          level.puzzle.height,
-        );
-        if (savedState == null) break; // Never touched — start here.
-        final validation = _validator.validate(
-          level.puzzle.copyWith(state: savedState),
-        );
-        if (!validation.isValid) break; // Partial / wrong — resume here.
-        // Otherwise this level is truly solved; continue to next.
-      } else {
-        // Not unlocked — can't go beyond here.
+      // Level 0 is always accessible; others require the previous to be solved.
+      if (i > 0 && !_progressService.isLevelSolved(group.levels[i - 1].id)) {
         break;
       }
+      targetIndex = i;
+      if (!_progressService.isLevelSolved(level.id)) break;
     }
 
     _loadLevel(groupId, targetIndex);

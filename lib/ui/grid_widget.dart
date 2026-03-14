@@ -91,6 +91,13 @@ class GridWidget extends StatelessWidget {
     final x = (localPosition.dx / _referenceCellSize).floor();
     final y = (localPosition.dy / _referenceCellSize).floor();
 
+    // Ignore pointer events outside the grid bounds (e.g. dragging past
+    // the last column would otherwise wrap to the first cell of the next row).
+    if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight) {
+      context.read<LevelProvider>().setHoveredDragPoint(null);
+      return;
+    }
+
     final point = GridPoint(y * gridWidth + x);
     final provider = context.read<LevelProvider>();
 

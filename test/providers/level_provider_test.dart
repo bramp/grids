@@ -27,11 +27,21 @@ void main() {
     expect(levelProvider.hasNextLevel, isFalse);
   });
 
-  test('hasNextLevel should be true if the next level is unlocked', () async {
-    // Manually get the second level ID in the group
-    final nextId = levelProvider.currentGroup.levels[1].id;
-
-    await progressService.saveLevelUnlocked(nextId);
+  test('hasNextLevel should be true if the current level is solved', () async {
+    // Solve the current level
+    final level = levelProvider.currentLevel;
+    final solution = level.knownSolutions.first;
+    for (var y = 0; y < level.puzzle.height; y++) {
+      for (var x = 0; x < level.puzzle.width; x++) {
+        final pt = level.puzzle.pointAt(x, y);
+        final needsLit = solution.isLit(pt);
+        final currentlyLit = levelProvider.puzzle.state.isLit(pt);
+        if (needsLit != currentlyLit) {
+          levelProvider.toggleCell(pt);
+        }
+      }
+    }
+    levelProvider.checkAnswer();
 
     expect(levelProvider.hasNextLevel, isTrue);
   });
@@ -83,17 +93,17 @@ void main() {
   });
 
   test(
-    'loadLevelById should not unlock levels just by visiting them',
+    'loadLevelById should not mark levels as solved just by visiting them',
     () async {
-      // The second level should not be unlocked initially
+      // The second level should not be solved initially
       final secondId = levelProvider.currentGroup.levels[1].id;
-      expect(progressService.isLevelUnlocked(secondId), isFalse);
+      expect(progressService.isLevelSolved(secondId), isFalse);
 
       // Navigate to the second level
       levelProvider.loadLevelById(secondId);
 
-      // The level should NOT be marked as unlocked just from visiting
-      expect(progressService.isLevelUnlocked(secondId), isFalse);
+      // The level should NOT be marked as solved just from visiting
+      expect(progressService.isLevelSolved(secondId), isFalse);
     },
   );
 
