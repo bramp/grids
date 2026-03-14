@@ -40,6 +40,28 @@
 
 - [ ] Add sound effects for solving puzzles.
 
+## Backgrounds
+
+- [ ] Blueprint Grid — faint coordinate system / technical grid with slow diagonal scroll.
+- [ ] Gaussian "Cloud" Orbs — soft, blurred color blobs that react to cell toggles.
+- [ ] Parallax Depth — tiny particle layer with gyroscope/mouse parallax.
+- [ ] Flowing Plasma Trails — smoke-like wisps that burst on cell toggle.
+- [ ] Matrix Data Rain — dark hex numbers falling in columns, flashing on combos.
+- [ ] Abstract Sound Waves — oscilloscope-style lines reacting to input.
+- [ ] Holographic Topography Maps — faint 3D contour lines rotating behind the grid.
+- [ ] Augmented Reality Interface (Light Theme) — thin saturated neon on white with scan-lines.
+- [ ] Bio-Neural Network — glowing bio-luminescent tendrils lighting up on cell toggle.
+- [ ] Geometric Data Topography — low-polygon data landscape with glowing vertices.
+- [ ] Particle Accelerator Ring — orbiting energy particles in a circular chamber.
+- [ ] Celestial Blueprint Grid — star field with tracking lines on a coordinate plane.
+- [ ] Deep-Level Cavern Scan — radar scan overlay with blinking pings and text readouts.
+
+## Backgrounds (to do later)
+
+- [ ] Circuit Pathing — PCB-style lines with occasional light pulses.
+- [ ] Ghost Layer (Light Theme) — white background with inner shadow / outer glow cells.
+- [ ] Negative Glow (Light Theme) — depressed cells with color-tinted shadows.
+
 ## Future / Polish
 
 - [ ] Level Selection screen.
