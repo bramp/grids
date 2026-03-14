@@ -3,49 +3,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:csv/csv.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_format.dart';
-import 'package:grids/engine/grid_point.dart';
-import 'package:grids/engine/puzzle.dart';
 import 'package:grids/engine/solver.dart';
+import 'package:grids/solver/puzzle_metrics.dart';
+import 'package:grids/solver/solve_cache.dart';
 
-/// Returns the number of playable (non-locked) cells in the grid.
-int _countPlayable(Puzzle puzzle) {
-  var count = 0;
-  for (var i = 0; i < puzzle.mechanics.length; i++) {
-    if (!puzzle.isLocked(GridPoint(i))) {
-      count++;
-    }
-  }
-  return count;
-}
-
-/// Returns a difficulty rating based on solution density and grid complexity.
-///
-/// Heuristic: score = playableCells - log2(solutionCount)
-/// This represents "how many bits of information you need to find a solution."
-/// Higher = harder.
-String _difficulty(int solutionCount, int playableCells) {
-  if (playableCells == 0) return '⬜ trivial';
-  if (solutionCount == 0) return '🚫 impossible';
-
-  final searchSpace = pow(2, playableCells);
-  final density = solutionCount / searchSpace;
-  final score = -log(density) / ln2;
-
-  if (score <= 4) return '🟢 easy';
-  if (score <= 8) return '🟡 medium';
-  if (score <= 14) return '🟠 hard';
-  return '🔴 expert';
-}
-
-/// Escapes a value for CSV output, quoting if it contains commas or quotes.
-String _csvEscape(String value) {
-  if (value.contains(',') || value.contains('"') || value.contains('\n')) {
-    return '"${value.replaceAll('"', '""')}"';
-  }
-  return value;
-}
+const CsvEncoder _csvEncoder = CsvEncoder();
 
 void main(List<String> args) {
   final maskMode = args.contains('--mask');
@@ -57,6 +22,7 @@ void main(List<String> args) {
 
   final levels = LevelRepository.levels;
   final solver = PuzzleSolver();
+  final cache = SolveCache();
 
   if (filteredArgs.isNotEmpty) {
     final targetId = filteredArgs[0];
@@ -70,7 +36,7 @@ void main(List<String> args) {
 
     final puzzle = level.puzzle;
 
-    final playable = _countPlayable(puzzle);
+    final playable = countPlayable(puzzle);
     final searchSpace = pow(2, playable);
 
     print(
@@ -81,21 +47,24 @@ void main(List<String> args) {
     );
 
     final stopwatch = Stopwatch()..start();
-    final result = solver.solve(puzzle, analyze: true);
-    final solutions = result.solutions;
+    final (:result, :solutions) = cache.solve(
+      solver,
+      puzzle,
+      analyze: true,
+    );
     stopwatch.stop();
 
     final density = searchSpace > 0
         ? (solutions.length / searchSpace * 100).toStringAsFixed(4)
         : 'N/A';
-    final difficulty = _difficulty(solutions.length, playable);
+    final diff = difficulty(solutions.length, playable);
 
     print(
       'Found ${solutions.length} solution(s) in '
       '${stopwatch.elapsedMilliseconds}ms',
     );
     print('Solution density: ${solutions.length}/$searchSpace ($density%)');
-    print('Difficulty: $difficulty');
+    print('Difficulty: $diff');
     print('Average Error Cells: ${result.averageErrors.toStringAsFixed(2)}');
     print('Median Error Cells: ${result.medianErrors.toStringAsFixed(2)}');
     print(
@@ -145,7 +114,7 @@ void main(List<String> args) {
       'time_ms',
       for (var i = 0; i <= maxErrorCount; i++) 'errors_$i',
     ];
-    print(columns.join(','));
+    print(_csvEncoder.convert([columns]).trimRight());
   } else {
     final header =
         '${'ID'.padRight(15)}'
@@ -164,7 +133,7 @@ void main(List<String> args) {
   for (var li = 0; li < levels.length; li++) {
     final level = levels[li];
     final puzzle = level.puzzle;
-    final playable = _countPlayable(puzzle);
+    final playable = countPlayable(puzzle);
     final searchSpace = pow(2, playable);
 
     // Print progress on stderr below stdout output. The \r lets each
@@ -175,38 +144,41 @@ void main(List<String> args) {
     );
 
     final stopwatch = Stopwatch()..start();
-    final result = solver.solve(puzzle, analyze: true);
-    final solutions = result.solutions;
+    final (:result, solutions: _) = cache.solve(
+      solver,
+      puzzle,
+      analyze: true,
+    );
     stopwatch.stop();
 
     final density = searchSpace > 0
-        ? '${(solutions.length / searchSpace * 100).toStringAsFixed(2)}%'
+        ? '${(result.solutions.length / searchSpace * 100).toStringAsFixed(2)}%'
         : 'N/A';
-    final difficulty = _difficulty(solutions.length, playable);
+    final diff = difficulty(result.solutions.length, playable);
 
     // Clear the stderr progress line before printing stdout row.
     stderr.write('\r\x1B[K');
 
     if (csvMode) {
       final densityNum = searchSpace > 0
-          ? (solutions.length / searchSpace * 100).toStringAsFixed(4)
+          ? (result.solutions.length / searchSpace * 100).toStringAsFixed(4)
           : '';
       final row = [
-        _csvEscape(level.id),
+        level.id,
         puzzle.width,
         puzzle.height,
         playable,
         searchSpace,
-        solutions.length,
+        result.solutions.length,
         densityNum,
-        _csvEscape(difficulty),
+        diff,
         result.averageErrors.toStringAsFixed(2),
         result.medianErrors.toStringAsFixed(2),
         result.percentileErrors(0.9).toStringAsFixed(2),
         stopwatch.elapsedMilliseconds,
         for (var i = 0; i <= maxErrorCount; i++) result.errorHistogram[i] ?? 0,
       ];
-      print(row.join(','));
+      print(_csvEncoder.convert([row]).trimRight());
     } else {
       final size = '${puzzle.width}x${puzzle.height}';
       print(
@@ -214,9 +186,9 @@ void main(List<String> args) {
         '${size.padRight(6)}'
         '${playable.toString().padRight(6)}'
         '${searchSpace.toString().padRight(14)}'
-        '${solutions.length.toString().padRight(7)}'
+        '${result.solutions.length.toString().padRight(7)}'
         '${density.padRight(10)}'
-        '${difficulty.padRight(14)}'
+        '${diff.padRight(14)}'
         '${result.averageErrors.toStringAsFixed(2).padRight(9)}'
         '${stopwatch.elapsedMilliseconds}ms',
       );
