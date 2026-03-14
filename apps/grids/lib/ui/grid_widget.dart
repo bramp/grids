@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:flutter/material.dart';
 import 'package:grids/providers/level_provider.dart';
 import 'package:grids/providers/theme_provider.dart';
@@ -16,6 +18,13 @@ import 'package:provider/provider.dart';
 /// focus ring is ever needed, draw it *outside* the [FittedBox].
 const double _referenceCellSize = 100;
 
+/// Minimum grid dimension (in cells) used for layout sizing.
+///
+/// Puzzles smaller than this are still rendered at their actual size, but
+/// the surrounding layout area is padded to this minimum so cells don't
+/// appear oversized. The actual grid is centred within the extra space.
+const int _minGridDimension = 3;
+
 class GridWidget extends StatelessWidget {
   const GridWidget({super.key});
 
@@ -30,44 +39,64 @@ class GridWidget extends StatelessWidget {
     );
     final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
 
+    // Clamp layout dimensions so small puzzles don't get oversized cells.
+    // The actual grid is centred within the extra space.
+    final clampedWidth = max(width, _minGridDimension);
+    final clampedHeight = max(height, _minGridDimension);
+
     return FittedBox(
-      child: theme.buildGridBackground(
-        context,
-        isSolved: isSolved,
-        child: SizedBox(
-          width: width * _referenceCellSize,
-          height: height * _referenceCellSize,
-          child: Listener(
-            onPointerDown: (details) => _handleDrag(
-              context,
-              details.localPosition,
-              width,
-              height,
-            ),
-            onPointerMove: (details) => _handleDrag(
-              context,
-              details.localPosition,
-              width,
-              height,
-            ),
-            onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
-            onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              key: ValueKey(puzzleId),
-              child: Column(
-                children: List.generate(
+      // Stack with an invisible spacer sets the minimum intrinsic size
+      // FittedBox sees, while letting buildGridBackground size naturally
+      // so the border/tube snugly wraps the actual grid.
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Invisible spacer — ensures FittedBox never scales above 3×3
+          // equivalent cell size for small puzzles.
+          SizedBox(
+            width: clampedWidth * _referenceCellSize,
+            height: clampedHeight * _referenceCellSize,
+          ),
+          // Actual grid with theme border — sizes to its natural dimensions.
+          theme.buildGridBackground(
+            context,
+            isSolved: isSolved,
+            child: SizedBox(
+              width: width * _referenceCellSize,
+              height: height * _referenceCellSize,
+              child: Listener(
+                onPointerDown: (details) => _handleDrag(
+                  context,
+                  details.localPosition,
+                  width,
                   height,
-                  (y) => SizedBox(
-                    height: _referenceCellSize,
-                    child: Row(
-                      children: List.generate(
-                        width,
-                        (x) => SizedBox(
-                          width: _referenceCellSize,
-                          height: _referenceCellSize,
-                          child: GridCellWidget(
-                            point: GridPoint(y * width + x),
+                ),
+                onPointerMove: (details) => _handleDrag(
+                  context,
+                  details.localPosition,
+                  width,
+                  height,
+                ),
+                onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
+                onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  key: ValueKey(puzzleId),
+                  child: Column(
+                    children: List.generate(
+                      height,
+                      (y) => SizedBox(
+                        height: _referenceCellSize,
+                        child: Row(
+                          children: List.generate(
+                            width,
+                            (x) => SizedBox(
+                              width: _referenceCellSize,
+                              height: _referenceCellSize,
+                              child: GridCellWidget(
+                                point: GridPoint(y * width + x),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -77,7 +106,7 @@ class GridWidget extends StatelessWidget {
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
