@@ -11,6 +11,7 @@ class ParticleAcceleratorRing extends StatefulWidget {
     this.particleCount = 60,
     this.color = const Color(0xFF00FFCC),
     this.secondaryColor = const Color(0xFF00BB99),
+    this.spread = 40.0,
   });
 
   /// Number of orbiting particles.
@@ -21,6 +22,9 @@ class ParticleAcceleratorRing extends StatefulWidget {
 
   /// Secondary particle / ring color.
   final Color secondaryColor;
+
+  /// How far particles spread from the ring (pixels).
+  final double spread;
 
   @override
   State<ParticleAcceleratorRing> createState() =>
@@ -69,7 +73,7 @@ class _ParticleAcceleratorRingState extends State<ParticleAcceleratorRing>
       return _RingParticle(
         angle: _rng.nextDouble() * 2 * pi,
         speed: 0.8 + _rng.nextDouble() * 0.6,
-        radiusOffset: (_rng.nextDouble() - 0.5) * 20,
+        radiusOffset: (_rng.nextDouble() - 0.5) * widget.spread,
         brightness: 0.1 + _rng.nextDouble() * 0.3,
         size: 1.0 + _rng.nextDouble() * 2.0,
       );
@@ -93,6 +97,7 @@ class _ParticleAcceleratorRingState extends State<ParticleAcceleratorRing>
               particles: _particles,
               color: widget.color,
               secondaryColor: widget.secondaryColor,
+              spread: widget.spread,
               time: _controller.value * 600,
             ),
             size: Size.infinite,
@@ -108,12 +113,14 @@ class _AcceleratorPainter extends CustomPainter {
     required this.particles,
     required this.color,
     required this.secondaryColor,
+    required this.spread,
     required this.time,
   });
 
   final List<_RingParticle> particles;
   final Color color;
   final Color secondaryColor;
+  final double spread;
   final double time;
 
   @override
@@ -139,7 +146,10 @@ class _AcceleratorPainter extends CustomPainter {
     for (var i = 0; i < 4; i++) {
       final startAngle = i * pi / 2 + time * 0.02;
       canvas.drawArc(
-        Rect.fromCircle(center: Offset(cx, cy), radius: radius + 15),
+        Rect.fromCircle(
+          center: Offset(cx, cy),
+          radius: radius + spread * 0.4,
+        ),
         startAngle,
         pi / 6,
         false,

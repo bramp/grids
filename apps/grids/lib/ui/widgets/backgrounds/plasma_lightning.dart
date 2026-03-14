@@ -6,7 +6,21 @@ import 'package:flutter/material.dart';
 /// Ambient plasma lightning arcs that occasionally crackle across the
 /// background in the theme's accent colour.
 class PlasmaLightning extends StatefulWidget {
-  const PlasmaLightning({super.key});
+  const PlasmaLightning({
+    super.key,
+    this.color = const Color(0xFF00FFCC),
+    this.boltWidth = 1.5,
+    this.spawnInterval = 3.5,
+  });
+
+  /// Base bolt color (variants are derived automatically).
+  final Color color;
+
+  /// Maximum stroke width of each bolt's core.
+  final double boltWidth;
+
+  /// Average seconds between bolt spawns.
+  final double spawnInterval;
 
   @override
   State<PlasmaLightning> createState() => _PlasmaLightningState();
@@ -47,21 +61,26 @@ class _PlasmaLightningState extends State<PlasmaLightning>
   /// Seconds between bolt spawns (varies).
   double _nextSpawnAt = 0;
 
-  static const _boltColors = [
-    Color(0xFF00FFCC),
-    Color(0xFF33FFDD),
-    Color(0xFF00DDBB),
-  ];
+  late final List<Color> _boltColors;
 
   @override
   void initState() {
     super.initState();
+
+    // Derive two extra tints from the base color for variety.
+    final hsl = HSLColor.fromColor(widget.color);
+    _boltColors = [
+      widget.color,
+      hsl.withLightness((hsl.lightness + 0.1).clamp(0, 1)).toColor(),
+      hsl.withLightness((hsl.lightness - 0.05).clamp(0, 1)).toColor(),
+    ];
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3600), // long running
     );
     unawaited(_controller.repeat());
-    _nextSpawnAt = 1 + _random.nextDouble() * 3;
+    _nextSpawnAt = 1 + _random.nextDouble() * widget.spawnInterval;
   }
 
   @override
@@ -111,7 +130,8 @@ class _PlasmaLightningState extends State<PlasmaLightning>
       if (_random.nextDouble() < 0.3) {
         _bolts.add(_generateBolt(size, time));
       }
-      _nextSpawnAt = time + 2 + _random.nextDouble() * 5;
+      _nextSpawnAt =
+          time + widget.spawnInterval * (0.6 + _random.nextDouble() * 1.0);
     }
   }
 
@@ -126,7 +146,7 @@ class _PlasmaLightningState extends State<PlasmaLightning>
     return _Bolt(
       points: points,
       color: _boltColors[_random.nextInt(_boltColors.length)],
-      width: 1.0 + _random.nextDouble() * 1.5,
+      width: widget.boltWidth * (0.7 + _random.nextDouble()),
       createdAt: time,
       duration: 0.3 + _random.nextDouble() * 0.4,
     );

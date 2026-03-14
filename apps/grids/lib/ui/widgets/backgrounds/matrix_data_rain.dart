@@ -11,7 +11,7 @@ class MatrixDataRain extends StatefulWidget {
     this.columnWidth = 18.0,
     this.charHeight = 14.0,
     this.fallSpeed = 30.0,
-    this.color = const Color(0xFF1A2A2A),
+    this.color = const Color(0xFF0A3A2A),
     this.accentColor = const Color(0xFF00FFCC),
   });
 

@@ -3,18 +3,25 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-/// Thin horizontal oscilloscope-style lines that gently undulate at the
-/// top and bottom of the screen.
-class AbstractSoundWaves extends StatefulWidget {
-  const AbstractSoundWaves({
+/// Thin horizontal oscilloscope-style lines that gently undulate.
+///
+/// When [mirror] is true (the default), lines appear at both the top and
+/// bottom of the screen.  When false, only the top set is drawn.
+class SoundWaves extends StatefulWidget {
+  const SoundWaves({
     super.key,
     this.lineCount = 3,
+    this.lineSpacing = 12.0,
     this.color = const Color(0xFF00FFCC),
     this.amplitude = 8.0,
+    this.mirror = true,
   });
 
-  /// Number of wave lines at each edge (top and bottom).
+  /// Number of wave lines at each edge.
   final int lineCount;
+
+  /// Vertical spacing between consecutive wave lines (in logical pixels).
+  final double lineSpacing;
 
   /// Base wave color (drawn at low opacity).
   final Color color;
@@ -22,11 +29,14 @@ class AbstractSoundWaves extends StatefulWidget {
   /// Maximum wave amplitude in logical pixels.
   final double amplitude;
 
+  /// Whether to mirror the wave group at the bottom of the screen.
+  final bool mirror;
+
   @override
-  State<AbstractSoundWaves> createState() => _AbstractSoundWavesState();
+  State<SoundWaves> createState() => _SoundWavesState();
 }
 
-class _AbstractSoundWavesState extends State<AbstractSoundWaves>
+class _SoundWavesState extends State<SoundWaves>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -55,8 +65,10 @@ class _AbstractSoundWavesState extends State<AbstractSoundWaves>
           return CustomPaint(
             painter: _WavePainter(
               lineCount: widget.lineCount,
+              lineSpacing: widget.lineSpacing,
               color: widget.color,
               amplitude: widget.amplitude,
+              mirror: widget.mirror,
               time: _controller.value * 120,
             ),
             size: Size.infinite,
@@ -70,14 +82,18 @@ class _AbstractSoundWavesState extends State<AbstractSoundWaves>
 class _WavePainter extends CustomPainter {
   const _WavePainter({
     required this.lineCount,
+    required this.lineSpacing,
     required this.color,
     required this.amplitude,
+    required this.mirror,
     required this.time,
   });
 
   final int lineCount;
+  final double lineSpacing;
   final Color color;
   final double amplitude;
+  final bool mirror;
   final double time;
 
   @override
@@ -86,12 +102,14 @@ class _WavePainter extends CustomPainter {
       final alpha = 0.08 + i * 0.03;
       final freq = 0.02 + i * 0.005;
       final phase = i * 0.7;
-      final yBase = 30.0 + i * 12.0;
+      final yBase = 30.0 + i * lineSpacing;
 
       // Top wave
       _drawWave(canvas, size, yBase, freq, phase, alpha);
       // Bottom wave (mirrored)
-      _drawWave(canvas, size, size.height - yBase, freq, phase + pi, alpha);
+      if (mirror) {
+        _drawWave(canvas, size, size.height - yBase, freq, phase + pi, alpha);
+      }
     }
   }
 

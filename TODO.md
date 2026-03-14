@@ -42,19 +42,16 @@
 
 ## Backgrounds
 
-- [ ] Blueprint Grid — faint coordinate system / technical grid with slow diagonal scroll.
-- [ ] Gaussian "Cloud" Orbs — soft, blurred color blobs that react to cell toggles.
-- [ ] Parallax Depth — tiny particle layer with gyroscope/mouse parallax.
-- [ ] Flowing Plasma Trails — smoke-like wisps that burst on cell toggle.
-- [ ] Matrix Data Rain — dark hex numbers falling in columns, flashing on combos.
-- [ ] Abstract Sound Waves — oscilloscope-style lines reacting to input.
-- [ ] Holographic Topography Maps — faint 3D contour lines rotating behind the grid.
-- [ ] Augmented Reality Interface (Light Theme) — thin saturated neon on white with scan-lines.
-- [ ] Bio-Neural Network — glowing bio-luminescent tendrils lighting up on cell toggle.
-- [ ] Geometric Data Topography — low-polygon data landscape with glowing vertices.
-- [ ] Particle Accelerator Ring — orbiting energy particles in a circular chamber.
-- [ ] Celestial Blueprint Grid — star field with tracking lines on a coordinate plane.
-- [ ] Deep-Level Cavern Scan — radar scan overlay with blinking pings and text readouts.
+- [x] Gaussian "Cloud" Orbs — soft, blurred color blobs that react to cell toggles.
+- [x] Parallax Depth — tiny particle layer with gyroscope/mouse parallax.
+- [x] Flowing Plasma Trails — smoke-like wisps that burst on cell toggle.
+- [x] Matrix Data Rain — dark hex numbers falling in columns, flashing on combos.
+- [x] Sound Waves — oscilloscope-style lines reacting to input.
+- [x] Augmented Reality Interface (Light Theme) — thin saturated neon on white with scan-lines.
+- [x] Bio-Neural Network — glowing bio-luminescent tendrils lighting up on cell toggle.
+- [x] Particle Accelerator Ring — orbiting energy particles in a circular chamber.
+- [x] Plasma Lightning — electrical arcs crackling across the background.
+- [ ] Warp speed - stars flying towards the user.
 
 ## Backgrounds (to do later)
 
@@ -83,6 +80,10 @@
 - [x] All the radius should match
 - [x] Set android:navigationBarColor
 - [ ] Make "success" more obvious.
+- [x] If the puzzle is a small grid, don't make it too large - default to max size of a 4x4 for example
+- [ ] Should we use shaders for the backgrounds?
+- [ ] The dice with 6 or more, are too compact
+- [ ] The flowers look wrong.
 
 ## Code Audit (March 2026)
 

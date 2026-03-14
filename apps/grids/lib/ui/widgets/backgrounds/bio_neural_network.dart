@@ -130,8 +130,8 @@ class _NeuralPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Draw edges (tendrils).
     final edgePaint = Paint()
-      ..color = color.withValues(alpha: 0.04)
-      ..strokeWidth = 0.8
+      ..color = color.withValues(alpha: 0.12)
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
     for (final (i, j) in edges) {
@@ -150,8 +150,8 @@ class _NeuralPainter extends CustomPainter {
       final center = Offset(pos.dx * size.width, pos.dy * size.height);
 
       final pulse = 0.5 + 0.5 * sin(node.pulseFreq * time + node.phase);
-      final alpha = 0.05 + pulse * 0.08;
-      final radius = 2.0 + pulse * 2.0;
+      final alpha = 0.12 + pulse * 0.15;
+      final radius = 2.5 + pulse * 3.0;
 
       final paint = Paint()
         ..color = color.withValues(alpha: alpha)
