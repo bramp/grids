@@ -10,6 +10,22 @@ import 'package:grids/ui/widgets/plasma_lightning.dart';
 /// [_NeonTubePainter.inset].
 const double _neonTubeInset = 13;
 
+/// Corner radius shared across grid and cell elements.
+///
+/// All radii are derived concentrically from [_cellBorderRadius] so nested
+/// rounded rects share the same corner centre:
+///   outerRadius = innerRadius + gap.
+const double _cellBorderRadius = 13;
+
+/// Concentric radius for the inner neon tube painted inside each cell.
+/// Gap = cell inset (5% of cell content height ≈ 4.4px at reference size).
+const double _cellInnerTubeRadius = _cellBorderRadius - 4.4;
+
+/// Concentric radius for the grid-level neon tube.
+/// Gap = distance from tube rect edge to corner cell box edge
+///     = (2 * cellPadding) + cellPadding = 18px at reference size.
+const double _gridTubeRadius = _cellBorderRadius + 18;
+
 class CyberTheme extends PuzzleTheme {
   const CyberTheme();
 
@@ -56,6 +72,7 @@ class CyberTheme extends PuzzleTheme {
               painter: _NeonTubePainter(
                 color: const Color(0xFF00FFCC), // Default Cyan
                 isLit: isSolved,
+                cornerRadius: _gridTubeRadius,
               ),
             ),
           ),
@@ -111,7 +128,7 @@ class CyberTheme extends PuzzleTheme {
     return LayoutBuilder(
       builder: (context, constraints) {
         final s = constraints.maxHeight;
-        final cellBorderRadius = s * 0.15;
+        final cellBorderRadius = s * (_cellBorderRadius / 88);
 
         // --- Shadows ---
         final shadows = <BoxShadow>[
@@ -184,7 +201,7 @@ class CyberTheme extends PuzzleTheme {
                   isLit: isLit || hasError,
                   inset: s * 0.05,
                   tubeWidth: s * 0.04,
-                  cornerRadius: cellBorderRadius * 0.8,
+                  cornerRadius: s * (_cellInnerTubeRadius / 88),
                   glow1Blur: s * 0.08,
                   glow1Spread: s * 0.04,
                   glow2Blur: s * 0.03,

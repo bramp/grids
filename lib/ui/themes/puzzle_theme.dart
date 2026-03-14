@@ -42,7 +42,7 @@ abstract class PuzzleTheme {
       padding: gridPadding,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white, width: 4),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: child,
     );

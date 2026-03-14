@@ -56,7 +56,7 @@ class GridWidget extends StatelessWidget {
             child: Container(
               key: ValueKey(puzzleId),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(8),
                 child: Column(
                   children: List.generate(
                     height,
