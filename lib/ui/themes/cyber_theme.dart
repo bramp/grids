@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grids/engine/cell.dart';
 import 'package:grids/ui/themes/puzzle_theme.dart';
+import 'package:grids/ui/widgets/backgrounds/gaussian_orbs.dart';
+import 'package:grids/ui/widgets/backgrounds/parallax_dust.dart';
+import 'package:grids/ui/widgets/backgrounds/plasma_lightning.dart';
 import 'package:grids/ui/widgets/dice_dots_widget.dart';
-import 'package:grids/ui/widgets/gaussian_orbs.dart';
-import 'package:grids/ui/widgets/parallax_dust.dart';
-import 'package:grids/ui/widgets/plasma_lightning.dart';
 
 /// Inset of the neon tube from the edge of the grid, must match
 /// [_NeonTubePainter.inset].
