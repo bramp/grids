@@ -8,6 +8,7 @@ import 'package:csv/csv.dart';
 import 'package:grids_engine/data/level_repository.dart';
 import 'package:grids_engine/grid_format.dart';
 import 'package:grids_engine/solver.dart';
+import 'package:grids_tools/solver/duration_format.dart';
 import 'package:grids_tools/solver/puzzle_metrics.dart';
 import 'package:grids_tools/solver/solve_cache.dart';
 
@@ -60,7 +61,7 @@ void main(List<String> args) {
 
     print(
       'Found ${solutions.length} solution(s) in '
-      '${solveTimeMs}ms',
+      '${formatDuration(Duration(milliseconds: solveTimeMs))}',
     );
     print('Solution density: ${solutions.length}/$searchSpace ($density%)');
     print('Difficulty: $diff');
@@ -187,7 +188,7 @@ void main(List<String> args) {
         '${density.padRight(10)}'
         '${diff.padRight(14)}'
         '${result.averageErrors.toStringAsFixed(2).padRight(9)}'
-        '${solveTimeMs}ms',
+        '${formatDuration(Duration(milliseconds: solveTimeMs))}',
       );
     }
   }
