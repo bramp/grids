@@ -1,4 +1,6 @@
-// ignore_for_file: avoid_print, Print is allowed in CLI tools.
+// CLI tool using dev deps.
+// ignore_for_file: avoid_print
+// ignore_for_file: depend_on_referenced_packages
 import 'dart:io';
 import 'dart:math';
 
@@ -7,8 +9,8 @@ import 'package:csv/csv.dart';
 import 'package:grids/data/level_repository.dart';
 import 'package:grids/engine/grid_format.dart';
 import 'package:grids/engine/solver.dart';
-import 'package:grids/solver/puzzle_metrics.dart';
-import 'package:grids/solver/solve_cache.dart';
+import 'solver/puzzle_metrics.dart';
+import 'solver/solve_cache.dart';
 
 const CsvEncoder _csvEncoder = CsvEncoder();
 

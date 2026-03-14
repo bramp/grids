@@ -1,4 +1,6 @@
-// ignore_for_file: avoid_print, prefer_final_locals // CLI tool.
+// CLI tool using dev deps.
+// ignore_for_file: avoid_print, prefer_final_locals
+// ignore_for_file: depend_on_referenced_packages
 // NOTE: This generator is a work in progress.
 import 'dart:math';
 

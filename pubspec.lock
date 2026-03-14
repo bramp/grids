@@ -34,7 +34,7 @@ packages:
     source: hosted
     version: "4.0.9"
   args:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: args
       sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
@@ -82,7 +82,7 @@ packages:
     source: hosted
     version: "1.19.1"
   crypto:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: crypto
       sha256: c8ea0233063ba03258fbcf2ca4d6dadfefe14f02fab57702265467a19f27fadf
@@ -98,7 +98,7 @@ packages:
     source: hosted
     version: "1.0.2"
   csv:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: csv
       sha256: e122a402b966b93a4e98925da241ecb3d58d2e62c0aa6486b0c8de4bd405dad5
