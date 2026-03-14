@@ -30,7 +30,7 @@ jobs:
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
           BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          flutter build web --release \
+          cd apps/grids && flutter build web --release \
             --dart-define=COMMIT_HASH=$COMMIT_HASH \
             --dart-define=BUILD_DATE="$BUILD_DATE"
 
@@ -39,5 +39,5 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+          publish_dir: ./apps/grids/build/web
           cname: grid.bramp.net

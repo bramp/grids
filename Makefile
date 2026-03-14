@@ -1,4 +1,4 @@
-.PHONY: all format analyze test test-engine test-app fix clean run run-widgetbook
+.PHONY: all format analyze test test-engine test-app test-app-ci test-golden-ci fix clean run run-widgetbook
 
 # Device to run on: chrome, macos, ios, android (default: chrome)
 DEVICE ?= chrome
@@ -32,6 +32,16 @@ test-engine:
 ## Run app tests
 test-app:
 	cd apps/grids && flutter test
+
+## Run app tests for CI (excludes golden/mac tests, injects build info)
+test-app-ci:
+	cd apps/grids && flutter test --exclude-tags mac \
+		--dart-define=COMMIT_HASH=$$(git rev-parse --short HEAD) \
+		--dart-define=BUILD_DATE="$$(date -u +'%Y-%m-%d %H:%M UTC')"
+
+## Run golden tests for CI (macOS only)
+test-golden-ci:
+	cd apps/grids && flutter test --tags mac
 
 ## Apply auto-fixes
 fix:

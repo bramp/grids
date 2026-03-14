@@ -28,16 +28,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Format
+        run: make format
+
       - name: Analyze
-        run: flutter analyze
+        run: make analyze
+
+      - name: Run engine tests
+        run: make test-engine
 
       - name: Run unit tests
-        run: |
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          flutter test --exclude-tags mac \
-            --dart-define=COMMIT_HASH=$COMMIT_HASH \
-            --dart-define=BUILD_DATE="$BUILD_DATE"
+        run: make test-app-ci
 
   golden_tests:
     runs-on: macos-latest
@@ -60,5 +61,4 @@ jobs:
         run: flutter pub get
 
       - name: Run golden tests
-        run: |
-          flutter test --tags mac
+        run: make test-golden-ci
