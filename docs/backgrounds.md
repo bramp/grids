@@ -61,6 +61,20 @@ The orbs and stars provide a static field. Add a few very thin, horizontal lines
 
 Faint, interlocking contours that slowly rotate in 3D space behind the grid. They don't have to look like real mountains; think stylized data visualization. This adds a sense of immense, intangible space.
 
+### 5. 📋 Warp Drive Star Field
+
+A hyperspace / warp-speed effect — stars streak past the viewer from a central
+vanishing point.
+
+- **The Look:** Tiny white/cyan star dots spawn near the screen centre and
+  accelerate outward, stretching into speed lines as they approach the edges.
+  Brightness and trail length increase with distance from the origin, simulating
+  depth and velocity.
+- **The Polish:** Stars are randomly distributed across multiple depth layers.
+  Nearer stars are brighter and move faster, creating a natural parallax. A
+  subtle bloom or glow on the brightest streaks adds punch without overwhelming
+  the puzzle overlay.
+
 ---
 
 ## Light Theme Concepts

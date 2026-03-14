@@ -12,8 +12,11 @@ import 'package:grids/ui/widgets/backgrounds/parallax_dust.dart';
 import 'package:grids/ui/widgets/backgrounds/particle_accelerator_ring.dart';
 import 'package:grids/ui/widgets/backgrounds/plasma_lightning.dart';
 import 'package:grids/ui/widgets/backgrounds/sound_waves.dart';
+import 'package:grids/ui/widgets/backgrounds/warp_drive_star_field.dart';
 import 'package:grids/ui/widgets/win_animations/code_burst.dart';
+import 'package:grids/ui/widgets/win_animations/confetti_burst.dart';
 import 'package:grids/ui/widgets/win_animations/holographic_overlay.dart';
+import 'package:grids/ui/widgets/win_animations/matrix_ripple.dart';
 import 'package:grids/ui/widgets/win_animations/particle_implosion.dart';
 import 'package:grids/ui/widgets/win_animations/shockwave_ring.dart';
 import 'package:grids_engine/cell.dart';
@@ -23,8 +26,9 @@ import 'package:widgetbook/widgetbook.dart';
 ///
 /// Run with:
 ///   flutter run -t tool/background_demo.dart
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MatrixRipple.precache();
   FlutterNativeSplash.remove();
   runApp(const BackgroundWidgetbook());
 }
@@ -226,16 +230,29 @@ class _InteractivePuzzleGridState extends State<_InteractivePuzzleGrid> {
 
 /// Wrapper that places a win animation over a real CyberTheme puzzle grid and
 /// provides a Replay button to re-trigger the one-shot animation.
+///
+/// Use [animationBuilder] for overlay-style animations (drawn on top of the
+/// grid). Use [childWrapBuilder] for wrapper-style animations that need to
+/// capture and distort the grid content (e.g. shader-based effects).
 class _WinAnimationPreview extends StatefulWidget {
   const _WinAnimationPreview({
     required this.gridSize,
-    required this.animationBuilder,
+    this.animationBuilder,
+    this.childWrapBuilder,
     this.color = _defaultCyan,
-  });
+  }) : assert(
+         animationBuilder != null || childWrapBuilder != null,
+         'Provide either animationBuilder or childWrapBuilder',
+       );
 
   final int gridSize;
   final Color color;
-  final Widget Function(Key key) animationBuilder;
+
+  /// Overlay-style: animation widget stacked on top of the grid.
+  final Widget Function(Key key)? animationBuilder;
+
+  /// Wrapper-style: widget that wraps the grid + background as its child.
+  final Widget Function(Key key, Widget child)? childWrapBuilder;
 
   @override
   State<_WinAnimationPreview> createState() => _WinAnimationPreviewState();
@@ -248,7 +265,7 @@ class _WinAnimationPreviewState extends State<_WinAnimationPreview> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    final grid = Stack(
       fit: StackFit.expand,
       children: [
         const ColoredBox(color: _darkBg, child: SizedBox.expand()),
@@ -256,7 +273,26 @@ class _WinAnimationPreviewState extends State<_WinAnimationPreview> {
           gridSize: widget.gridSize,
           isSolved: true,
         ),
-        widget.animationBuilder(_animKey),
+      ],
+    );
+
+    final Widget content;
+    if (widget.childWrapBuilder != null) {
+      content = widget.childWrapBuilder!(_animKey, grid);
+    } else {
+      content = Stack(
+        fit: StackFit.expand,
+        children: [
+          grid,
+          widget.animationBuilder!(_animKey),
+        ],
+      );
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        content,
         Positioned(
           right: 12,
           bottom: 12,
@@ -538,6 +574,34 @@ class BackgroundWidgetbook extends StatelessWidget {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'WarpDriveStarField',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => _wrap(
+                    WarpDriveStarField(
+                      starCount: context.knobs.int.slider(
+                        label: 'starCount',
+                        initialValue: 150,
+                        min: 20,
+                        max: 400,
+                      ),
+                      color: context.knobs.color(
+                        label: 'color',
+                        initialValue: _defaultCyan,
+                      ),
+                      speed: context.knobs.double.slider(
+                        label: 'speed',
+                        initialValue: 1,
+                        min: 0.2,
+                        max: 3,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         WidgetbookCategory(
@@ -704,6 +768,115 @@ class BackgroundWidgetbook extends StatelessWidget {
                         key: key,
                         color: color,
                         text: text,
+                        duration: Duration(milliseconds: durationMs),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'MatrixRipple',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    final color = context.knobs.color(
+                      label: 'color',
+                      initialValue: _defaultCyan,
+                    );
+                    final waveCount = context.knobs.int.slider(
+                      label: 'waveCount',
+                      initialValue: 1,
+                      min: 1,
+                      max: 8,
+                    );
+                    final durationMs = context.knobs.int.slider(
+                      label: 'duration (ms)',
+                      initialValue: 2000,
+                      min: 500,
+                      max: 5000,
+                    );
+                    final amplitude = context.knobs.double.slider(
+                      label: 'amplitude',
+                      initialValue: 0.016,
+                      min: 0.01,
+                      max: 0.2,
+                      precision: 3,
+                    );
+                    final waveSpacing = context.knobs.double.slider(
+                      label: 'waveSpacing',
+                      initialValue: 0.18,
+                      min: 0.05,
+                      max: 0.4,
+                      precision: 2,
+                    );
+                    final waveDecay = context.knobs.double.slider(
+                      label: 'waveDecay',
+                      initialValue: 0.56,
+                      min: 0.1,
+                      max: 1,
+                      precision: 2,
+                    );
+                    return _WinAnimationPreview(
+                      gridSize: gridSize,
+                      color: color,
+                      childWrapBuilder: (key, child) => MatrixRipple(
+                        key: key,
+                        color: color,
+                        waveCount: waveCount,
+                        amplitude: amplitude,
+                        waveSpacing: waveSpacing,
+                        waveDecay: waveDecay,
+                        duration: Duration(milliseconds: durationMs),
+                        child: child,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ConfettiBurst',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    final color = context.knobs.color(
+                      label: 'color',
+                      initialValue: _defaultCyan,
+                    );
+                    final particleCount = context.knobs.int.slider(
+                      label: 'particleCount',
+                      initialValue: 100,
+                      min: 20,
+                      max: 300,
+                    );
+                    final durationMs = context.knobs.int.slider(
+                      label: 'duration (ms)',
+                      initialValue: 3000,
+                      min: 500,
+                      max: 6000,
+                    );
+                    return _WinAnimationPreview(
+                      gridSize: gridSize,
+                      color: color,
+                      animationBuilder: (key) => ConfettiBurst(
+                        key: key,
+                        color: color,
+                        particleCount: particleCount,
                         duration: Duration(milliseconds: durationMs),
                       ),
                     );

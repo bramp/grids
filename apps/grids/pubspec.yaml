@@ -37,6 +37,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  shaders:
+    - shaders/ripple_distortion.frag
+
   assets:
     - web/privacy.html
 

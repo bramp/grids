@@ -54,3 +54,28 @@ Dynamic and highly kinetic — burst plus undeniable motion.
 - **The Details:** A very quick diagonal scan-flash over the whole UI. Use
   very thin, bright, geometric lines for the shockwave.
 - **The Vibe:** *A release of contained digital pressure.*
+
+## Concept 5: 📋 Matrix Ripple
+
+A reality-warping visual — the screen itself distorts outward from the centre.
+
+- **The Effect:** Concentric rings of distortion pulse outward from the grid
+  centre, "bending" the visible content like a stone dropped in water. A
+  matrix-green tint washes across each wavefront.
+- **The Details:** Multiple staggered wavefronts expand at slightly different
+  speeds. Each ring carries a faint glow and warps the grid lines behind it. The
+  amplitude decays as rings reach the screen edge, leaving the scene still.
+- **The Vibe:** *You cracked the simulation — reality stutters.*
+
+## Concept 6: 📋 Confetti Burst
+
+A classic celebration moment, tuned to the cyber-terminal palette.
+
+- **The Effect:** Rectangular confetti pieces explode outward from the grid
+  centre, tumbling and spinning with realistic physics (gravity, air drag,
+  flutter rotation).
+- **The Details:** Pieces are neon-coloured rectangles (cyan, green, magenta,
+  yellow) that start at high velocity and decelerate under gravity. Each piece
+  has independent 3D rotation (X, Y, Z axes) so the tumble looks natural. A
+  thin bright flash precedes the burst.
+- **The Vibe:** *Pure celebration — no subtlety, just joy.*
