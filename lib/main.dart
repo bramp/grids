@@ -23,6 +23,15 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+  // Lock to portrait mode for puzzle gameplay consistency
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // Enable edge-to-edge mode (especially for modern Android)
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -94,11 +103,21 @@ class GridsApp extends StatelessWidget {
         final themeProvider = context.watch<ThemeProvider>();
         final activeTheme = themeProvider.activeTheme;
 
-        // Ensure the system navigation bar matches the theme background
+        // Ensure the system bars match the theme background and handle contrast
+        final isDark = activeTheme.backgroundColor.computeLuminance() < 0.5;
         SystemChrome.setSystemUIOverlayStyle(
           SystemUiOverlayStyle(
-            systemNavigationBarColor: activeTheme.backgroundColor,
-            systemNavigationBarIconBrightness: Brightness.light,
+            // Use transparent for edge-to-edge look, background color otherwise
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+            systemNavigationBarIconBrightness: isDark
+                ? Brightness.light
+                : Brightness.dark,
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: isDark
+                ? Brightness.light
+                : Brightness.dark,
+            statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
           ),
         );
 
