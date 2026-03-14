@@ -9,10 +9,9 @@ repos:
     hooks:
     -   id: flutter-format
         name: Flutter Format
-        entry: make format
+        entry: dart format
         language: system
         types: [dart]
-        pass_filenames: false
 
     -   id: flutter-analyze
         name: Flutter Analyze
