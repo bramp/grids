@@ -43,36 +43,120 @@ Widget _wrap(Widget child, {Color bg = _darkBg}) {
   );
 }
 
-/// Renders a real CyberTheme grid at [gridSize] × [gridSize] with a seeded
-/// random pattern of lit/unlit cells.
-class _PuzzleGrid extends StatelessWidget {
-  const _PuzzleGrid({this.gridSize = 5});
+/// Renders a real CyberTheme grid at [gridSize] × [gridSize] with interactive
+/// tappable cells.
+class _InteractivePuzzleGrid extends StatefulWidget {
+  const _InteractivePuzzleGrid({
+    this.gridSize = 5,
+    this.isSolved = false,
+    this.showErrors = false,
+    this.lockedCells = false,
+    this.mechanic = _CellMechanic.blank,
+  });
 
   final int gridSize;
+  final bool isSolved;
+  final bool showErrors;
+  final bool lockedCells;
+  final _CellMechanic mechanic;
 
+  @override
+  State<_InteractivePuzzleGrid> createState() => _InteractivePuzzleGridState();
+}
+
+enum _CellMechanic { blank, number, diamond, flower, dash, diagonalDash, void_ }
+
+class _InteractivePuzzleGridState extends State<_InteractivePuzzleGrid> {
   static const _referenceCellSize = 100.0;
   static const _minGridDimension = 3;
   static const _theme = CyberTheme();
 
+  late Set<int> _litCells;
+  int? _pressedCell;
+
+  @override
+  void initState() {
+    super.initState();
+    _seedLitCells();
+  }
+
+  @override
+  void didUpdateWidget(_InteractivePuzzleGrid old) {
+    super.didUpdateWidget(old);
+    if (old.gridSize != widget.gridSize) _seedLitCells();
+  }
+
+  void _seedLitCells() {
+    final rng = Random(42);
+    final total = widget.gridSize * widget.gridSize;
+    _litCells = {
+      for (var i = 0; i < total; i++)
+        if (rng.nextDouble() < 0.4) i,
+    };
+  }
+
+  void _toggleCell(int index) {
+    setState(() {
+      if (_litCells.contains(index)) {
+        _litCells.remove(index);
+      } else {
+        _litCells.add(index);
+      }
+    });
+  }
+
+  Cell _buildMechanic(_CellMechanic type, int idx) {
+    final color = CellColor.values[idx % CellColor.values.length];
+    return switch (type) {
+      _CellMechanic.blank => const BlankCell(),
+      _CellMechanic.number => NumberCell((idx % 4) + 1, color: color),
+      _CellMechanic.diamond => DiamondCell(color),
+      _CellMechanic.flower => FlowerCell(idx % 5),
+      _CellMechanic.dash => DashCell(color),
+      _CellMechanic.diagonalDash => DiagonalDashCell(color),
+      _CellMechanic.void_ => const VoidCell(),
+    };
+  }
+
+  Widget _buildMechanicChild(BuildContext context, Cell mechanic) {
+    return switch (mechanic) {
+      BlankCell() || VoidCell() => const SizedBox.shrink(),
+      NumberCell() => Center(
+        child: _theme.buildNumberMechanic(context, mechanic),
+      ),
+      DiamondCell() => Center(
+        child: _theme.buildDiamondMechanic(context, mechanic),
+      ),
+      FlowerCell() => Center(
+        child: _theme.buildFlowerMechanic(context, mechanic),
+      ),
+      DashCell() => Center(
+        child: _theme.buildDashMechanic(context, mechanic),
+      ),
+      DiagonalDashCell() => Center(
+        child: _theme.buildDiagonalDashMechanic(context, mechanic),
+      ),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    final rng = Random(42);
+    final gridSize = widget.gridSize;
     final clampedSize = max(gridSize, _minGridDimension);
+    final rng = Random(7); // Deterministic for error/lock positions.
 
     return Center(
       child: FittedBox(
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Invisible spacer — ensures small grids don't get oversized.
             SizedBox(
               width: clampedSize * _referenceCellSize,
               height: clampedSize * _referenceCellSize,
             ),
-            // Actual grid with CyberTheme border.
             _theme.buildGridBackground(
               context,
-              isSolved: true,
+              isSolved: widget.isSolved,
               child: SizedBox(
                 width: gridSize * _referenceCellSize,
                 height: gridSize * _referenceCellSize,
@@ -83,22 +167,46 @@ class _PuzzleGrid extends StatelessWidget {
                       height: _referenceCellSize,
                       child: Row(
                         children: List.generate(gridSize, (x) {
-                          final isLit = rng.nextDouble() < 0.4;
+                          final idx = y * gridSize + x;
+                          final isLit = _litCells.contains(idx);
+                          final isLocked =
+                              widget.lockedCells && rng.nextDouble() < 0.2;
+                          final hasError =
+                              widget.showErrors && isLit && idx % 5 == 0;
+
+                          final mechanic = _buildMechanic(
+                            widget.mechanic,
+                            idx,
+                          );
+
                           return SizedBox(
                             width: _referenceCellSize,
                             height: _referenceCellSize,
                             child: Padding(
                               padding: EdgeInsets.all(_theme.cellPadding),
-                              child: _theme.buildCellBackground(
-                                context,
-                                mechanic: const BlankCell(),
-                                isLocked: false,
-                                isLit: isLit,
-                                hasError: false,
-                                isHovered: false,
-                                isFocused: false,
-                                isPressed: false,
-                                child: const SizedBox.shrink(),
+                              child: GestureDetector(
+                                onTapDown: (_) =>
+                                    setState(() => _pressedCell = idx),
+                                onTapUp: (_) {
+                                  setState(() => _pressedCell = null);
+                                  if (!isLocked) _toggleCell(idx);
+                                },
+                                onTapCancel: () =>
+                                    setState(() => _pressedCell = null),
+                                child: _theme.buildCellBackground(
+                                  context,
+                                  mechanic: mechanic,
+                                  isLocked: isLocked,
+                                  isLit: isLit,
+                                  hasError: hasError,
+                                  isHovered: false,
+                                  isFocused: false,
+                                  isPressed: _pressedCell == idx,
+                                  child: _buildMechanicChild(
+                                    context,
+                                    mechanic,
+                                  ),
+                                ),
                               ),
                             ),
                           );
@@ -144,7 +252,10 @@ class _WinAnimationPreviewState extends State<_WinAnimationPreview> {
       fit: StackFit.expand,
       children: [
         const ColoredBox(color: _darkBg, child: SizedBox.expand()),
-        _PuzzleGrid(gridSize: widget.gridSize),
+        _InteractivePuzzleGrid(
+          gridSize: widget.gridSize,
+          isSolved: true,
+        ),
         widget.animationBuilder(_animKey),
         Positioned(
           right: 12,
@@ -166,6 +277,13 @@ class BackgroundWidgetbook extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Widgetbook.material(
+      addons: [
+        ViewportAddon(Viewports.all),
+        TextScaleAddon(),
+        // SemanticsAddon is stable enough for widgetbook usage.
+        // ignore: experimental_member_use
+        SemanticsAddon(),
+      ],
       directories: [
         WidgetbookCategory(
           name: 'Backgrounds',
@@ -437,8 +555,28 @@ class BackgroundWidgetbook extends StatelessWidget {
                       min: 1,
                       max: 8,
                     );
+                    final isSolved = context.knobs.boolean(
+                      label: 'isSolved',
+                    );
+                    final showErrors = context.knobs.boolean(
+                      label: 'showErrors',
+                    );
+                    final lockedCells = context.knobs.boolean(
+                      label: 'lockedCells',
+                    );
+                    final mechanic = context.knobs.object.dropdown(
+                      label: 'mechanic',
+                      options: _CellMechanic.values,
+                      labelBuilder: (m) => m.name,
+                    );
                     return _wrap(
-                      _PuzzleGrid(gridSize: gridSize),
+                      _InteractivePuzzleGrid(
+                        gridSize: gridSize,
+                        isSolved: isSolved,
+                        showErrors: showErrors,
+                        lockedCells: lockedCells,
+                        mechanic: mechanic,
+                      ),
                     );
                   },
                 ),
