@@ -46,10 +46,18 @@ class GameBottomBar extends StatelessWidget {
             child: SizedBox(
               height: 56,
               child: FilledButton.tonal(
-                onPressed: () => context.read<LevelProvider>().checkAnswer(),
+                onPressed: isSolved
+                    ? null
+                    : () => context.read<LevelProvider>().checkAnswer(),
                 style: isSolved
                     ? FilledButton.styleFrom(
                         backgroundColor: solvedColor,
+                        disabledBackgroundColor: solvedColor,
+                        disabledForegroundColor:
+                            ThemeData.estimateBrightnessForColor(solvedColor) ==
+                                Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
                       )
                     : null,
                 child: const Text(

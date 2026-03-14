@@ -24,6 +24,10 @@ void main() {
     float dist = length((uv - center) * aspect);
     float maxDist = length(vec2(0.5, 0.5) * aspect);
 
+    // Overshoot so the ease-out wave comfortably reaches every corner
+    // before its amplitude decays to nothing.
+    float travelDist = maxDist * 1.3;
+
     // Accumulate displacement and glow across all wave fronts.
     float displacement = 0.0;
     float glow = 0.0;
@@ -38,7 +42,7 @@ void main() {
 
         // Ease-out expansion.
         float eased = 1.0 - pow(1.0 - t, 3.0);
-        float waveRadius = eased * maxDist;
+        float waveRadius = eased * travelDist;
 
         // Signed distance to the wave front.
         float waveDist = dist - waveRadius;

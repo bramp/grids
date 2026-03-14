@@ -68,6 +68,7 @@ class LevelProvider extends ChangeNotifier {
   Timer? _errorPulseTimer;
   bool _showErrors = true;
   int _errorPulseCount = 0;
+  bool _showWinAnimation = false;
 
   DateTime _levelStartTime = DateTime(0);
   int _solveAttempts = 0;
@@ -89,6 +90,16 @@ class LevelProvider extends ChangeNotifier {
   GridPoint? get activeDragPoint => _activeDragPoint;
 
   bool get isSolved => _lastValidation?.isValid ?? false;
+
+  /// True only when the user just solved the puzzle via [checkAnswer].
+  /// Reset by calling [clearWinAnimation].
+  bool get showWinAnimation => _showWinAnimation;
+
+  /// Called by the UI after the win animation has played.
+  void clearWinAnimation() {
+    _showWinAnimation = false;
+    notifyListeners();
+  }
 
   Set<String> get unlockedGroups => _unlockedGroups;
 
@@ -159,6 +170,7 @@ class LevelProvider extends ChangeNotifier {
     _errorPulseTimer?.cancel();
     _showErrors = true;
     _errorPulseCount = 0;
+    _showWinAnimation = false;
 
     // Restore the solved UI only when BOTH conditions are met:
     //  1. The user previously clicked "Check Answer" and it passed
@@ -202,6 +214,7 @@ class LevelProvider extends ChangeNotifier {
     _errorPulseTimer?.cancel();
     _showErrors = true;
     _errorPulseCount = 0;
+    _showWinAnimation = false;
     _levelStartTime = clock.now();
     _solveAttempts = 0;
     unawaited(_progressService.clearSolution(_currentLevel.id));
@@ -330,6 +343,8 @@ class LevelProvider extends ChangeNotifier {
     }
 
     if (isValid) {
+      _showWinAnimation = true;
+
       // Mark this level as solved
       unawaited(_progressService.saveLevelSolved(_currentLevel.id));
 
@@ -438,6 +453,7 @@ class LevelProvider extends ChangeNotifier {
     _currentLevel = Level(id: id, puzzle: puzzle);
     _puzzle = puzzle;
     _lastValidation = null;
+    _showWinAnimation = false;
     _levelStartTime = clock.now();
     _solveAttempts = 0;
     notifyListeners();

@@ -17,6 +17,7 @@ import 'package:grids/ui/screens/world_map_screen.dart';
 import 'package:grids/ui/widgets/consent_banner.dart';
 import 'package:grids/ui/widgets/game_app_bar.dart';
 import 'package:grids/ui/widgets/game_bottom_bar.dart';
+import 'package:grids/ui/widgets/win_animations/matrix_ripple.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -45,6 +46,8 @@ void main() async {
   final progressService = ProgressService(preferencesService);
   final consentService = ConsentService(preferencesService);
   final analyticsService = AnalyticsService(consentService);
+
+  await MatrixRipple.precache();
 
   FlutterNativeSplash.remove();
 
@@ -247,22 +250,44 @@ class _GameScreenState extends State<GameScreen> {
             },
           ),
         },
-        child: const Scaffold(
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: GameAppBar(),
-          body: Column(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: GridWidget(),
-                ),
-              ),
-              GameBottomBar(),
-            ],
+          appBar: const GameAppBar(),
+          body: _GameBody(
+            showWin: provider.showWinAnimation,
           ),
         ),
       ),
     );
+  }
+}
+
+class _GameBody extends StatelessWidget {
+  const _GameBody({required this.showWin});
+
+  final bool showWin;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget body = const Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: GridWidget(),
+          ),
+        ),
+        GameBottomBar(),
+      ],
+    );
+
+    if (showWin) {
+      body = MatrixRipple(
+        onComplete: () => context.read<LevelProvider>().clearWinAnimation(),
+        child: body,
+      );
+    }
+
+    return body;
   }
 }

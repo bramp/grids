@@ -44,7 +44,7 @@ class GridWidget extends StatelessWidget {
     final clampedWidth = max(width, _minGridDimension);
     final clampedHeight = max(height, _minGridDimension);
 
-    return FittedBox(
+    final grid = FittedBox(
       // Stack with an invisible spacer sets the minimum intrinsic size
       // FittedBox sees, while letting buildGridBackground size naturally
       // so the border/tube snugly wraps the actual grid.
@@ -109,6 +109,8 @@ class GridWidget extends StatelessWidget {
         ],
       ),
     );
+
+    return grid;
   }
 
   void _handleDrag(

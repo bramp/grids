@@ -22,6 +22,7 @@ class MatrixRipple extends StatefulWidget {
     this.waveSpacing = 0.18,
     this.waveDecay = 0.56,
     this.duration = const Duration(milliseconds: 2000),
+    this.onComplete,
   });
 
   /// Pre-compile the ripple distortion shader. Call once from `main()` before
@@ -59,6 +60,9 @@ class MatrixRipple extends StatefulWidget {
   /// Total animation duration.
   final Duration duration;
 
+  /// Called when the ripple animation finishes.
+  final VoidCallback? onComplete;
+
   @override
   State<MatrixRipple> createState() => _MatrixRippleState();
 }
@@ -78,6 +82,11 @@ class _MatrixRippleState extends State<MatrixRipple>
       vsync: this,
       duration: widget.duration,
     );
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        widget.onComplete?.call();
+      }
+    });
 
     final program = MatrixRipple._program;
     assert(
@@ -119,7 +128,7 @@ class _MatrixRippleState extends State<MatrixRipple>
     final animating = _snapshot != null && _shader != null;
 
     return Stack(
-      fit: StackFit.expand,
+      fit: StackFit.passthrough,
       children: [
         // The child is always in the tree so layout is stable. We hide it via
         // Opacity once the shader takes over rendering.
@@ -131,24 +140,28 @@ class _MatrixRippleState extends State<MatrixRipple>
           ),
         ),
         if (animating)
-          RepaintBoundary(
-            child: ListenableBuilder(
-              listenable: _controller,
-              builder: (context, _) {
-                return CustomPaint(
-                  painter: _RippleShaderPainter(
-                    shader: _shader!,
-                    image: _snapshot!,
-                    progress: _controller.value,
-                    color: widget.color,
-                    waveCount: widget.waveCount,
-                    amplitude: widget.amplitude,
-                    waveSpacing: widget.waveSpacing,
-                    waveDecay: widget.waveDecay,
-                  ),
-                  size: Size.infinite,
-                );
-              },
+          Positioned.fill(
+            child: IgnorePointer(
+              child: RepaintBoundary(
+                child: ListenableBuilder(
+                  listenable: _controller,
+                  builder: (context, _) {
+                    return CustomPaint(
+                      painter: _RippleShaderPainter(
+                        shader: _shader!,
+                        image: _snapshot!,
+                        progress: _controller.value,
+                        color: widget.color,
+                        waveCount: widget.waveCount,
+                        amplitude: widget.amplitude,
+                        waveSpacing: widget.waveSpacing,
+                        waveDecay: widget.waveDecay,
+                      ),
+                      size: Size.infinite,
+                    );
+                  },
+                ),
+              ),
             ),
           ),
       ],
