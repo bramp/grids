@@ -30,14 +30,32 @@ jobs:
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
           BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          cd apps/grids && flutter build web --release \
+          cd apps/grids
+
+          # Create a dist directory to hold both builds
+          mkdir -p build/dist
+
+          # 1. Build the main app
+          flutter build web --release \
             --dart-define=COMMIT_HASH=$COMMIT_HASH \
             --dart-define=BUILD_DATE="$BUILD_DATE"
+
+          # Move main app output into dist/
+          cp -r build/web/* build/dist/
+
+          # 2. Build Widgetbook (using base-href for subdirectory hosting)
+          flutter build web --release \
+            --target=tool/background_demo.dart \
+            --base-href /widgetbook/
+
+          # Move widgetbook output into dist/widgetbook/
+          mkdir -p build/dist/widgetbook
+          cp -r build/web/* build/dist/widgetbook/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./apps/grids/build/web
+          publish_dir: ./apps/grids/build/dist
           cname: grid.bramp.net
