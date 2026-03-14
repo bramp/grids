@@ -65,6 +65,7 @@ class CyberTheme extends PuzzleTheme {
     return Container(
       padding: gridPadding,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           // Surround the entire grid in a cyan neon tube
           Positioned.fill(

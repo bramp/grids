@@ -55,22 +55,19 @@ class GridWidget extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: Container(
               key: ValueKey(puzzleId),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Column(
-                  children: List.generate(
-                    height,
-                    (y) => SizedBox(
-                      height: _referenceCellSize,
-                      child: Row(
-                        children: List.generate(
-                          width,
-                          (x) => SizedBox(
-                            width: _referenceCellSize,
-                            height: _referenceCellSize,
-                            child: GridCellWidget(
-                              point: GridPoint(y * width + x),
-                            ),
+              child: Column(
+                children: List.generate(
+                  height,
+                  (y) => SizedBox(
+                    height: _referenceCellSize,
+                    child: Row(
+                      children: List.generate(
+                        width,
+                        (x) => SizedBox(
+                          width: _referenceCellSize,
+                          height: _referenceCellSize,
+                          child: GridCellWidget(
+                            point: GridPoint(y * width + x),
                           ),
                         ),
                       ),
