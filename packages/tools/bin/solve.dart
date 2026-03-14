@@ -7,10 +7,11 @@ import 'package:collection/collection.dart';
 import 'package:csv/csv.dart';
 import 'package:grids_engine/data/level_repository.dart';
 import 'package:grids_engine/grid_format.dart';
-import 'package:grids_engine/solver.dart';
 import 'package:grids_tools/solver/duration_format.dart';
+import 'package:grids_tools/solver/logical_solver.dart';
 import 'package:grids_tools/solver/puzzle_metrics.dart';
 import 'package:grids_tools/solver/solve_cache.dart';
+import 'package:grids_tools/solver/solver.dart';
 
 const CsvEncoder _csvEncoder = CsvEncoder();
 
@@ -24,6 +25,7 @@ void main(List<String> args) {
 
   final levels = LevelRepository.levels;
   final solver = PuzzleSolver();
+  final logicSolver = LogicalSolver();
   final cache = SolveCache();
 
   if (filteredArgs.isNotEmpty) {
@@ -105,13 +107,18 @@ void main(List<String> args) {
       'height',
       'playable',
       'search_space',
-      'solutions',
+      'solns',
       'density_pct',
       'difficulty',
       'avg_err',
       'median_err',
       'p90_err',
       'time_ms',
+      'logic_dead_ends',
+      'logic_moves',
+      'guess_moves',
+      'logic_ratio',
+      'mechanic_density',
       for (var i = 0; i <= maxErrorCount; i++) 'errors_$i',
     ];
     print(_csvEncoder.convert([columns]).trimRight());
@@ -125,6 +132,7 @@ void main(List<String> args) {
         '${'Density'.padRight(10)}'
         '${'Difficulty'.padRight(14)}'
         '${'Avg Err'.padRight(9)}'
+        '${'L/G Ratio'.padRight(12)}'
         'Time';
     print(header);
     print('─' * header.length);
@@ -149,10 +157,17 @@ void main(List<String> args) {
       analyze: true,
     );
 
+    // Also run our shiny new logic solver on the side just to dump its metrics
+    // for now!
+    // Since analyse=false it should be blazing fast, but we won't cache it yet.
+    final logicResult = logicSolver.solve(puzzle);
+
     final density = searchSpace > 0
         ? '${(result.solutions.length / searchSpace * 100).toStringAsFixed(2)}%'
         : 'N/A';
     final diff = difficulty(result.solutions.length, playable);
+    final lRatio =
+        '${(logicResult.logicVsGuessingRatio * 100).toStringAsFixed(1)}%';
 
     // Clear the stderr progress line before printing stdout row.
     stderr.write('\r\x1B[K');
@@ -174,6 +189,11 @@ void main(List<String> args) {
         result.medianErrors.toStringAsFixed(2),
         result.percentileErrors(0.9).toStringAsFixed(2),
         solveTimeMs,
+        logicResult.deadEnds,
+        logicResult.logicMoves,
+        logicResult.guessMoves,
+        logicResult.logicVsGuessingRatio.toStringAsFixed(4),
+        logicResult.constraintDensity.toStringAsFixed(4),
         for (var i = 0; i <= maxErrorCount; i++) result.errorHistogram[i] ?? 0,
       ];
       print(_csvEncoder.convert([row]).trimRight());
@@ -188,6 +208,7 @@ void main(List<String> args) {
         '${density.padRight(10)}'
         '${diff.padRight(14)}'
         '${result.averageErrors.toStringAsFixed(2).padRight(9)}'
+        '${lRatio.padRight(12)}'
         '${formatDuration(Duration(milliseconds: solveTimeMs))}',
       );
     }

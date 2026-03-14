@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:grids_engine/grid_format.dart';
 import 'package:grids_engine/puzzle.dart';
 import 'package:grids_engine/puzzle_canonical.dart';
-import 'package:grids_engine/solver.dart';
+import 'package:grids_tools/solver/solver.dart';
 
 /// Cache for puzzle solve results, stored as per-puzzle JSON files on disk.
 ///

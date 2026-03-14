@@ -12,7 +12,7 @@ import 'package:grids_engine/grid_state.dart';
 import 'package:grids_engine/puzzle.dart';
 import 'package:grids_engine/puzzle_validator.dart';
 
-import 'package:grids_engine/solver.dart';
+import 'package:grids_tools/solver/solver.dart';
 
 void main(List<String> args) {
   final parser = ArgParser()
