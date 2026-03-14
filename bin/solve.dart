@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print, Print is allowed in CLI tools.
+import 'dart:io';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -38,11 +39,20 @@ String _difficulty(int solutionCount, int playableCells) {
   return '🔴 expert';
 }
 
+/// Escapes a value for CSV output, quoting if it contains commas or quotes.
+String _csvEscape(String value) {
+  if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+    return '"${value.replaceAll('"', '""')}"';
+  }
+  return value;
+}
+
 void main(List<String> args) {
   final maskMode = args.contains('--mask');
   final noColor = args.contains('--no-color');
+  final csvMode = args.contains('--csv');
   final filteredArgs = args
-      .where((a) => a != '--mask' && a != '--no-color')
+      .where((a) => a != '--mask' && a != '--no-color' && a != '--csv')
       .toList();
 
   final levels = LevelRepository.levels;
@@ -106,30 +116,63 @@ void main(List<String> args) {
   }
 
   // Summary mode (when no args provided)
-  print('Grids Solver Summary');
-  print('Usage: dart run bin/solve.dart [--mask] [puzzle_id]');
-  print(
-    '       --mask   Print solutions as parseMask strings for copy-pasting',
-  );
-  print('');
+  if (!csvMode) {
+    print('Grids Solver Summary');
+    print('Usage: dart run bin/solve.dart [--mask] [--csv] [puzzle_id]');
+    print(
+      '       --mask   Print solutions as parseMask strings for copy-pasting',
+    );
+    print('       --csv    Print summary as CSV with histogram data');
+    print('');
+  }
 
-  final header =
-      '${'ID'.padRight(15)}'
-      '${'Size'.padRight(6)}'
-      '${'Play'.padRight(6)}'
-      '${'Search Space'.padRight(14)}'
-      '${'Solns'.padRight(7)}'
-      '${'Density'.padRight(10)}'
-      '${'Difficulty'.padRight(14)}'
-      '${'Avg Err'.padRight(9)}'
-      'Time';
-  print(header);
-  print('─' * header.length);
+  const maxErrorCount = 10;
 
-  for (final level in levels) {
+  if (csvMode) {
+    // CSV header
+    final columns = [
+      'id',
+      'width',
+      'height',
+      'playable',
+      'search_space',
+      'solutions',
+      'density_pct',
+      'difficulty',
+      'avg_err',
+      'median_err',
+      'p90_err',
+      'time_ms',
+      for (var i = 0; i <= maxErrorCount; i++) 'errors_$i',
+    ];
+    print(columns.join(','));
+  } else {
+    final header =
+        '${'ID'.padRight(15)}'
+        '${'Size'.padRight(6)}'
+        '${'Play'.padRight(6)}'
+        '${'Search Space'.padRight(14)}'
+        '${'Solns'.padRight(7)}'
+        '${'Density'.padRight(10)}'
+        '${'Difficulty'.padRight(14)}'
+        '${'Avg Err'.padRight(9)}'
+        'Time';
+    print(header);
+    print('─' * header.length);
+  }
+
+  for (var li = 0; li < levels.length; li++) {
+    final level = levels[li];
     final puzzle = level.puzzle;
     final playable = _countPlayable(puzzle);
     final searchSpace = pow(2, playable);
+
+    // Print progress on stderr below stdout output. The \r lets each
+    // progress line overwrite the previous one without scrolling.
+    stderr.write(
+      '\r\x1B[K[${li + 1}/${levels.length}] Solving ${level.id} '
+      '($playable playable)...',
+    );
 
     final stopwatch = Stopwatch()..start();
     final result = solver.solve(puzzle, analyze: true);
@@ -140,21 +183,44 @@ void main(List<String> args) {
         ? '${(solutions.length / searchSpace * 100).toStringAsFixed(2)}%'
         : 'N/A';
     final difficulty = _difficulty(solutions.length, playable);
-    final size = '${puzzle.width}x${puzzle.height}';
-    final time = '${stopwatch.elapsedMilliseconds}ms';
 
-    final avgErrStr = result.averageErrors.toStringAsFixed(2);
+    // Clear the stderr progress line before printing stdout row.
+    stderr.write('\r\x1B[K');
 
-    print(
-      '${level.id.padRight(15)}'
-      '${size.padRight(6)}'
-      '${playable.toString().padRight(6)}'
-      '${searchSpace.toString().padRight(14)}'
-      '${solutions.length.toString().padRight(7)}'
-      '${density.padRight(10)}'
-      '${difficulty.padRight(14)}'
-      '${avgErrStr.padRight(9)}'
-      '$time',
-    );
+    if (csvMode) {
+      final densityNum = searchSpace > 0
+          ? (solutions.length / searchSpace * 100).toStringAsFixed(4)
+          : '';
+      final row = [
+        _csvEscape(level.id),
+        puzzle.width,
+        puzzle.height,
+        playable,
+        searchSpace,
+        solutions.length,
+        densityNum,
+        _csvEscape(difficulty),
+        result.averageErrors.toStringAsFixed(2),
+        result.medianErrors.toStringAsFixed(2),
+        result.percentileErrors(0.9).toStringAsFixed(2),
+        stopwatch.elapsedMilliseconds,
+        for (var i = 0; i <= maxErrorCount; i++) result.errorHistogram[i] ?? 0,
+      ];
+      print(row.join(','));
+    } else {
+      final size = '${puzzle.width}x${puzzle.height}';
+      print(
+        '${level.id.padRight(15)}'
+        '${size.padRight(6)}'
+        '${playable.toString().padRight(6)}'
+        '${searchSpace.toString().padRight(14)}'
+        '${solutions.length.toString().padRight(7)}'
+        '${density.padRight(10)}'
+        '${difficulty.padRight(14)}'
+        '${result.averageErrors.toStringAsFixed(2).padRight(9)}'
+        '${stopwatch.elapsedMilliseconds}ms',
+      );
+    }
   }
+  stderr.writeln();
 }
