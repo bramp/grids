@@ -46,13 +46,11 @@ void main(List<String> args) {
       '$searchSpace possible states)...',
     );
 
-    final stopwatch = Stopwatch()..start();
-    final (:result, :solutions) = cache.solve(
+    final (:result, :solutions, :solveTimeMs) = cache.solve(
       solver,
       puzzle,
       analyze: true,
     );
-    stopwatch.stop();
 
     final density = searchSpace > 0
         ? (solutions.length / searchSpace * 100).toStringAsFixed(4)
@@ -61,7 +59,7 @@ void main(List<String> args) {
 
     print(
       'Found ${solutions.length} solution(s) in '
-      '${stopwatch.elapsedMilliseconds}ms',
+      '${solveTimeMs}ms',
     );
     print('Solution density: ${solutions.length}/$searchSpace ($density%)');
     print('Difficulty: $diff');
@@ -143,13 +141,11 @@ void main(List<String> args) {
       '($playable playable)...',
     );
 
-    final stopwatch = Stopwatch()..start();
-    final (:result, solutions: _) = cache.solve(
+    final (:result, solutions: _, :solveTimeMs) = cache.solve(
       solver,
       puzzle,
       analyze: true,
     );
-    stopwatch.stop();
 
     final density = searchSpace > 0
         ? '${(result.solutions.length / searchSpace * 100).toStringAsFixed(2)}%'
@@ -175,7 +171,7 @@ void main(List<String> args) {
         result.averageErrors.toStringAsFixed(2),
         result.medianErrors.toStringAsFixed(2),
         result.percentileErrors(0.9).toStringAsFixed(2),
-        stopwatch.elapsedMilliseconds,
+        solveTimeMs,
         for (var i = 0; i <= maxErrorCount; i++) result.errorHistogram[i] ?? 0,
       ];
       print(_csvEncoder.convert([row]).trimRight());
@@ -190,7 +186,7 @@ void main(List<String> args) {
         '${density.padRight(10)}'
         '${diff.padRight(14)}'
         '${result.averageErrors.toStringAsFixed(2).padRight(9)}'
-        '${stopwatch.elapsedMilliseconds}ms',
+        '${solveTimeMs}ms',
       );
     }
   }

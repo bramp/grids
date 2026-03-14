@@ -18,11 +18,12 @@ class SolveCache {
   final String cacheDir;
 
   /// Bump this when adding new cached metrics to force a re-solve.
-  static const version = 1;
+  static const version = 2;
 
   /// Solves a puzzle, using the cache if available.
-  /// Returns the [SolveResult] and the list of [Puzzle] solutions.
-  ({SolveResult result, List<Puzzle> solutions}) solve(
+  /// Returns the [SolveResult], the list of [Puzzle] solutions, and the
+  /// original solve time in milliseconds.
+  ({SolveResult result, List<Puzzle> solutions, int solveTimeMs}) solve(
     PuzzleSolver solver,
     Puzzle puzzle, {
     required bool analyze,
@@ -32,6 +33,7 @@ class SolveCache {
 
     if (cached != null) {
       final solutionCount = cached['solutionCount'] as int;
+      final solveTimeMs = cached['solveTimeMs'] as int;
       final histogramRaw = cached['errorHistogram'] as Map<String, dynamic>;
       final histogram = histogramRaw.map(
         (k, v) => MapEntry(int.parse(k), v as int),
@@ -46,22 +48,30 @@ class SolveCache {
       return (
         result: SolveResult(solutions, errorHistogram: histogram),
         solutions: solutions,
+        solveTimeMs: solveTimeMs,
       );
     }
 
     // Cache miss — solve and store.
+    final stopwatch = Stopwatch()..start();
     final result = solver.solve(puzzle, analyze: analyze);
+    stopwatch.stop();
     final solutions = result.solutions;
 
     _saveEntry(key, {
       'solutionCount': solutions.length,
+      'solveTimeMs': stopwatch.elapsedMilliseconds,
       'errorHistogram': result.errorHistogram.map(
         (k, v) => MapEntry(k.toString(), v),
       ),
       'solutionMasks': solutions.map(GridFormat.toMaskString).toList(),
     });
 
-    return (result: result, solutions: solutions);
+    return (
+      result: result,
+      solutions: solutions,
+      solveTimeMs: stopwatch.elapsedMilliseconds,
+    );
   }
 
   /// Returns a stable SHA-1 hash of [s] as a hex string.
