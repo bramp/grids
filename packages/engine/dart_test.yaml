@@ -1,0 +1,4 @@
+# Test configuration for grids_engine
+# https://github.com/dart-lang/test/blob/master/pkgs/test/doc/configuration.md
+
+timeout: 10s

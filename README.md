@@ -10,10 +10,10 @@
 
 ## Setup & Running
 
-This project uses the standard Flutter framework.
+This project uses [Dart pub workspaces](https://dart.dev/tools/pub/workspaces) with Flutter.
 
 1. Ensure you have Flutter SDK installed (3.11.0 or newer).
-2. Install packages:
+2. Install packages from the workspace root:
 
    ```bash
    flutter pub get
@@ -22,7 +22,7 @@ This project uses the standard Flutter framework.
 3. Run or deploy to your target emulator/browser:
 
    ```bash
-   flutter run -d chrome
+   cd apps/grids && flutter run -d chrome
    ```
 
    (Alternatively, use `-d macos` or an iPhone/Android emulator).
@@ -39,15 +39,32 @@ This project uses Firebase Analytics to track puzzle solve attempts and timing. 
    ```
 
 3. Follow the prompts to select your Firebase project and select the platforms you wish to support.
-4. This will overwrite the placeholder `lib/firebase_options.dart` file with your real credentials, enabling analytics to begin tracking automatically.
+4. This will overwrite the placeholder `apps/grids/lib/firebase_options.dart` file with your real credentials, enabling analytics to begin tracking automatically.
+
+## Project Structure
+
+This project uses [Dart pub workspaces](https://dart.dev/tools/pub/workspaces) to split the codebase into focused packages:
+
+| Package | Path | Description |
+|---------|------|-------------|
+| `grids` | `apps/grids/` | Flutter app — UI, providers, services, platform dirs |
+| `grids_engine` | `packages/engine/` | Pure Dart game engine — grid logic, solver, validators, level data |
+| `grids_tools` | `packages/tools/` | CLI tools — puzzle solver, generator |
 
 ## Testing
 
-The core engine is 100% decoupled from the UI, so it is extensively tested via unit tests. Run all tests locally with:
+The core engine is 100% decoupled from the UI, so it is extensively tested via unit tests. A `Makefile` provides convenient commands for running checks across all packages:
 
-```bash
-flutter test
-```
+| Command | Description |
+|---------|-------------|
+| `make` | Run format, analyze, and all tests |
+| `make format` | Format all Dart code |
+| `make analyze` | Run the analyzer across all packages |
+| `make test` | Run all tests (engine + app) |
+| `make test-engine` | Run engine tests only (pure Dart, fast) |
+| `make test-app` | Run app tests only |
+| `make fix` | Apply auto-fixes from the analyzer |
+| `make clean` | Delete build artifacts |
 
 ## Development
 
@@ -60,7 +77,7 @@ To ensure code quality and consistency, we use [pre-commit](https://pre-commit.c
    pre-commit install
    ```
 
-The hooks will now run automatically on every `git commit`. You can also run them manually on all files:
+The hooks will now run automatically on every `git commit` (they delegate to the Makefile targets). You can also run them manually on all files:
 
 ```bash
 pre-commit run --all-files
@@ -73,13 +90,13 @@ The project includes a brute-force solver that can find all possible solutions f
 To run a summary of all levels:
 
 ```bash
-dart run bin/solve.dart
+cd packages/tools && dart run bin/solve.dart
 ```
 
 To see all solutions for a specific level (and copy-pastable ASCII):
 
 ```bash
-dart run bin/solve.dart shrine_5
+cd packages/tools && dart run bin/solve.dart shrine_5
 ```
 
 This tool is useful for verifying puzzle uniqueness and ensuring that every level in the repository is actually solvable.

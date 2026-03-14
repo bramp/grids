@@ -1,0 +1,57 @@
+import 'package:grids_engine/puzzle.dart';
+import 'package:grids_engine/rule_validator.dart';
+import 'package:grids_engine/validators.dart';
+
+/// Aggregates all cells validation and outputs the final master state
+/// of the full puzzle.
+class PuzzleValidator {
+  PuzzleValidator({
+    this.validators = const [
+      diamondValidator,
+      strictNumberValidator,
+      lockedCellValidator,
+      flowerValidator,
+      dashValidator,
+    ],
+  });
+
+  /// The list of rules to be applied to each contiguous area.
+  final List<RuleValidator> validators;
+
+  /// Returns a new [PuzzleValidator] containing only the rules relevant to
+  /// the given [puzzle].
+  ///
+  /// This optimizes validation by skipping rules for mechanics that are not
+  /// present in the puzzle.
+  PuzzleValidator filter(Puzzle puzzle) {
+    final relevant = validators.where((v) => v.isApplicable(puzzle)).toList();
+    return PuzzleValidator(validators: relevant);
+  }
+
+  /// Evaluates an entire grid state.
+  ///
+  /// Returns a [ValidationResult] representing the entire board.
+  ValidationResult validate(Puzzle puzzle) {
+    var allValid = true;
+    final allErrors = <ValidationError>{};
+
+    final areas = puzzle.extractContiguousAreas();
+
+    // Evaluate every contiguous area against every rule cell
+    for (final area in areas) {
+      for (final validator in validators) {
+        final result = validator.validate(puzzle, area);
+        if (!result.isValid) {
+          allValid = false;
+          allErrors.addAll(result.errors);
+        }
+      }
+    }
+
+    if (allValid) {
+      return ValidationResult.success();
+    }
+
+    return ValidationResult.failure(allErrors.toList());
+  }
+}

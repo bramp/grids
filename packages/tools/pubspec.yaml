@@ -1,0 +1,19 @@
+name: grids_tools
+description: CLI tools for Grids puzzle game.
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+resolution: workspace
+
+dependencies:
+  grids_engine:
+    path: ../engine
+  args: ^2.7.0
+  collection: any
+  crypto: ^3.0.7
+  csv: ^7.2.0
+
+dev_dependencies:
+  very_good_analysis: ^10.2.0

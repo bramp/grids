@@ -31,7 +31,7 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+**/build/
 /coverage/
 
 devtools_options.yaml
@@ -43,9 +43,9 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
 
 # Local temporary files
 analyze_output.txt
@@ -53,4 +53,4 @@ analyze_output.txt
 *.py
 
 # Golden test failure artifacts
-test/failures/
+**/test/failures/

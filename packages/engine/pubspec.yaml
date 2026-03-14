@@ -1,0 +1,16 @@
+name: grids_engine
+description: Pure Dart game engine for Grids puzzle game.
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+resolution: workspace
+
+dependencies:
+  collection: any
+  meta: ^1.11.0
+
+dev_dependencies:
+  test: any
+  very_good_analysis: ^10.2.0
