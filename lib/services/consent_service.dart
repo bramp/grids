@@ -11,7 +11,7 @@ import 'package:grids/services/preferences_service.dart';
 /// necessary and does not require consent.  Analytics (Firebase) is optional
 /// and requires an explicit opt-in.
 class ConsentService extends ChangeNotifier {
-  ConsentService(this._prefs) {
+  ConsentService(this._prefs, {this.debugOverride = kDebugMode}) {
     _analyticsConsent = _prefs.getBool(_keyAnalyticsConsent);
 
     // Apply the stored preference to Firebase immediately.
@@ -20,16 +20,25 @@ class ConsentService extends ChangeNotifier {
 
   final PreferencesService _prefs;
 
+  /// Whether to override consent in debug mode.
+  final bool debugOverride;
+
   static const String _keyAnalyticsConsent = 'analytics_consent';
 
   /// `null` = not yet asked, `true` = accepted, `false` = declined.
   bool? _analyticsConsent;
 
   /// Whether the consent banner still needs to be shown.
-  bool get needsConsent => _analyticsConsent == null;
+  bool get needsConsent {
+    if (debugOverride) return false;
+    return _analyticsConsent == null;
+  }
 
   /// Whether analytics collection is currently allowed.
-  bool get analyticsAllowed => _analyticsConsent == true;
+  bool get analyticsAllowed {
+    if (debugOverride) return true;
+    return _analyticsConsent == true;
+  }
 
   /// Record the user's choice and persist it.
   Future<void> setAnalyticsConsent({required bool allowed}) async {

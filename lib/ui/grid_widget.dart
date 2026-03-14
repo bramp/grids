@@ -5,13 +5,23 @@ import 'package:grids/providers/theme_provider.dart';
 import 'package:grids/ui/grid_cell_widget.dart';
 import 'package:provider/provider.dart';
 
+/// Reference size in logical pixels for a single grid cell.
+///
+/// The entire puzzle is rendered at this fixed scale, then a [FittedBox]
+/// scales it to fit the available space. This keeps padding, borders,
+/// and decorations proportional regardless of grid dimensions.
+///
+/// Note: 1px hairline borders may appear slightly soft after scaling since
+/// they no longer land on exact device-pixel boundaries. If a pixel-perfect
+/// focus ring is ever needed, draw it *outside* the [FittedBox].
+const double _referenceCellSize = 100;
+
 class GridWidget extends StatelessWidget {
   const GridWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Read dimensions from the provider, listening for changes
-    // TODO(bramp): Should we be selecting on both width and height?
     final width = context.select<LevelProvider, int>((p) => p.puzzle.width);
     final height = context.select<LevelProvider, int>((p) => p.puzzle.height);
     final theme = context.watch<ThemeProvider>().activeTheme;
@@ -20,50 +30,46 @@ class GridWidget extends StatelessWidget {
     );
     final isSolved = context.select<LevelProvider, bool>((p) => p.isSolved);
 
-    return Center(
+    return FittedBox(
       child: theme.buildGridBackground(
         context,
         isSolved: isSolved,
-        child: AspectRatio(
-          aspectRatio: width / height,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Listener(
-                onPointerDown: (details) => _handleDrag(
-                  context,
-                  details.localPosition,
-                  constraints.maxWidth,
-                  constraints.maxHeight,
-                  width,
-                  height,
-                ),
-                onPointerMove: (details) => _handleDrag(
-                  context,
-                  details.localPosition,
-                  constraints.maxWidth,
-                  constraints.maxHeight,
-                  width,
-                  height,
-                ),
-                onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
-                onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  key: ValueKey(puzzleId),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Column(
-                      children: List.generate(
-                        height,
-                        (y) => Expanded(
-                          child: Row(
-                            children: List.generate(
-                              width,
-                              (x) => Expanded(
-                                child: GridCellWidget(
-                                  point: GridPoint(y * width + x),
-                                ),
-                              ),
+        child: SizedBox(
+          width: width * _referenceCellSize,
+          height: height * _referenceCellSize,
+          child: Listener(
+            onPointerDown: (details) => _handleDrag(
+              context,
+              details.localPosition,
+              width,
+              height,
+            ),
+            onPointerMove: (details) => _handleDrag(
+              context,
+              details.localPosition,
+              width,
+              height,
+            ),
+            onPointerUp: (_) => context.read<LevelProvider>().endDrag(),
+            onPointerCancel: (_) => context.read<LevelProvider>().endDrag(),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              key: ValueKey(puzzleId),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Column(
+                  children: List.generate(
+                    height,
+                    (y) => SizedBox(
+                      height: _referenceCellSize,
+                      child: Row(
+                        children: List.generate(
+                          width,
+                          (x) => SizedBox(
+                            width: _referenceCellSize,
+                            height: _referenceCellSize,
+                            child: GridCellWidget(
+                              point: GridPoint(y * width + x),
                             ),
                           ),
                         ),
@@ -71,8 +77,8 @@ class GridWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),
@@ -82,17 +88,11 @@ class GridWidget extends StatelessWidget {
   void _handleDrag(
     BuildContext context,
     Offset localPosition,
-    double finalWidth,
-    double finalHeight,
     int gridWidth,
     int gridHeight,
   ) {
-    // Determine which cell we are currently hovering over
-    final cellWidth = finalWidth / gridWidth;
-    final cellHeight = finalHeight / gridHeight;
-
-    final x = (localPosition.dx / cellWidth).floor();
-    final y = (localPosition.dy / cellHeight).floor();
+    final x = (localPosition.dx / _referenceCellSize).floor();
+    final y = (localPosition.dy / _referenceCellSize).floor();
 
     final point = GridPoint(y * gridWidth + x);
     final provider = context.read<LevelProvider>();

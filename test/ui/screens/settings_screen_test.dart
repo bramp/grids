@@ -13,7 +13,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await PreferencesService.init();
-    consentService = ConsentService(prefs);
+    consentService = ConsentService(prefs, debugOverride: false);
   });
 
   Widget buildSubject() {

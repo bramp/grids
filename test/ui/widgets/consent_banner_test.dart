@@ -21,7 +21,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await PreferencesService.init();
-    consentService = ConsentService(prefs);
+    consentService = ConsentService(prefs, debugOverride: false);
   });
 
   testWidgets('shows banner when consent not yet given', (tester) async {
