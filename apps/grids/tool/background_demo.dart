@@ -1,5 +1,8 @@
+import 'dart:math' show Random, max;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:grids/ui/themes/cyber_theme.dart';
 import 'package:grids/ui/widgets/backgrounds/ar_scan_lines.dart';
 import 'package:grids/ui/widgets/backgrounds/bio_neural_network.dart';
 import 'package:grids/ui/widgets/backgrounds/flowing_plasma_trails.dart';
@@ -9,6 +12,11 @@ import 'package:grids/ui/widgets/backgrounds/parallax_dust.dart';
 import 'package:grids/ui/widgets/backgrounds/particle_accelerator_ring.dart';
 import 'package:grids/ui/widgets/backgrounds/plasma_lightning.dart';
 import 'package:grids/ui/widgets/backgrounds/sound_waves.dart';
+import 'package:grids/ui/widgets/win_animations/code_burst.dart';
+import 'package:grids/ui/widgets/win_animations/holographic_overlay.dart';
+import 'package:grids/ui/widgets/win_animations/particle_implosion.dart';
+import 'package:grids/ui/widgets/win_animations/shockwave_ring.dart';
+import 'package:grids_engine/cell.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 /// Standalone Widgetbook for previewing all background scenes.
@@ -33,6 +41,123 @@ Widget _wrap(Widget child, {Color bg = _darkBg}) {
     color: bg,
     child: SizedBox.expand(child: child),
   );
+}
+
+/// Renders a real CyberTheme grid at [gridSize] × [gridSize] with a seeded
+/// random pattern of lit/unlit cells.
+class _PuzzleGrid extends StatelessWidget {
+  const _PuzzleGrid({this.gridSize = 5});
+
+  final int gridSize;
+
+  static const _referenceCellSize = 100.0;
+  static const _minGridDimension = 3;
+  static const _theme = CyberTheme();
+
+  @override
+  Widget build(BuildContext context) {
+    final rng = Random(42);
+    final clampedSize = max(gridSize, _minGridDimension);
+
+    return Center(
+      child: FittedBox(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Invisible spacer — ensures small grids don't get oversized.
+            SizedBox(
+              width: clampedSize * _referenceCellSize,
+              height: clampedSize * _referenceCellSize,
+            ),
+            // Actual grid with CyberTheme border.
+            _theme.buildGridBackground(
+              context,
+              isSolved: true,
+              child: SizedBox(
+                width: gridSize * _referenceCellSize,
+                height: gridSize * _referenceCellSize,
+                child: Column(
+                  children: List.generate(
+                    gridSize,
+                    (y) => SizedBox(
+                      height: _referenceCellSize,
+                      child: Row(
+                        children: List.generate(gridSize, (x) {
+                          final isLit = rng.nextDouble() < 0.4;
+                          return SizedBox(
+                            width: _referenceCellSize,
+                            height: _referenceCellSize,
+                            child: Padding(
+                              padding: EdgeInsets.all(_theme.cellPadding),
+                              child: _theme.buildCellBackground(
+                                context,
+                                mechanic: const BlankCell(),
+                                isLocked: false,
+                                isLit: isLit,
+                                hasError: false,
+                                isHovered: false,
+                                isFocused: false,
+                                isPressed: false,
+                                child: const SizedBox.shrink(),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Wrapper that places a win animation over a real CyberTheme puzzle grid and
+/// provides a Replay button to re-trigger the one-shot animation.
+class _WinAnimationPreview extends StatefulWidget {
+  const _WinAnimationPreview({
+    required this.gridSize,
+    required this.animationBuilder,
+    this.color = _defaultCyan,
+  });
+
+  final int gridSize;
+  final Color color;
+  final Widget Function(Key key) animationBuilder;
+
+  @override
+  State<_WinAnimationPreview> createState() => _WinAnimationPreviewState();
+}
+
+class _WinAnimationPreviewState extends State<_WinAnimationPreview> {
+  var _animKey = UniqueKey();
+
+  void _replay() => setState(() => _animKey = UniqueKey());
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const ColoredBox(color: _darkBg, child: SizedBox.expand()),
+        _PuzzleGrid(gridSize: widget.gridSize),
+        widget.animationBuilder(_animKey),
+        Positioned(
+          right: 12,
+          bottom: 12,
+          child: FloatingActionButton.small(
+            backgroundColor: widget.color.withAlpha(200),
+            onPressed: _replay,
+            child: const Icon(Icons.replay, color: _darkBg),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class BackgroundWidgetbook extends StatelessWidget {
@@ -292,6 +417,201 @@ class BackgroundWidgetbook extends StatelessWidget {
                       ),
                     ),
                   ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookCategory(
+          name: 'Grid',
+          children: [
+            WidgetbookComponent(
+              name: 'PuzzleGrid',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    return _wrap(
+                      _PuzzleGrid(gridSize: gridSize),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookCategory(
+          name: 'Win Animations',
+          children: [
+            WidgetbookComponent(
+              name: 'CodeBurst',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    final color = context.knobs.color(
+                      label: 'color',
+                      initialValue: _defaultCyan,
+                    );
+                    final particleCount = context.knobs.int.slider(
+                      label: 'particleCount',
+                      initialValue: 120,
+                      min: 20,
+                      max: 300,
+                    );
+                    final durationMs = context.knobs.int.slider(
+                      label: 'duration (ms)',
+                      initialValue: 2500,
+                      min: 500,
+                      max: 5000,
+                    );
+                    return _WinAnimationPreview(
+                      gridSize: gridSize,
+                      color: color,
+                      animationBuilder: (key) => CodeBurst(
+                        key: key,
+                        color: color,
+                        particleCount: particleCount,
+                        duration: Duration(milliseconds: durationMs),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ParticleImplosion',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    final color = context.knobs.color(
+                      label: 'color',
+                      initialValue: _defaultCyan,
+                    );
+                    final particleCount = context.knobs.int.slider(
+                      label: 'particleCount',
+                      initialValue: 80,
+                      min: 10,
+                      max: 200,
+                    );
+                    final durationMs = context.knobs.int.slider(
+                      label: 'duration (ms)',
+                      initialValue: 2500,
+                      min: 500,
+                      max: 5000,
+                    );
+                    return _WinAnimationPreview(
+                      gridSize: gridSize,
+                      color: color,
+                      animationBuilder: (key) => ParticleImplosion(
+                        key: key,
+                        color: color,
+                        particleCount: particleCount,
+                        duration: Duration(milliseconds: durationMs),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'HolographicOverlay',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    final color = context.knobs.color(
+                      label: 'color',
+                      initialValue: _defaultCyan,
+                    );
+                    final text = context.knobs.string(
+                      label: 'text',
+                      initialValue: 'SOLVED',
+                    );
+                    final durationMs = context.knobs.int.slider(
+                      label: 'duration (ms)',
+                      initialValue: 3000,
+                      min: 500,
+                      max: 6000,
+                    );
+                    return _WinAnimationPreview(
+                      gridSize: gridSize,
+                      color: color,
+                      animationBuilder: (key) => HolographicOverlay(
+                        key: key,
+                        color: color,
+                        text: text,
+                        duration: Duration(milliseconds: durationMs),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ShockwaveRing',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) {
+                    final gridSize = context.knobs.int.slider(
+                      label: 'gridSize',
+                      initialValue: 5,
+                      min: 1,
+                      max: 8,
+                    );
+                    final color = context.knobs.color(
+                      label: 'color',
+                      initialValue: _defaultCyan,
+                    );
+                    final ringCount = context.knobs.int.slider(
+                      label: 'ringCount',
+                      initialValue: 5,
+                      min: 1,
+                      max: 10,
+                    );
+                    final durationMs = context.knobs.int.slider(
+                      label: 'duration (ms)',
+                      initialValue: 2000,
+                      min: 500,
+                      max: 5000,
+                    );
+                    return _WinAnimationPreview(
+                      gridSize: gridSize,
+                      color: color,
+                      animationBuilder: (key) => ShockwaveRing(
+                        key: key,
+                        color: color,
+                        ringCount: ringCount,
+                        duration: Duration(milliseconds: durationMs),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
